@@ -1,0 +1,51 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# PyInstaller / build
+dist/
+build/
+*.spec
+
+# IDEs / Editors
+# PyCharm
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
+
+# SQLite / DB
+*.db
+
+# Mac / Linux / Windows hidden files
+.DS_Store
+Thumbs.db
+
+# Generated files
+*.pyc
+*.pyo
+
+# Qt / PySide generated files (if using .ui converted to .py)
+*.ui.py
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# Temporary files
+*.tmp
+*.swp
+
+# Resources folder cache (optional)
+*.cache

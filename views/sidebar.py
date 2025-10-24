@@ -62,4 +62,4 @@ class Sidebar(QWidget):
                 print("Failed to run script:", e)
 
     def open_github(self):
-        QDesktopServices.openUrl(QUrl("https://github.com/Quantum-Yeti"))
+        QDesktopServices.openUrl(QUrl("https://github.com/Quantum-Yeti/ScratchBoard"))
