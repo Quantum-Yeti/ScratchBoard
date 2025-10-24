@@ -1,0 +1,67 @@
+/* ====== Global ====== */
+QWidget {
+    background-color: #212121;
+    color: #FAFAFA;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 13px;
+}
+
+/* ====== Sidebar ====== */
+QWidget#Sidebar {
+    background-color: #2E2E2E;
+    padding: 8px;
+}
+
+QPushButton {
+    color: white;
+    background-color: #424242;
+    border-radius: 6px;
+    padding: 8px;
+    text-align: left;
+}
+
+QPushButton:hover {
+    background-color: #616161;
+}
+
+/* ====== Note Card ====== */
+QFrame#NoteCard {
+    border-radius: 12px;
+    padding: 12px;
+}
+
+QLabel#NoteTitle {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* ====== Floating Action Button ====== */
+QPushButton#FloatingButton {
+    background-color: #1976D2;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    border-radius: 30px;
+    border: none;
+}
+
+QPushButton#FloatingButton:hover {
+    background-color: #2196F3;
+}
+
+/* ====== Scrollbar ====== */
+QScrollBar:vertical {
+    background: #2E2E2E;
+    width: 10px;
+    margin: 0;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical {
+    background: #616161;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #757575;
+}
