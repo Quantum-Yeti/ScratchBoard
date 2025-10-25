@@ -1,24 +1,34 @@
+import sys
+import os
 from PySide6.QtWidgets import QPushButton
-
-from PySide6.QtGui import QKeySequence, QShortcut
+from PySide6.QtGui import QIcon, QKeySequence, QShortcut
 from PySide6.QtCore import Qt, QEvent, QPropertyAnimation, QEasingCurve, QPoint
+from utils.resource_path import resource_path
 
 class FloatingButton(QPushButton):
-    def __init__(self, parent, text="+", tooltip="Add", shortcut="Ctrl+N"):
-        super().__init__(text, parent)
+    def __init__(self, parent, icon_path="resources/icons/edit.png", tooltip="Add", shortcut="Ctrl+N", size=60):
+        super().__init__(parent)
         self.setObjectName("FloatingButton")
         self.setToolTip(f"{tooltip} ({shortcut})")
-        self.setFixedSize(60, 60)
+        self.setFixedSize(size, size)
         self.setCursor(Qt.PointingHandCursor)
 
+        # Load icon
+        icon = QIcon(resource_path(icon_path))
+        self.setIcon(icon)
+        self.setIconSize(self.size())  # Icon fills the button
+
+        # Animation for hover lift
         self._anim = QPropertyAnimation(self, b"pos", self)
         self._anim.setDuration(150)
         self._anim.setEasingCurve(QEasingCurve.OutCubic)
 
+        # Event filter for parent resize & hover effects
         self.installEventFilter(self)
         if parent:
             parent.installEventFilter(self)
 
+        # Keyboard shortcut
         self.shortcut = QShortcut(QKeySequence(shortcut), parent)
         self.shortcut.setContext(Qt.ApplicationShortcut)
         self.shortcut.activated.connect(self.click)

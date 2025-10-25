@@ -93,7 +93,7 @@ class NoteModel:
         cur.execute("""
             SELECT notes.*, categories.name as category_name
             FROM notes LEFT JOIN categories ON notes.category_id = categories.id
-            WHERE id=?
+            WHERE notes.id=?
         """, (note_id,))
         return cur.fetchone()
 

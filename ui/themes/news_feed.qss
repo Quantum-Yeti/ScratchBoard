@@ -1,0 +1,14 @@
+#NewsTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-bottom: 10px;
+}
+
+#NewsContent {
+    background-color: #1e1e1e;
+    color: #dcdcdc;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 10px;
+}

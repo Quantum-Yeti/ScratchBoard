@@ -1,11 +1,13 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, Property
-from PySide6.QtGui import QPixmap, QFont
+from PySide6.QtGui import QPixmap
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from collections import defaultdict
 from datetime import datetime
 from utils.resource_path import resource_path
+from views.news_feed import NewsFeedView
+import numpy as np
 
 class StatCard(QFrame):
     """A dark stat card with animated numeric value."""
@@ -62,58 +64,81 @@ class DashboardView(QWidget):
         main_layout.setContentsMargins(12, 12, 12, 12)
         main_layout.setSpacing(12)
 
-        # --- Banner ---
+        # --- Banner + Stats in Horizontal Layout ---
+        top_layout = QHBoxLayout()
+        top_layout.setSpacing(12)
+        main_layout.addLayout(top_layout)
+
         if image_path:
             self.banner = QLabel()
             self.banner.setAlignment(Qt.AlignCenter)
-            main_layout.addWidget(self.banner)
+            self.banner.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+            top_layout.addWidget(self.banner)
             self.update_banner()
 
-        # --- Stat cards ---
         stats_layout = QHBoxLayout()
         stats_layout.setSpacing(16)
-        main_layout.addLayout(stats_layout)
+        stats_widget = QWidget()
+        stats_widget.setLayout(stats_layout)
+        stats_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        top_layout.addWidget(stats_widget)
 
         self.cards = {
             "total": StatCard("Total Notes"),
             "cats": StatCard("Categories"),
-            "avg": StatCard("Avg Length"),
+            "monthly": StatCard("Notes This Month"),
         }
         for c in self.cards.values():
+            c.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             stats_layout.addWidget(c)
 
         # --- Charts Layout ---
         charts_layout = QHBoxLayout()
-        main_layout.addLayout(charts_layout)
+        charts_layout.setSpacing(12)
+        charts_widget = QWidget()
+        charts_widget.setLayout(charts_layout)
+        charts_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        main_layout.addWidget(charts_widget, stretch=3)
 
-        self.line_figure = Figure(figsize=(5, 4), dpi=100)
-        self.line_canvas = FigureCanvas(self.line_figure)
-        charts_layout.addWidget(self.line_canvas)
+        # Stacked Area Chart (Cumulative Notes by Category)
+        self.area_figure = Figure(figsize=(5, 4), dpi=100)
+        self.area_canvas = FigureCanvas(self.area_figure)
+        self.area_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        charts_layout.addWidget(self.area_canvas)
 
-        self.scatter_figure = Figure(figsize=(5, 4), dpi=100)
-        self.scatter_canvas = FigureCanvas(self.scatter_figure)
-        charts_layout.addWidget(self.scatter_canvas)
+        # Heatmap (Note Length by Category and Date)
+        self.heatmap_figure = Figure(figsize=(5, 4), dpi=100)
+        self.heatmap_canvas = FigureCanvas(self.heatmap_figure)
+        self.heatmap_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        charts_layout.addWidget(self.heatmap_canvas)
+
+        # --- News Feed ---
+        self.news_feed = NewsFeedView(
+            feed_url=""
+        )
+        self.news_feed.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        main_layout.addWidget(self.news_feed, stretch=2)
 
         # Initial data
         self.update_stats(animated=False)
         self.update_graphs()
+        self.load_stylesheet()
 
-    #   STATS
+    # --- Stats ---
     def update_stats(self, animated=True):
-        """Recalculate and optionally animate the top stats."""
         categories = self.model.get_all_categories()
         all_notes = []
         for c in categories:
             all_notes.extend(self.model.get_notes(category_name=c))
 
         total = len(all_notes)
-        avg_len = int(sum(len(n["content"]) for n in all_notes) / total) if total else 0
+        monthly_count = sum(1 for n in all_notes if datetime.fromisoformat(n["created"]).month == datetime.now().month)
         cats = len(categories)
 
         values = {
             "total": total,
             "cats": cats,
-            "avg": avg_len,
+            "monthly": monthly_count,
         }
 
         for key, val in values.items():
@@ -124,29 +149,28 @@ class DashboardView(QWidget):
                 card._set_value(val)
 
     def animate_card_value(self, card, new_value):
-        """Smoothly count the number up/down."""
         anim = QPropertyAnimation(card, b"value", self)
         anim.setDuration(800)
         anim.setStartValue(card.value)
         anim.setEndValue(new_value)
         anim.setEasingCurve(QEasingCurve.OutCubic)
         anim.start()
-        # Keep reference alive to prevent garbage collection
         card._anim = anim
 
-    # GRAPHS
+    # --- Graphs ---
     def update_graphs(self):
-        self.update_line_chart()
-        self.update_scatter_plot()
+        self.update_area_chart()
+        self.update_heatmap()
 
-    def update_line_chart(self):
-        self.line_figure.clear()
-        ax = self.line_figure.add_subplot(111)
+    def update_area_chart(self):
+        self.area_figure.clear()
+        ax = self.area_figure.add_subplot(111)
         ax.set_facecolor("#2b2b2b")
-        self.line_figure.patch.set_facecolor("#2b2b2b")
+        self.area_figure.patch.set_facecolor("#2b2b2b")
 
         categories = self.model.get_all_categories()
-        data = defaultdict(list)
+        data_dict = defaultdict(list)
+        all_dates = set()
 
         for cat in categories:
             notes = self.model.get_notes(category_name=cat, order_by="created ASC")
@@ -156,53 +180,67 @@ class DashboardView(QWidget):
             for d in sorted(dates):
                 cumulative += 1
                 by_date[d] = cumulative
-            x = list(by_date.keys())
-            y = list(by_date.values())
-            data[cat] = (x, y)
+                all_dates.add(d)
+            data_dict[cat] = by_date
 
-        for cat, (x, y) in data.items():
-            ax.plot(x, y, marker='o', label=cat)
+        all_dates = sorted(list(all_dates))
+        stack_data = []
+        labels = []
+        for cat, by_date in data_dict.items():
+            y = [by_date.get(d, 0) for d in all_dates]
+            stack_data.append(y)
+            labels.append(cat)
 
-        ax.set_title("Cumulative Notes Over Time", color="#e0e0e0")
+        ax.stackplot(all_dates, stack_data, labels=labels)
+        ax.set_title("Cumulative Notes by Category", color="#e0e0e0")
         ax.set_xlabel("Date", color="#e0e0e0")
         ax.set_ylabel("Total Notes", color="#e0e0e0")
         ax.legend()
         ax.tick_params(colors="#e0e0e0")
-        self.line_canvas.draw()
+        ax.set_xticks([])
+        self.area_canvas.draw()
 
-    def update_scatter_plot(self):
-        self.scatter_figure.clear()
-        ax = self.scatter_figure.add_subplot(111)
+    def update_heatmap(self):
+        self.heatmap_figure.clear()
+        ax = self.heatmap_figure.add_subplot(111)
         ax.set_facecolor("#2b2b2b")
-        self.scatter_figure.patch.set_facecolor("#2b2b2b")
+        self.heatmap_figure.patch.set_facecolor("#2b2b2b")
 
         categories = self.model.get_all_categories()
-        for cat in categories:
-            notes = self.model.get_notes(category_name=cat, order_by="created ASC")
-            x = list(range(1, len(notes) + 1))
-            y = [len(n["content"]) for n in notes]
-            ax.scatter(x, y, label=cat)
+        all_dates = sorted({datetime.fromisoformat(n["created"]).date() for c in categories for n in self.model.get_notes(category_name=c)})
 
-        ax.set_title("Note Length vs. Creation Order", color="#e0e0e0")
-        ax.set_xlabel("Note Index", color="#e0e0e0")
-        ax.set_ylabel("Content Length", color="#e0e0e0")
-        ax.legend()
-        ax.tick_params(colors="#e0e0e0")
-        self.scatter_canvas.draw()
-
-    # BANNER
-    def update_banner(self):
-        """Load and scale the banner image using resource_path."""
-        if not self.image_path:
+        if not all_dates:
             return
 
+        heat_data = []
+        for cat in categories:
+            notes = self.model.get_notes(category_name=cat)
+            y = []
+            for d in all_dates:
+                lengths = [len(n["content"]) for n in notes if datetime.fromisoformat(n["created"]).date() == d]
+                y.append(np.mean(lengths) if lengths else 0)
+            heat_data.append(y)
+
+        im = ax.imshow(heat_data, aspect='auto', cmap='viridis', origin='lower')
+        ax.set_yticks(range(len(categories)))
+        ax.set_yticklabels(categories, color="#e0e0e0")
+        ax.set_xticks([])
+        #ax.set_xticks(range(len(all_dates)))
+        #ax.set_xticklabels([d.strftime("%b %d") for d in all_dates], rotation=45, color="#e0e0e0", ha='right')
+        ax.set_title("Average Note Length per Category by Date", color="#e0e0e0")
+        self.heatmap_figure.colorbar(im, ax=ax)
+        self.heatmap_canvas.draw()
+
+    # --- Banner ---
+    def update_banner(self):
+        if not self.image_path:
+            return
         pixmap = QPixmap(self.image_path)
         if pixmap.isNull():
             print(f"⚠️ Failed to load banner image: {self.image_path}")
             return
-
-        max_width = self.width() - 24
-        max_height = self.height() // 4
+        max_width = 200  # fixed width for left-side banner
+        max_height = self.height() // 2
         scaled_pixmap = pixmap.scaled(
             max_width,
             max_height,
@@ -215,3 +253,11 @@ class DashboardView(QWidget):
         super().resizeEvent(event)
         if hasattr(self, "banner"):
             self.update_banner()
+
+    # --- Stylesheet ---
+    def load_stylesheet(self):
+        try:
+            with open(resource_path("ui/themes/dark.qss"), "r") as f:
+                self.setStyleSheet(f.read())
+        except Exception as e:
+            print("Failed to load dark.qss:", e)

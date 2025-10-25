@@ -8,9 +8,9 @@ from utils.resource_path import resource_path
 import sys
 
 def load_styles(app):
-    qss_path = resource_path("ui/themes/dark.qss")
-    with open(qss_path, "r") as f:
+    with open(resource_path("ui/themes/dark.qss"), "r") as f:
         app.setStyleSheet(f.read())
+
 
 class MainWindow(QMainWindow):
     def __init__(self):

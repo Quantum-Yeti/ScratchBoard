@@ -35,7 +35,7 @@ class MainView(QWidget):
         layout.addWidget(self.scroll)
 
         # Floating add button
-        self.add_btn = FloatingButton(self, text="+", tooltip="Add Note")
+        self.add_btn = FloatingButton(self, icon_path="resources/icons/edit.png", tooltip="Add note", shortcut="Ctrl+N")
 
     def resizeEvent(self, event):
         self.add_btn.reposition()

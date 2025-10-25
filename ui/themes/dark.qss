@@ -21,7 +21,7 @@ QPushButton {
 }
 
 QPushButton:hover {
-    background-color: #616161;
+    background-color: #505050;
 }
 
 /* ====== Note Card ====== */
@@ -37,7 +37,7 @@ QLabel#NoteTitle {
 
 /* ====== Floating Action Button ====== */
 QPushButton#FloatingButton {
-    background-color: #1976D2;
+    background-color: #505050;
     color: white;
     font-size: 28px;
     font-weight: bold;
