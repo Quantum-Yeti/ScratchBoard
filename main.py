@@ -1,11 +1,16 @@
+import time
+
 from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QWidget, QStackedLayout
 from views.dashboard import DashboardView
 from views.sidebar import Sidebar
 from views.main_view import MainView
 from controllers.note_controller import NoteController
 from models.note_model import NoteModel
-from utils.resource_path import resource_path
+from utils.resource_path import resource_path, configure_matplotlib
 import sys
+
+from views.splash_screen import SplashScreen
+
 
 def load_styles(app):
     with open(resource_path("ui/themes/dark.qss"), "r") as f:
@@ -16,6 +21,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ScratchBoard")
+        self.setGeometry(200, 200, 800, 600)
 
         # Model
         self.model = NoteModel()
@@ -66,10 +72,29 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+
+    # --- Splash Screen ---
+    # --- Splash Screen ---
+    splash = SplashScreen(resource_path("resources/icons/astronautsplash.png"))
+
+    # --- Simulated loading steps ---
+    steps = [
+        ("Initializing Matplotlib...", configure_matplotlib),
+        ("Loading modules...", lambda: time.sleep(1)),
+        ("Starting controllers...", lambda: time.sleep(1)),
+        ("Finalizing...", lambda: time.sleep(0.5)),
+    ]
+
+    for i, (msg, func) in enumerate(steps, start=1):
+        splash.set_progress(int(i / len(steps) * 100), msg)
+        func()  # run
+
+    configure_matplotlib()
     load_styles(app)
     window = MainWindow()
-    window.resize(1000, 700)
+    window.resize(1200, 800)
     window.show()
+    splash.close()
     sys.exit(app.exec())
 
 if __name__ == "__main__":
