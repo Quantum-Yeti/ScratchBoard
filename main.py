@@ -1,5 +1,6 @@
 import time
 
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QWidget, QStackedLayout
 from views.dashboard import DashboardView
 from views.sidebar import Sidebar
@@ -21,6 +22,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ScratchBoard")
+        self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
         self.setGeometry(200, 200, 800, 600)
 
         # Model
@@ -73,7 +75,8 @@ class MainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
 
-    # --- Splash Screen ---
+    configure_matplotlib() # needed for pyinstaller
+
     # --- Splash Screen ---
     splash = SplashScreen(resource_path("resources/icons/astronautsplash.png"))
 
@@ -97,5 +100,9 @@ def main():
     splash.close()
     sys.exit(app.exec())
 
+
+
 if __name__ == "__main__":
     main()
+
+

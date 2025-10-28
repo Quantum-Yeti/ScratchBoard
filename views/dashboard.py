@@ -1,11 +1,34 @@
+import os
+import sys
+
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, Property
 from PySide6.QtGui import QPixmap
+
+import matplotlib
+
+# Force QtAgg backend for PySide6
+matplotlib.use("QtAgg")
+
+# Fix datapath for PyInstaller
+try:
+    # If running in a PyInstaller bundle, _MEIPASS is the temp folder
+    base_path = getattr(sys, "_MEIPASS", os.path.abspath("."))
+    mpl_data_path = os.path.join(base_path, "mpl-data")
+    if os.path.exists(mpl_data_path):
+        matplotlib.rcParams["datapath"] = mpl_data_path
+        print(f"[Matplotlib] datapath set to: {mpl_data_path}")
+    else:
+        print("[Matplotlib] mpl-data folder not found, using default.")
+except Exception as e:
+    print(f"[Matplotlib] configuration skipped: {e}")
+
+# Import FigureCanvas after backend is set
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from collections import defaultdict
+
 from datetime import datetime
-from utils.resource_path import resource_path
+from utils.resource_path import resource_path, configure_matplotlib
 from views.news_feed import NewsFeedView
 import numpy as np
 
@@ -57,12 +80,15 @@ class StatCard(QFrame):
 class DashboardView(QWidget):
     def __init__(self, model, image_path=None):
         super().__init__()
+
         self.model = model
         self.image_path = resource_path(image_path) if image_path else None
 
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(12, 12, 12, 12)
         main_layout.setSpacing(12)
+
+        configure_matplotlib()
 
         # --- Banner + Stats in Horizontal Layout ---
         top_layout = QHBoxLayout()
@@ -100,11 +126,11 @@ class DashboardView(QWidget):
         charts_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         main_layout.addWidget(charts_widget, stretch=3)
 
-        # Stacked Area Chart (Cumulative Notes by Category)
-        self.area_figure = Figure(figsize=(5, 4), dpi=100)
-        self.area_canvas = FigureCanvas(self.area_figure)
-        self.area_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        charts_layout.addWidget(self.area_canvas)
+        # Line Chart
+        self.line_figure = Figure(figsize=(5, 4), dpi=100)
+        self.line_canvas = FigureCanvas(self.line_figure)
+        self.line_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        charts_layout.addWidget(self.line_canvas)
 
         # Heatmap (Note Length by Category and Date)
         self.heatmap_figure = Figure(figsize=(5, 4), dpi=100)
@@ -159,46 +185,50 @@ class DashboardView(QWidget):
 
     # --- Graphs ---
     def update_graphs(self):
-        self.update_area_chart()
+        self.update_line_chart()
         self.update_heatmap()
 
-    def update_area_chart(self):
-        self.area_figure.clear()
-        ax = self.area_figure.add_subplot(111)
+
+
+    def update_line_chart(self):
+        self.line_figure.clear()
+        ax = self.line_figure.add_subplot(111)
         ax.set_facecolor("#2b2b2b")
-        self.area_figure.patch.set_facecolor("#2b2b2b")
+        self.line_figure.patch.set_facecolor("#2b2b2b")
 
         categories = self.model.get_all_categories()
-        data_dict = defaultdict(list)
-        all_dates = set()
+        all_dates = sorted({datetime.fromisoformat(n["created"]).date() for c in categories for n in self.model.get_notes(category_name=c)})
+        if not all_dates:
+            return
 
-        for cat in categories:
-            notes = self.model.get_notes(category_name=cat, order_by="created ASC")
-            dates = [datetime.fromisoformat(n["created"]).date() for n in notes]
+        x = list(range(len(all_dates)))
+        colors = ['#4c8caf', '#c24cfa', '#4cfa8c', '#fa4c4c', '#ffa500']
+
+        for i, cat in enumerate(categories):
+            notes = self.model.get_notes(category_name=cat)
             cumulative = 0
-            by_date = defaultdict(int)
-            for d in sorted(dates):
-                cumulative += 1
-                by_date[d] = cumulative
-                all_dates.add(d)
-            data_dict[cat] = by_date
+            y = []
+            for d in all_dates:
+                count = sum(1 for n in notes if datetime.fromisoformat(n["created"]).date() == d)
+                cumulative += count
+                y.append(cumulative)
 
-        all_dates = sorted(list(all_dates))
-        stack_data = []
-        labels = []
-        for cat, by_date in data_dict.items():
-            y = [by_date.get(d, 0) for d in all_dates]
-            stack_data.append(y)
-            labels.append(cat)
+            # Add markers to show points
+            ax.plot(x, y,
+                    color=colors[i % len(colors)],
+                    linewidth=2,
+                    marker='o',  # <-- marker added
+                    markersize=6,  # size of each point
+                    label=cat)
 
-        ax.stackplot(all_dates, stack_data, labels=labels)
-        ax.set_title("Cumulative Notes by Category", color="#e0e0e0")
-        ax.set_xlabel("Date", color="#e0e0e0")
+        ax.set_xticks(x)
+        ax.set_xticklabels([d.strftime("%b %d") for d in all_dates], rotation=45, color="#e0e0e0")
         ax.set_ylabel("Total Notes", color="#e0e0e0")
-        ax.legend()
+        ax.set_title("Cumulative Notes by Category", color="#e0e0e0")
         ax.tick_params(colors="#e0e0e0")
-        ax.set_xticks([])
-        self.area_canvas.draw()
+        ax.legend(facecolor="#2b2b2b", edgecolor="#4c8caf", labelcolor="#e0e0e0")
+
+        self.line_canvas.draw()
 
     def update_heatmap(self):
         self.heatmap_figure.clear()
