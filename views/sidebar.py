@@ -1,16 +1,18 @@
 import subprocess
 from PySide6.QtGui import QIcon, QDesktopServices
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QPlainTextEdit
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
+from views.scratch_view import ScratchPad
 from utils.resource_path import resource_path
 
 class Sidebar(QWidget):
     category_selected = Signal(str)
     dashboard_clicked = Signal()
 
-    def __init__(self):
+    def __init__(self, model=None):
         super().__init__()
         self.setObjectName("Sidebar")
+        self.model = model
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 8)
@@ -38,6 +40,12 @@ class Sidebar(QWidget):
         dash_btn.clicked.connect(lambda: self.dashboard_clicked.emit())
         layout.addWidget(dash_btn)
 
+        self.scratch_btn = QPushButton("Scratch Pad")
+        self.scratch_btn.setIcon(QIcon(resource_path("resources/icons/scratch.png")))
+        self.scratch_btn.setIconSize(QSize(32, 32))
+        self.layout().addWidget(self.scratch_btn)
+        self.scratch_btn.clicked.connect(self.open_scratch_pad)
+
         bat_btn = QPushButton("Run *.bat")
         bat_btn.setIcon(QIcon(resource_path("resources/icons/run.png")))
         bat_btn.setIconSize(QSize(32, 32))
@@ -63,3 +71,11 @@ class Sidebar(QWidget):
 
     def open_github(self):
         QDesktopServices.openUrl(QUrl("https://github.com/Quantum-Yeti/ScratchBoard"))
+
+
+    def open_scratch_pad(self):
+        if hasattr(self, "_scratch_pad") and self._scratch_pad.isVisible():
+            self._scratch_pad.raise_()
+            return
+        self._scratch_pad = ScratchPad(parent=self, model=self.model)
+        self._scratch_pad.show()

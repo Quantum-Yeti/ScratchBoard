@@ -16,38 +16,46 @@ class NoteModel:
         cur.execute("""
             CREATE TABLE IF NOT EXISTS categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT UNIQUE
-            )
+                name TEXT UNIQUE NOT NULL
+            );
         """)
+
         cur.execute("""
             CREATE TABLE IF NOT EXISTS notes (
                 id TEXT PRIMARY KEY,
                 category_id INTEGER,
-                title TEXT,
-                content TEXT,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL,
                 color TEXT,
                 image_path TEXT,
-                created TEXT,
-                updated TEXT,
+                created TEXT NOT NULL,
+                updated TEXT NOT NULL,
                 FOREIGN KEY(category_id) REFERENCES categories(id)
-            )
+                    ON DELETE SET NULL ON UPDATE CASCADE
+            );
         """)
+
+        # Ensure default category always exists
+        cur.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Notes')")
+
+        # Indexes for speed
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_notes_cat ON notes(category_id)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_notes_title ON notes(title)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(updated)")
+
         self.conn.commit()
 
-    # --- Categories ---
+    # --- Category handling ---
     def add_category(self, name):
         cur = self.conn.cursor()
-        try:
-            cur.execute("INSERT INTO categories (name) VALUES (?)", (name,))
-            self.conn.commit()
-        except sqlite3.IntegrityError:
-            pass
+        cur.execute("INSERT OR IGNORE INTO categories (name) VALUES (?)", (name,))
         cur.execute("SELECT id FROM categories WHERE name=?", (name,))
-        return cur.fetchone()["id"]
+        row = cur.fetchone()
+        return row["id"] if row else None
 
     def get_all_categories(self):
         cur = self.conn.cursor()
-        cur.execute("SELECT name FROM categories ORDER BY name")
+        cur.execute("SELECT name FROM categories ORDER BY name ASC")
         return [row["name"] for row in cur.fetchall()]
 
     def get_note_count_by_category(self, category_name):
@@ -75,16 +83,24 @@ class NoteModel:
     def get_notes(self, category_name=None, search=None, order_by="updated DESC"):
         cur = self.conn.cursor()
         params = []
-        query = "SELECT notes.*, categories.name as category_name FROM notes " \
-                "LEFT JOIN categories ON notes.category_id = categories.id WHERE 1=1"
-        if category_name:
+        query = """
+            SELECT notes.*, categories.name as category_name
+            FROM notes
+            LEFT JOIN categories ON notes.category_id = categories.id
+            WHERE 1=1
+        """
+
+        if category_name and category_name != "All Categories":
             query += " AND categories.name=?"
             params.append(category_name)
+
         if search:
-            query += " AND (title LIKE ? OR content LIKE ?)"
             term = f"%{search}%"
+            query += " AND (title LIKE ? OR content LIKE ?)"
             params.extend([term, term])
+
         query += f" ORDER BY {order_by}"
+
         cur.execute(query, params)
         return cur.fetchall()
 
@@ -92,7 +108,8 @@ class NoteModel:
         cur = self.conn.cursor()
         cur.execute("""
             SELECT notes.*, categories.name as category_name
-            FROM notes LEFT JOIN categories ON notes.category_id = categories.id
+            FROM notes
+            LEFT JOIN categories ON notes.category_id = categories.id
             WHERE notes.id=?
         """, (note_id,))
         return cur.fetchone()
@@ -101,15 +118,26 @@ class NoteModel:
         note = self.get_note_by_id(note_id)
         if not note:
             return False
+
         fields, params = [], []
-        if title is not None: fields.append("title=?"); params.append(title)
-        if content is not None: fields.append("content=?"); params.append(content)
+        if title is not None:
+            fields.append("title=?")
+            params.append(title)
+        if content is not None:
+            fields.append("content=?")
+            params.append(content)
         if category_name is not None:
             category_id = self.add_category(category_name)
-            fields.append("category_id=?"); params.append(category_id)
-        if image_path is not None: fields.append("image_path=?"); params.append(image_path)
-        fields.append("updated=?"); params.append(datetime.now().isoformat())
+            fields.append("category_id=?")
+            params.append(category_id)
+        if image_path is not None:
+            fields.append("image_path=?")
+            params.append(image_path)
+
+        fields.append("updated=?")
+        params.append(datetime.now().isoformat())
         params.append(note_id)
+
         query = f"UPDATE notes SET {', '.join(fields)} WHERE id=?"
         self.conn.execute(query, params)
         self.conn.commit()
@@ -118,6 +146,7 @@ class NoteModel:
     def delete_note(self, note_id):
         self.conn.execute("DELETE FROM notes WHERE id=?", (note_id,))
         self.conn.commit()
+        return True
 
     def search_notes(self, term):
         return self.get_notes(search=term)
