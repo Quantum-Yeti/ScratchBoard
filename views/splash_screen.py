@@ -2,12 +2,16 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar
 from PySide6.QtGui import QPixmap, QPalette, QColor
 from PySide6.QtCore import Qt
+from utils.resource_path import resource_path
 
 class SplashScreen(QWidget):
     def __init__(self, image_path: str):
         super().__init__()
         self.setWindowFlags(Qt.SplashScreen | Qt.WindowStaysOnTopHint)
         self.setFixedSize(500, 300)  # Adjust to your image size
+
+        # Sets the dark theme
+        self.apply_dark_theme()
 
         # Set background pixmap
         self.pixmap = QPixmap(image_path)
@@ -34,6 +38,13 @@ class SplashScreen(QWidget):
 
         self.setLayout(self.vbox)
         self.show()
+
+    def apply_dark_theme(self):
+        try:
+            with open(resource_path("ui/themes/dark_theme.qss"), "r") as f:
+                self.setStyleSheet(f.read())
+        except Exception as e:
+            print(f" Failed to load {resource_path('ui/themes/dark_theme.qss')}: {e}")
 
     def set_progress(self, value: int, message: str = ""):
         """Update progress bar and optional message"""

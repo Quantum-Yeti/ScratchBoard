@@ -1,24 +1,41 @@
 from datetime import datetime
 
 import feedparser
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTextBrowser, QScrollArea
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTextBrowser, QScrollArea, QHBoxLayout
 from PySide6.QtCore import Qt, QTimer
 from utils.resource_path import resource_path
 
 
 class NewsFeedView(QWidget):
-    def __init__(self, feed_url="https://news.ycombinator.com/rss" + "https://hackernoon.com/feed"):
+    def __init__(self):
         super().__init__()
-        self.feed_url = feed_url
+        self.feed_url = ["https://news.ycombinator.com/rss",
+                         "https://hackernoon.com/feed"
+        ]
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(8)
 
-        self.title_label = QLabel("📰 Latest News")
-        self.title_label.setAlignment(Qt.AlignCenter)
+        title_widget = QWidget()
+        title_layout = QHBoxLayout(title_widget)
+        title_layout.setContentsMargins(0, 0, 0, 0)
+        title_layout.setAlignment(Qt.AlignCenter)
+
+        # Icon
+        icon_label = QLabel()
+        pixmap = QPixmap(resource_path("resources/icons/news.png"))  # your icon path
+        pixmap = pixmap.scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        icon_label.setPixmap(pixmap)
+        title_layout.addWidget(icon_label)
+
+        # Text label
+        self.title_label = QLabel("Latest News")
         self.title_label.setObjectName("NewsTitle")
-        layout.addWidget(self.title_label)
+        title_layout.addWidget(self.title_label)
+
+        layout.addWidget(title_widget)
 
         self.browser = QTextBrowser()
         self.browser.setOpenExternalLinks(True)

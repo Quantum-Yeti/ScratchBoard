@@ -1,18 +1,24 @@
 import os
 import sys
+from datetime import datetime
 
+import numpy as np
+import matplotlib
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, Property
 from PySide6.QtGui import QPixmap
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 
-import matplotlib
+from utils.resource_path import resource_path, configure_matplotlib
+from views.news_feed import NewsFeedView
+from helpers.dashboard_stats import calculate_stats
 
 # Force QtAgg backend for PySide6
 matplotlib.use("QtAgg")
 
 # Fix datapath for PyInstaller
 try:
-    # If running in a PyInstaller bundle, _MEIPASS is the temp folder
     base_path = getattr(sys, "_MEIPASS", os.path.abspath("."))
     mpl_data_path = os.path.join(base_path, "mpl-data")
     if os.path.exists(mpl_data_path):
@@ -23,22 +29,14 @@ try:
 except Exception as e:
     print(f"[Matplotlib] configuration skipped: {e}")
 
-# Import FigureCanvas after backend is set
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
-
-from datetime import datetime
-from utils.resource_path import resource_path, configure_matplotlib
-from views.news_feed import NewsFeedView
-import numpy as np
 
 class StatCard(QFrame):
     """A dark stat card with animated numeric value."""
+
     def __init__(self, title, value="0"):
         super().__init__()
         self._value = 0
-        self._display_value = QLabel(value)
-        self._display_value.setAlignment(Qt.AlignCenter)
+        self._display_value = QLabel(value, alignment=Qt.AlignCenter)
 
         self.setObjectName("StatCard")
         self.setStyleSheet("""
@@ -47,21 +45,15 @@ class StatCard(QFrame):
                 border-radius: 12px;
                 padding: 10px;
             }
-            QLabel {
-                color: #2b2b2b;
-            }
+            QLabel { color: #2b2b2b; }
         """)
 
         layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignCenter)
 
-        title_label = QLabel(title)
-        title_label.setAlignment(Qt.AlignCenter)
+        title_label = QLabel(title, alignment=Qt.AlignCenter)
         title_label.setStyleSheet("font-size: 13px; font-weight: bold; color: #fff;")
-
-        self._display_value.setStyleSheet(
-            "font-size: 22px; font-weight: bold; color: #4c8caf;"
-        )
+        self._display_value.setStyleSheet("font-size: 22px; font-weight: bold; color: #4c8caf;")
 
         layout.addWidget(title_label)
         layout.addWidget(self._display_value)
@@ -80,7 +72,6 @@ class StatCard(QFrame):
 class DashboardView(QWidget):
     def __init__(self, model, image_path=None):
         super().__init__()
-
         self.model = model
         self.image_path = resource_path(image_path) if image_path else None
 
@@ -90,14 +81,13 @@ class DashboardView(QWidget):
 
         configure_matplotlib()
 
-        # --- Banner + Stats in Horizontal Layout ---
+        # --- Banner + Stats ---
         top_layout = QHBoxLayout()
         top_layout.setSpacing(12)
         main_layout.addLayout(top_layout)
 
         if image_path:
-            self.banner = QLabel()
-            self.banner.setAlignment(Qt.AlignCenter)
+            self.banner = QLabel(alignment=Qt.AlignCenter)
             self.banner.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
             top_layout.addWidget(self.banner)
             self.update_banner()
@@ -118,7 +108,7 @@ class DashboardView(QWidget):
             c.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             stats_layout.addWidget(c)
 
-        # --- Charts Layout ---
+        # --- Charts ---
         charts_layout = QHBoxLayout()
         charts_layout.setSpacing(12)
         charts_widget = QWidget()
@@ -126,47 +116,28 @@ class DashboardView(QWidget):
         charts_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         main_layout.addWidget(charts_widget, stretch=3)
 
-        # Line Chart
         self.line_figure = Figure(figsize=(5, 4), dpi=100)
         self.line_canvas = FigureCanvas(self.line_figure)
         self.line_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         charts_layout.addWidget(self.line_canvas)
 
-        # Heatmap (Note Length by Category and Date)
         self.heatmap_figure = Figure(figsize=(5, 4), dpi=100)
         self.heatmap_canvas = FigureCanvas(self.heatmap_figure)
         self.heatmap_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         charts_layout.addWidget(self.heatmap_canvas)
 
         # --- News Feed ---
-        self.news_feed = NewsFeedView(
-            feed_url=""
-        )
+        self.news_feed = NewsFeedView()
         self.news_feed.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         main_layout.addWidget(self.news_feed, stretch=2)
 
         # Initial data
-        self.update_stats(animated=False)
-        self.update_graphs()
+        self.refresh_dashboard()
         self.load_stylesheet()
 
     # --- Stats ---
     def update_stats(self, animated=True):
-        categories = self.model.get_all_categories()
-        all_notes = []
-        for c in categories:
-            all_notes.extend(self.model.get_notes(category_name=c))
-
-        total = len(all_notes)
-        monthly_count = sum(1 for n in all_notes if datetime.fromisoformat(n["created"]).month == datetime.now().month)
-        cats = len(categories)
-
-        values = {
-            "total": total,
-            "cats": cats,
-            "monthly": monthly_count,
-        }
-
+        values = calculate_stats(self.model)
         for key, val in values.items():
             card = self.cards[key]
             if animated:
@@ -188,7 +159,11 @@ class DashboardView(QWidget):
         self.update_line_chart()
         self.update_heatmap()
 
-
+    # --- Refresh everything ---
+    def refresh_dashboard(self):
+        """Update stats and graphs automatically."""
+        self.update_stats(animated=True)
+        self.update_graphs()
 
     def update_line_chart(self):
         self.line_figure.clear()
@@ -212,14 +187,8 @@ class DashboardView(QWidget):
                 count = sum(1 for n in notes if datetime.fromisoformat(n["created"]).date() == d)
                 cumulative += count
                 y.append(cumulative)
-
-            # Add markers to show points
-            ax.plot(x, y,
-                    color=colors[i % len(colors)],
-                    linewidth=2,
-                    marker='o',  # <-- marker added
-                    markersize=6,  # size of each point
-                    label=cat)
+            ax.plot(x, y, color=colors[i % len(colors)], linewidth=2,
+                    marker='o', markersize=6, label=cat)
 
         ax.set_xticks(x)
         ax.set_xticklabels([d.strftime("%b %d") for d in all_dates], rotation=45, color="#e0e0e0")
@@ -238,7 +207,6 @@ class DashboardView(QWidget):
 
         categories = self.model.get_all_categories()
         all_dates = sorted({datetime.fromisoformat(n["created"]).date() for c in categories for n in self.model.get_notes(category_name=c)})
-
         if not all_dates:
             return
 
@@ -255,8 +223,6 @@ class DashboardView(QWidget):
         ax.set_yticks(range(len(categories)))
         ax.set_yticklabels(categories, color="#e0e0e0")
         ax.set_xticks([])
-        #ax.set_xticks(range(len(all_dates)))
-        #ax.set_xticklabels([d.strftime("%b %d") for d in all_dates], rotation=45, color="#e0e0e0", ha='right')
         ax.set_title("Average Note Length per Category by Date", color="#e0e0e0")
         self.heatmap_figure.colorbar(im, ax=ax)
         self.heatmap_canvas.draw()
@@ -269,14 +235,9 @@ class DashboardView(QWidget):
         if pixmap.isNull():
             print(f"⚠️ Failed to load banner image: {self.image_path}")
             return
-        max_width = 200  # fixed width for left-side banner
+        max_width = 200
         max_height = self.height() // 2
-        scaled_pixmap = pixmap.scaled(
-            max_width,
-            max_height,
-            Qt.KeepAspectRatio,
-            Qt.SmoothTransformation
-        )
+        scaled_pixmap = pixmap.scaled(max_width, max_height, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.banner.setPixmap(scaled_pixmap)
 
     def resizeEvent(self, event):
@@ -287,7 +248,7 @@ class DashboardView(QWidget):
     # --- Stylesheet ---
     def load_stylesheet(self):
         try:
-            with open(resource_path("ui/themes/dark.qss"), "r") as f:
+            with open(resource_path("ui/themes/dark_theme.qss"), "r") as f:
                 self.setStyleSheet(f.read())
         except Exception as e:
-            print("Failed to load dark.qss:", e)
+            print("Failed to load dark_theme.qss:", e)

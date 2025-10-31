@@ -1,9 +1,9 @@
-import subprocess
 from PySide6.QtGui import QIcon, QDesktopServices
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QPlainTextEdit
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QSizePolicy
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
 from views.scratch_view import ScratchPad
 from utils.resource_path import resource_path
+import subprocess
 
 class Sidebar(QWidget):
     category_selected = Signal(str)
@@ -43,7 +43,7 @@ class Sidebar(QWidget):
         self.scratch_btn = QPushButton("Scratch Pad")
         self.scratch_btn.setIcon(QIcon(resource_path("resources/icons/scratch.png")))
         self.scratch_btn.setIconSize(QSize(32, 32))
-        self.layout().addWidget(self.scratch_btn)
+        layout.addWidget(self.scratch_btn)
         self.scratch_btn.clicked.connect(self.open_scratch_pad)
 
         bat_btn = QPushButton("Run *.bat")
@@ -56,12 +56,15 @@ class Sidebar(QWidget):
         logo_btn.setIcon(QIcon(resource_path("resources/icons/dev_logo.png")))
         logo_btn.setIconSize(QSize(32, 32))
         logo_btn.setFlat(True)
-        #logo_btn.setEnabled(False)
         logo_btn.setCursor(Qt.PointingHandCursor)
         logo_btn.clicked.connect(self.open_github)
         layout.addWidget(logo_btn, alignment=Qt.AlignBottom)
 
+        # Keep one instance
+        self._scratch_pad = None
+
     def open_bat_file(self):
+        from PySide6.QtWidgets import QFileDialog
         file_path, _ = QFileDialog.getOpenFileName(self, "Select a *.bat file", "", "*.bat")
         if file_path:
             try:
@@ -72,10 +75,10 @@ class Sidebar(QWidget):
     def open_github(self):
         QDesktopServices.openUrl(QUrl("https://github.com/Quantum-Yeti/ScratchBoard"))
 
-
     def open_scratch_pad(self):
-        if hasattr(self, "_scratch_pad") and self._scratch_pad.isVisible():
+        if self._scratch_pad and self._scratch_pad.isVisible():
             self._scratch_pad.raise_()
-            return
-        self._scratch_pad = ScratchPad(parent=self, model=self.model)
-        self._scratch_pad.show()
+            self._scratch_pad.activateWindow()
+        else:
+            self._scratch_pad = ScratchPad(parent=self, model=self.model)
+            self._scratch_pad.show()
