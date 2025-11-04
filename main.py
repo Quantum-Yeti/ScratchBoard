@@ -1,8 +1,10 @@
+
 import sys
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QWidget, QStackedLayout
 
 from helpers.run_startup import run_startup
+from ui.menu_bar import MainMenuBar
 from views.splash_screen import SplashScreen
 from views.dashboard import DashboardView
 from views.sidebar import Sidebar
@@ -34,15 +36,21 @@ class MainWindow(QMainWindow):
         self.dashboard_view = DashboardView(self.model, image_path="resources/icons/penguin.png")
 
         # --- Sidebar ---
-        self.sidebar = Sidebar()
+        self.sidebar = Sidebar(model=self.model)
         self.sidebar.category_selected.connect(self.on_sidebar_category_selected)
         self.sidebar.dashboard_clicked.connect(self.show_dashboard)
+
+        # Menu
+        menu_bar = MainMenuBar(self)
+        self.setMenuBar(menu_bar)
+
 
         # --- Layout ---
         container = QWidget()
         layout = QHBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
+
 
         # Stacked layout for main content
         self.stacked_layout = QStackedLayout()

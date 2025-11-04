@@ -1,123 +1,148 @@
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QTabWidget, QMessageBox
-)
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout
+from PySide6.QtCore import Qt, QTimer, QPoint, QSize
+from PySide6.QtGui import QColor, QIcon
+from utils.resource_path import resource_path
 
+PASTEL_COLORS = ["#FFEBEE", "#FFF3E0", "#E8F5E9", "#E3F2FD", "#F3E5F5"]
 
-class ScratchPad(QDialog):
-    def __init__(self, parent=None, model=None):
-        super().__init__(parent)
-        self.setWindowTitle("Scratch Pad")
-        self.resize(600, 400)
-        self.setWindowFlag(Qt.WindowStaysOnTopHint)
+def get_text_color(bg_color):
+    """Return black or white depending on background brightness."""
+    c = QColor(bg_color)
+    brightness = (c.red()*299 + c.green()*587 + c.blue()*114) / 1000
+    return "#000000" if brightness > 128 else "#FFFFFF"
+
+class ScratchNote(QDialog):
+    RESIZE_MARGIN = 8
+
+    def __init__(self, model, note_id=None, title="Sticky Note", content="", color=None):
+        super().__init__()
         self.model = model
+        self.note_id = note_id
+        self.color = color or PASTEL_COLORS[0]
+
+        self.setWindowTitle(title)
+        self.setWindowFlag(Qt.WindowStaysOnTopHint)
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setMinimumSize(150, 120)
+        self.resize(300, 250)
+
+        self._drag_active = False
+        self._resize_active = False
+        self._drag_pos = QPoint()
 
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(6, 6, 6, 6)
 
-        # Tabs
-        self.tabs = QTabWidget()
-        layout.addWidget(self.tabs)
+        # Top bar: delete button with padding
+        top_bar = QHBoxLayout()
+        top_bar.setContentsMargins(4, 4, 4, 4)
+        top_bar.addStretch()
 
-        # Mapping from QTextEdit to note ID
-        self.tab_note_map = {}
+        # Delete from database
+        delete_btn = QPushButton()
+        delete_btn.setIcon(QIcon(resource_path("resources/icons/delete_black.png")))
+        delete_btn.setIconSize(QSize(24, 24))
+        delete_btn.setFixedSize(30, 30)  # slightly bigger clickable area
+        delete_btn.setStyleSheet("background: transparent; border: none;")
+        delete_btn.clicked.connect(self.delete_note)
+        top_bar.addWidget(delete_btn)
 
-        # Controls for tabs
-        tab_btn_layout = QHBoxLayout()
-        self.new_tab_btn = QPushButton("New Tab")
-        self.new_tab_btn.clicked.connect(self.add_tab)
-        self.save_tab_btn = QPushButton("Save Tab")
-        self.save_tab_btn.clicked.connect(self.save_current_tab)
-        self.close_tab_btn = QPushButton("Close Tab")
-        self.close_tab_btn.clicked.connect(self.close_current_tab)
-        tab_btn_layout.addWidget(self.new_tab_btn)
-        tab_btn_layout.addWidget(self.save_tab_btn)
-        tab_btn_layout.addWidget(self.close_tab_btn)
-        tab_btn_layout.addStretch()
-        layout.addLayout(tab_btn_layout)
+        # Close window
+        close_btn = QPushButton()
+        close_btn.setIcon(QIcon(resource_path("resources/icons/close_black.png")))
+        close_btn.setIconSize(QSize(24, 24))
+        close_btn.setFixedSize(30, 30)
+        close_btn.setStyleSheet("background: transparent; border: none;")
+        close_btn.clicked.connect(self.close)
+        top_bar.addWidget(close_btn)
 
-        # Load existing scratch notes
-        self.reload_tabs()
+        layout.addLayout(top_bar)
 
-        # Start with one tab if none exist
-        if self.tabs.count() == 0:
-            self.add_tab()
+        # Text edit
+        self.text_edit = QTextEdit()
+        self.text_edit.setText(content)
+        self.text_edit.setPlaceholderText("Type note...")
+        layout.addWidget(self.text_edit)
 
-    def reload_tabs(self):
-        """Clear current tabs and reload all scratch notes from DB."""
-        self.tabs.clear()
-        self.tab_note_map.clear()
+        # Auto-save timer
+        self.auto_save_timer = QTimer(self)
+        self.auto_save_timer.timeout.connect(self.auto_save)
+        self.auto_save_timer.start(2000)
+        self.dirty = False
+        self.text_edit.textChanged.connect(self.mark_dirty)
 
-        if not self.model:
-            return
+        self.apply_style()
 
-        notes = self.model.get_notes(category_name="Scratch Notes", order_by="created ASC")
-        for note in notes:
-            self.add_tab(title=note["title"], content=note["content"], note_id=note["id"])
+    def apply_style(self):
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {self.color};
+                border: 2px solid #888;  /* No border-radius */
+            }}
+            QTextEdit {{
+                background: transparent;
+                border: none;
+                font-size: 14px;
+                color: {get_text_color(self.color)};
+            }}
+        """)
 
-    def add_tab(self, title=None, content="", note_id=None):
-        """Add a new tab. If note_id provided, link to DB note."""
-        text_edit = QTextEdit()
-        text_edit.setPlaceholderText("Write your scratch note here...")
-        text_edit.setText(content)
-        tab_title = title if title else f"Untitled {self.tabs.count() + 1}"
-        self.tabs.addTab(text_edit, tab_title)
-        self.tabs.setCurrentWidget(text_edit)
+    def mark_dirty(self):
+        self.dirty = True
 
-        if self.model:
-            if note_id:
-                self.tab_note_map[text_edit] = note_id
-            else:
-                # Auto-create a note in DB immediately for new tabs
-                new_id = self.model.add_note("Scratch Notes", tab_title, content)
-                self.tab_note_map[text_edit] = new_id
+    def auto_save(self):
+        if self.dirty:
+            self.save_to_db()
+            self.dirty = False
 
-    def save_current_tab(self):
-        widget = self.tabs.currentWidget()
-        if widget:
-            self.save_tab(widget)
-            QMessageBox.information(self, "Saved", "Scratch note saved!")
+    def save_to_db(self):
+        text = self.text_edit.toPlainText().strip()
+        title = text.split("\n")[0][:20] or "Sticky Note"
 
-    def save_tab(self, widget):
-        """Save a specific tab to DB."""
-        if not widget or not self.model:
-            return
-        text = widget.toPlainText().strip()
-        if not text:
-            return
-
-        title_index = self.tabs.indexOf(widget)
-        title = self.tabs.tabText(title_index)
-        note_id = self.tab_note_map.get(widget)
-
-        if note_id:
-            self.model.edit_note(note_id, title=title, content=text)
+        if self.note_id:
+            self.model.edit_note(self.note_id, title=title, content=text)
         else:
-            new_id = self.model.add_note("Scratch Notes", title, text)
-            self.tab_note_map[widget] = new_id
+            self.note_id = self.model.add_note("Sticky Notes", title, text)
 
-    def close_current_tab(self):
-        current_index = self.tabs.currentIndex()
-        if current_index != -1:
-            widget = self.tabs.widget(current_index)
-            confirm = QMessageBox.question(
-                self,
-                "Close Tab?",
-                "Are you sure you want to close this tab? Unsaved content will be saved automatically.",
-                QMessageBox.Yes | QMessageBox.No
-            )
-            if confirm == QMessageBox.Yes:
-                self.save_tab(widget)
-                self.tab_note_map.pop(widget, None)
-                self.tabs.removeTab(current_index)
+        self.setWindowTitle(title)
+
+    # --- Dragging and resizing ---
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            rect = self.rect()
+            if event.pos().x() >= rect.width() - self.RESIZE_MARGIN and event.pos().y() >= rect.height() - self.RESIZE_MARGIN:
+                self._resize_active = True
+            else:
+                self._drag_active = True
+                self._drag_pos = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self._drag_active:
+            self.move(event.globalPosition().toPoint() - self._drag_pos)
+        elif self._resize_active:
+            new_width = max(self.minimumWidth(), event.pos().x())
+            new_height = max(self.minimumHeight(), event.pos().y())
+            self.resize(new_width, new_height)
+        else:
+            rect = self.rect()
+            if event.pos().x() >= rect.width() - self.RESIZE_MARGIN and event.pos().y() >= rect.height() - self.RESIZE_MARGIN:
+                self.setCursor(Qt.SizeFDiagCursor)
+            else:
+                self.setCursor(Qt.ArrowCursor)
+        super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self._drag_active = False
+        self._resize_active = False
+        super().mouseReleaseEvent(event)
+
+    def delete_note(self):
+        """Delete the note from the database"""
+        if self.note_id and self.model:
+            self.model.delete_note(self.note_id)
+        self.close()
 
     def closeEvent(self, event):
-        """Autosave all tabs on close."""
-        for i in range(self.tabs.count()):
-            widget = self.tabs.widget(i)
-            self.save_tab(widget)
+        self.auto_save()
         super().closeEvent(event)
-
-    def showEvent(self, event):
-        """Reload all tabs whenever ScratchPad is shown."""
-        super().showEvent(event)
-        self.reload_tabs()

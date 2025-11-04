@@ -1,7 +1,9 @@
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QSizePolicy
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
-from views.scratch_view import ScratchPad
+
+from views.scratch_manager import ScratchManager
+from views.scratch_view import ScratchNote
 from utils.resource_path import resource_path
 import subprocess
 
@@ -76,9 +78,9 @@ class Sidebar(QWidget):
         QDesktopServices.openUrl(QUrl("https://github.com/Quantum-Yeti/ScratchBoard"))
 
     def open_scratch_pad(self):
-        if self._scratch_pad and self._scratch_pad.isVisible():
-            self._scratch_pad.raise_()
-            self._scratch_pad.activateWindow()
-        else:
-            self._scratch_pad = ScratchPad(parent=self, model=self.model)
-            self._scratch_pad.show()
+        if hasattr(self, "_scratch") and self._scratch.isVisible():
+            self._scratch.raise_()
+            return
+        self._scratch = ScratchManager(model=self.model)
+        self._scratch.show()
+
