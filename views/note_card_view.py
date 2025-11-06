@@ -17,6 +17,7 @@ class NoteCard(QFrame):
         # Title
         title_label = QLabel(note["title"])
         title_label.setObjectName("NoteTitle")
+        title_label.setStyleSheet("background: transparent; border: none;")
         layout.addWidget(title_label)
 
         # Content (rendered Markdown)
@@ -24,6 +25,16 @@ class NoteCard(QFrame):
         content_view.setOpenExternalLinks(True)
         content_view.setStyleSheet("background: transparent; border: none;")
         content_view.setHtml(markdown.markdown(note["content"]))
+
+        # Hide scrollbars but keep original size
+        content_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        content_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        content_view.setSizePolicy(
+            content_view.sizePolicy().horizontalPolicy(),
+            content_view.sizePolicy().verticalPolicy()
+        )
+
+        # Content
         layout.addWidget(content_view)
 
         # Apply stylesheet

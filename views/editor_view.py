@@ -60,10 +60,15 @@ class EditorPanel(QDialog):
 
         # ---------------- Right (Preview)
         self.preview = QTextBrowser()
+        self.preview.setObjectName("PreviewPanel")
+        self.preview.setAutoFillBackground(True)
+
+
+        left_l.addWidget(self.preview, stretch=1)
         self.preview.setOpenExternalLinks(True)
         self._opacity = QGraphicsOpacityEffect(self.preview)
         self.preview.setGraphicsEffect(self._opacity)
-        self._opacity.setOpacity(1.0)
+        self._opacity.setOpacity(1)
         splitter.addWidget(self.preview)
 
         splitter.setSizes([620, 480])

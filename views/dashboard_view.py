@@ -14,6 +14,7 @@ from utils.resource_path import resource_path, configure_matplotlib
 
 from helpers.dashboard_stats import calculate_stats
 from views.recent_note_view import RecentNoteView
+from views.time_clock import TimezoneClock
 
 # Force QtAgg backend for PySide6
 matplotlib.use("QtAgg")
@@ -127,9 +128,34 @@ class DashboardView(QWidget):
         self.heatmap_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         charts_layout.addWidget(self.heatmap_canvas)
 
-        # --- Most Recent Note ---
+        # --- Recent Note + Timezone Clock Side-by-Side ---
+        recent_tz_layout = QHBoxLayout()
+        recent_tz_layout.setSpacing(12)
+
+        # Left: Recent notes
         self.recent_view = RecentNoteView(self.model, self.open_note_callback)
-        main_layout.addWidget(self.recent_view, stretch=2)
+        recent_tz_layout.addWidget(self.recent_view, stretch=3)
+
+        # Right: Timezone clock with title
+        tz_layout = QVBoxLayout()
+        tz_layout.setSpacing(6)
+
+        tz_title = QLabel("Timezones", alignment=Qt.AlignCenter)
+        tz_title.setStyleSheet("font-size: 11pt; font-weight: bold; color: #fff;")
+        tz_layout.addWidget(tz_title)
+
+        self.timezone_clock = TimezoneClock()
+        tz_layout.addWidget(self.timezone_clock, stretch=1)
+
+        tz_widget = QWidget()
+        tz_widget.setLayout(tz_layout)
+        tz_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        recent_tz_layout.addWidget(tz_widget, stretch=1)
+
+        # Wrap both sides in a widget
+        recent_tz_widget = QWidget()
+        recent_tz_widget.setLayout(recent_tz_layout)
+        main_layout.addWidget(recent_tz_widget, stretch=2)
 
         # Initial data
         self.refresh_dashboard()
@@ -233,7 +259,7 @@ class DashboardView(QWidget):
             return
         pixmap = QPixmap(self.image_path)
         if pixmap.isNull():
-            print(f"⚠️ Failed to load banner image: {self.image_path}")
+            print(f"Failed to load banner image: {self.image_path}")
             return
         max_width = 200
         max_height = self.height() // 2

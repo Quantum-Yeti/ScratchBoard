@@ -63,3 +63,8 @@ QPushButton#CancelButton {
 QPushButton#CancelButton:hover {
     background-color: #555;
 }
+
+QTextBrowser#PreviewPanel {
+    background-color: #0f1720;
+    color: #dddddd;
+}

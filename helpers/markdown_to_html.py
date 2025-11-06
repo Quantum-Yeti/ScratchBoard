@@ -12,14 +12,88 @@ from pygments.formatters import HtmlFormatter
 # CSS used for code blocks (Pygments + small github-like tweaks)
 PYGMENTS_CSS = HtmlFormatter(nowrap=True).get_style_defs(".codehilite")
 EXTRA_CSS = """
-/* small GitHub-like preview CSS */
-body { background:#0f1720; color:#d6deeb; font-family: "Segoe UI", Arial, sans-serif; padding:10px; }
-a { color: #58a6ff; text-decoration: none; }
-pre { background:#010409; border-radius:6px; padding:10px; overflow:auto; }
-code.inline { background:#011627; padding:2px 6px; border-radius:4px;}
-table { border-collapse:collapse; margin:6px 0; }
-th, td { border:1px solid #222; padding:6px 8px; }
-th { background:#0b1220; }
+/* Overall body */
+body {
+    background: #0f1720;   /* matches editor background */
+    color: #d6deeb;        /* matches editor text color */
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 12pt;
+    padding: 10px;
+    margin: 0;
+}
+
+/* Links */
+a {
+    color: #58a6ff;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* Code blocks */
+pre, .codehilite {
+    background: #0f1720;   /* match editor panel */
+    color: #d6deeb;        /* match editor text */
+    border-radius: 6px;
+    padding: 10px;
+    overflow: auto;
+    font-family: "Fira Code", monospace;
+    font-size: 11pt;
+}
+
+pre.codehilite {
+    background: #0f1720 !important;
+    color: #d6deeb !important;
+    border-radius: 6px;
+    padding: 10px;
+    overflow: auto;
+    font-family: "Fira Code", monospace;
+    font-size: 11pt;
+}
+
+/* Inline code */
+code.inline {
+    background: #0f1720;   
+    color: #d6deeb;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Fira Code", monospace;
+}
+
+/* Tables */
+table {
+    border-collapse: collapse;
+    margin: 6px 0;
+}
+th, td {
+    border: 1px solid #222;
+    padding: 6px 8px;
+}
+th {
+    background: #0b1220;
+}
+
+/* Blockquotes */
+blockquote {
+    border-left: 4px solid #58a6ff;
+    padding-left: 10px;
+    color: #9aa5b1;
+    margin: 6px 0;
+}
+
+/* Lists */
+ul, ol {
+    margin: 6px 0;
+    padding-left: 20px;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #d6deeb;
+    margin: 8px 0;
+    font-weight: bold;
+}
 """ + PYGMENTS_CSS
 
 
@@ -36,7 +110,7 @@ def _highlight_code_blocks(html: str) -> str:
             lexer = get_lexer_by_name(lang) if lang else TextLexer()
         except Exception:
             lexer = TextLexer()
-        formatter = HtmlFormatter(nowrap=True)
+        formatter = HtmlFormatter(nowrap=True, noclasses=True)
         highlighted = highlight(code, lexer, formatter)
         # embed in <pre><code class="codehilite"> for consistent CSS
         return f'<pre><code class="codehilite">{highlighted}</code></pre>'

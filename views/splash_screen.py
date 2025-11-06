@@ -1,6 +1,7 @@
 # views/splash_screen.py
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar
-from PySide6.QtGui import QPixmap, QPalette, QColor
+from PySide6 import QtGui, QtCore
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QTextBrowser
+from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 from utils.resource_path import resource_path
 
@@ -10,35 +11,70 @@ class SplashScreen(QWidget):
         self.setWindowFlags(Qt.SplashScreen | Qt.WindowStaysOnTopHint)
         self.setFixedSize(500, 300)  # Adjust to your image size
 
-        # Sets the dark theme
+        # Apply dark theme
         self.apply_dark_theme()
 
-        # Set background pixmap
+        # Title Label
+        self.title_label = QLabel("Scratch Board", self)
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setStyleSheet(
+            "QLabel { font-size: 20pt; font-weight: bold; color: white; }"
+        )
+
+        # Image Label
         self.pixmap = QPixmap(image_path)
         self.label_image = QLabel(self)
         self.label_image.setPixmap(self.pixmap)
         self.label_image.setAlignment(Qt.AlignCenter)
 
-        # Overlay layout
+        # Layout
         self.vbox = QVBoxLayout(self)
+        self.vbox.addWidget(self.title_label)
         self.vbox.addWidget(self.label_image)
 
-        # Progress bar
+        # Progress Bar
         self.progress = QProgressBar(self)
         self.progress.setFixedHeight(20)
         self.progress.setRange(0, 100)
         self.progress.setTextVisible(True)
         self.vbox.addWidget(self.progress)
 
-        # Message label
+        # Message Label
         self.message_label = QLabel("", self)
         self.message_label.setAlignment(Qt.AlignCenter)
         self.message_label.setStyleSheet("color: white;")
         self.vbox.addWidget(self.message_label)
 
+        # Developer Label (Clickable Link)
+        self.dev_label = QTextBrowser(self)
+        self.dev_label.setHtml(
+            '<a href="https://github.com/Quantum-Yeti/ScratchBoard">'
+            'Developed by Quantum-Yeti</a>'
+        )
+        self.dev_label.setAlignment(Qt.AlignCenter)
+        self.dev_label.setStyleSheet(
+            """
+            QTextBrowser {
+                color: red;
+                font-style: italic;
+                font-weight: bold;
+                background: transparent;
+                border: none;
+            }
+            QTextBrowser:hover {
+                color: cyan;
+            }
+            """
+        )
+        self.dev_label.setOpenExternalLinks(True)
+        self.dev_label.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.dev_label.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.vbox.addWidget(self.dev_label)
+
         self.setLayout(self.vbox)
         self.show()
 
+    # Helper Methods
     def apply_dark_theme(self):
         try:
             with open(resource_path("ui/themes/dark_theme.qss"), "r") as f:
@@ -51,5 +87,5 @@ class SplashScreen(QWidget):
         self.progress.setValue(value)
         if message:
             self.message_label.setText(message)
-        # Process events so UI updates
+        # Force UI to update immediately
         self.repaint()
