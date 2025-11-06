@@ -6,8 +6,8 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QWidget, Q
 from helpers.run_startup import run_startup
 from ui.menu_bar import MainMenuBar
 from views.splash_screen import SplashScreen
-from views.dashboard import DashboardView
-from views.sidebar import Sidebar
+from views.dashboard_view import DashboardView
+from views.sidebar_view import Sidebar
 from views.main_view import MainView
 from controllers.note_controller import NoteController
 from models.note_model import NoteModel

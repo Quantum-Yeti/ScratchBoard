@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QComboBox, QLabel
 from PySide6.QtCore import Qt, QEvent
 from helpers.floating_action import FloatingButton
-from views.note_card import NoteCard
+from views.note_card_view import NoteCard
 
 class MainView(QWidget):
     def __init__(self, categories):

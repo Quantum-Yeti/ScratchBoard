@@ -11,8 +11,9 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 from utils.resource_path import resource_path, configure_matplotlib
-from views.news_feed import NewsFeedView
+
 from helpers.dashboard_stats import calculate_stats
+from views.recent_note_view import RecentNoteView
 
 # Force QtAgg backend for PySide6
 matplotlib.use("QtAgg")
@@ -126,10 +127,9 @@ class DashboardView(QWidget):
         self.heatmap_canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         charts_layout.addWidget(self.heatmap_canvas)
 
-        # --- News Feed ---
-        self.news_feed = NewsFeedView()
-        self.news_feed.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        main_layout.addWidget(self.news_feed, stretch=2)
+        # --- Most Recent Note ---
+        self.recent_view = RecentNoteView(self.model, self.open_note_callback)
+        main_layout.addWidget(self.recent_view, stretch=2)
 
         # Initial data
         self.refresh_dashboard()
@@ -244,6 +244,9 @@ class DashboardView(QWidget):
         super().resizeEvent(event)
         if hasattr(self, "banner"):
             self.update_banner()
+
+    def open_note_callback(self, note):
+        self.parent().open_editor(note["id"])
 
     # --- Stylesheet ---
     def load_stylesheet(self):

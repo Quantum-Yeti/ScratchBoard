@@ -1,9 +1,8 @@
 from PySide6.QtGui import QIcon, QDesktopServices
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QSizePolicy
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
 
-from views.scratch_manager import ScratchManager
-from views.scratch_view import ScratchNote
+from managers.scratch_manager import ScratchManager
 from utils.resource_path import resource_path
 import subprocess
 

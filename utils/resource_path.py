@@ -4,7 +4,7 @@ import matplotlib
 
 def resource_path(relative_path: str) -> str:
     """
-    Absolute path for resources (works for dev & PyInstaller)
+    Absolute path for resources (should work for dev & PyInstaller)
     """
     try:
         base_path = sys._MEIPASS  # PyInstaller temp folder
@@ -18,7 +18,7 @@ def configure_matplotlib():
     Ensure matplotlib can find its data (fonts, styles) when frozen by PyInstaller.
     """
     if getattr(sys, 'frozen', False):
-        # We're running in a PyInstaller bundle
+        # For PyInstaller
         try:
             base_path = sys._MEIPASS
             mpl_data_path = os.path.join(base_path, "mpl-data")

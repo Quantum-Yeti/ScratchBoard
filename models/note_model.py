@@ -151,5 +151,20 @@ class NoteModel:
     def search_notes(self, term):
         return self.get_notes(search=term)
 
+    def get_most_recent_note(self):
+        """Return the most recently created note across all categories."""
+        categories = self.get_all_categories()
+        notes = []
+
+        for cat in categories:
+            notes.extend(self.get_notes(category_name=cat))
+
+        if not notes:
+            return None
+
+        # Sort by created date (ISO format string)
+        notes.sort(key=lambda n: n["created"], reverse=True)
+        return notes[0]
+
     def close(self):
         self.conn.close()
