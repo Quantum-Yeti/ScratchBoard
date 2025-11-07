@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QLabel, QColorDialog
 from PySide6.QtCore import Qt, QTimer, QPoint, QSize
 from PySide6.QtGui import QColor, QIcon
 from utils.resource_path import resource_path
@@ -14,17 +14,18 @@ def get_text_color(bg_color):
 class ScratchNote(QDialog):
     RESIZE_MARGIN = 8
 
-    def __init__(self, model, note_id=None, title="Sticky Note", content="", color=None):
+    def __init__(self, model, note_id=None, title="Sticky Note", content="", color=None, on_new_note=None):
         super().__init__()
         self.model = model
         self.note_id = note_id
         self.color = color or PASTEL_COLORS[0]
+        self.on_new_note = on_new_note
 
         self.setWindowTitle(title)
         self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setMinimumSize(150, 120)
-        self.resize(300, 250)
+        self.setMinimumSize(300, 200)
+        self.resize(450, 350)
 
         self._drag_active = False
         self._resize_active = False
@@ -36,7 +37,35 @@ class ScratchNote(QDialog):
         # Top bar: delete button with padding
         top_bar = QHBoxLayout()
         top_bar.setContentsMargins(4, 4, 4, 4)
+
+        # Sticky note title with index counter
+        self.title_label = QLabel(self.get_display_title())
+        self.title_label.setStyleSheet(f"""
+            background-color: transparent;
+            font-weight:bold;
+            color: {get_text_color(self.color)};
+            padding-left: 6px;""")
+        top_bar.addWidget(self.title_label)
+
         top_bar.addStretch()
+
+        # Add button
+        add_button = QPushButton()
+        add_button.setIcon(QIcon(resource_path("resources/icons/add_button.png")))
+        add_button.setIconSize(QSize(24, 24))
+        add_button.setFixedSize(QSize(30, 30))
+        add_button.setStyleSheet("background: transparent; border: none;")
+        add_button.clicked.connect(self.add_new_note)
+        top_bar.addWidget(add_button)
+
+        # Color Picker Button
+        color_btn = QPushButton()
+        color_btn.setIcon(QIcon(resource_path("resources/icons/color_wheel.png")))
+        color_btn.setIconSize(QSize(24, 24))
+        color_btn.setFixedSize(30, 30)
+        color_btn.setStyleSheet("background: transparent; border: none;")
+        color_btn.clicked.connect(self.pick_color)
+        top_bar.addWidget(color_btn)
 
         # Delete from database
         delete_btn = QPushButton()
@@ -104,7 +133,11 @@ class ScratchNote(QDialog):
         else:
             self.note_id = self.model.add_note("Sticky Notes", title, text)
 
-        self.setWindowTitle(title)
+        display_title = self.get_display_title()
+        self.setWindowTitle(display_title)
+
+        if hasattr(self, "title_label"):
+            self.title_label.setText(display_title)
 
     # --- Dragging and resizing ---
     def mousePressEvent(self, event):
@@ -136,6 +169,27 @@ class ScratchNote(QDialog):
         self._drag_active = False
         self._resize_active = False
         super().mouseReleaseEvent(event)
+
+    def get_display_title(self):
+        try:
+            index = int(self.note_id)
+        except (TypeError, ValueError):
+            index = ""
+        return f"Scratch Note {index}"
+
+
+    def add_new_note(self):
+        if callable(self.on_new_note):
+            self.on_new_note()
+
+    def pick_color(self):
+        new_color = QColorDialog.getColor(QColor(self.color), self, "Select Note Color")
+        if not new_color.isValid():
+            return
+
+        self.color = new_color.name()
+        self.apply_style()
+        self.mark_dirty()
 
     def delete_note(self):
         """Delete the note from the database"""

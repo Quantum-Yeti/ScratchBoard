@@ -46,29 +46,28 @@ class SplashScreen(QWidget):
         self.vbox.addWidget(self.message_label)
 
         # Developer Label (Clickable Link)
-        self.dev_label = QTextBrowser(self)
-        self.dev_label.setHtml(
-            '<a href="https://github.com/Quantum-Yeti/ScratchBoard">'
+        self.dev_label = QLabel(self)
+        self.dev_label.setText(
+            '<a href="https://github.com/Quantum-Yeti/ScratchBoard"'
+            'style="text-decoration: none;">'
             'Developed by Quantum-Yeti</a>'
         )
+        self.dev_label.setTextInteractionFlags(Qt.TextBrowserInteraction)  # allow clicking
+        self.dev_label.setOpenExternalLinks(True)  # opens in default browser
         self.dev_label.setAlignment(Qt.AlignCenter)
-        self.dev_label.setStyleSheet(
-            """
-            QTextBrowser {
+        self.dev_label.setStyleSheet("""
+            QLabel {
                 color: red;
                 font-style: italic;
                 font-weight: bold;
                 background: transparent;
-                border: none;
+                text-decoration: none;
             }
-            QTextBrowser:hover {
+            QLabel:hover {
                 color: cyan;
             }
-            """
-        )
+        """)
         self.dev_label.setOpenExternalLinks(True)
-        self.dev_label.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.dev_label.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.vbox.addWidget(self.dev_label)
 
         self.setLayout(self.vbox)

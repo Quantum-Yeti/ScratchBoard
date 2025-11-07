@@ -39,7 +39,7 @@ class ScratchManager(QWidget):
     def open_note(self, note_id=None, title="Sticky Note", content="", color=None):
         """Open a single ScratchNote window."""
         color = color or random.choice(PASTEL_COLORS)
-        note = ScratchNote(self.model, note_id=note_id, title=title, content=content, color=color)
+        note = ScratchNote(self.model, note_id=note_id, title=title, content=content, color=color, on_new_note=self.new_note)
         note.show()
         self.active_notes.append(note)
 
