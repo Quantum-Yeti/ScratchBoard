@@ -1,10 +1,13 @@
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QHBoxLayout, QSizePolicy, QWidget
+from PySide6.QtWidgets import (
+    QFrame, QVBoxLayout, QLabel, QHBoxLayout, QSizePolicy, QWidget, QGraphicsDropShadowEffect
+)
 from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QColor, QFont
 from datetime import datetime
 import pytz
 
 class TimezoneClock(QFrame):
-    """Displays current time in major American timezones in two rows."""
+    """Displays current time in American timezones with cards and shadows."""
 
     TIMEZONES = {
         "PT": "US/Pacific",
@@ -15,28 +18,18 @@ class TimezoneClock(QFrame):
         "HST": "US/Hawaii"
     }
 
+    CARD_COLORS = ["#2c3e50", "#34495e", "#16a085", "#27ae60", "#2980b9", "#8e44ad"]
+
     def __init__(self):
         super().__init__()
         self.setObjectName("TimezoneClock")
-        self.setStyleSheet("""
-            QFrame#TimezoneClock {
-                background-color: #2b2b2b;
-                border-radius: 12px;
-                padding: 10px;
-            }
-            QLabel {
-                color: #dddddd;
-                font-size: 11px;
-                font-weight: bold;
-            }
-        """)
+        self.setStyleSheet("QFrame#TimezoneClock { background: transparent; }")
 
         self.labels = {}
         main_layout = QVBoxLayout(self)
-        main_layout.setSpacing(6)
+        main_layout.setSpacing(12)
         main_layout.setAlignment(Qt.AlignCenter)
 
-        # Split timezones into two rows
         tz_names = list(self.TIMEZONES.keys())
         row1 = QHBoxLayout()
         row1.setSpacing(12)
@@ -44,15 +37,48 @@ class TimezoneClock(QFrame):
         row2.setSpacing(12)
 
         for i, tz_name in enumerate(tz_names):
+            # Card frame
+            frame = QFrame()
+            frame.setObjectName(f"card_{tz_name}")
+            frame.setStyleSheet(f"""
+                QFrame#{frame.objectName()} {{
+                    background-color: {self.CARD_COLORS[i]};
+                    border-radius: 12px;
+                    padding: 8px 16px;
+                }}
+                QFrame#{frame.objectName()}:hover {{
+                    background-color: {self.CARD_COLORS[i]}AA;
+                }}
+            """)
+            frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+
+            # Drop shadow
+            shadow = QGraphicsDropShadowEffect()
+            shadow.setBlurRadius(12)
+            shadow.setXOffset(0)
+            shadow.setYOffset(3)
+            shadow.setColor(QColor(0, 0, 0, 120))
+            frame.setGraphicsEffect(shadow)
+
+            # Label
             lbl = QLabel()
             lbl.setAlignment(Qt.AlignCenter)
-            lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)  # <-- expand horizontally
+            lbl.setStyleSheet("color: white;")
+            lbl.setFont(QFont("Arial", 11, QFont.Bold))
             self.labels[tz_name] = lbl
-            if i < len(tz_names)//2:
-                row1.addWidget(lbl)
-            else:
-                row2.addWidget(lbl)
 
+            # Add label to frame
+            frame_layout = QVBoxLayout(frame)
+            frame_layout.addWidget(lbl)
+            frame_layout.setContentsMargins(0, 0, 0, 0)
+
+            # Add frame to row
+            if i < len(tz_names)//2:
+                row1.addWidget(frame)
+            else:
+                row2.addWidget(frame)
+
+        # Add rows to main layout
         row1_widget = QWidget()
         row1_widget.setLayout(row1)
         row2_widget = QWidget()
@@ -61,10 +87,9 @@ class TimezoneClock(QFrame):
         main_layout.addWidget(row1_widget)
         main_layout.addWidget(row2_widget)
 
-        # Allow the whole widget to expand
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        # Timer to update every second
+        # Timer for updates
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_times)
         self.timer.start(1000)
@@ -75,4 +100,6 @@ class TimezoneClock(QFrame):
         for name, tz_str in self.TIMEZONES.items():
             tz = pytz.timezone(tz_str)
             local_time = now_utc.astimezone(tz)
-            self.labels[name].setText(f"{name}: {local_time.strftime('%H:%M:%S')}")
+            self.labels[name].setText(
+                f"{name}\n{local_time.strftime('%H:%M:%S')}\n{local_time.strftime('%a %b %d')}"
+            )
