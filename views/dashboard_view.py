@@ -1,6 +1,5 @@
-import os
+
 from datetime import datetime
-import numpy as np
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, Property
@@ -16,6 +15,7 @@ from PySide6.QtCharts import (
 from utils.resource_path import resource_path
 from helpers.dashboard_stats import calculate_stats
 from views.recent_note_view import RecentNoteView
+from views.reference_view import ReferenceWidget
 from views.time_clock import TimezoneClock
 
 
@@ -108,8 +108,9 @@ class DashboardView(QWidget):
         bottom_layout = QHBoxLayout()
         main_layout.addLayout(bottom_layout, stretch=2)
 
-        self.recent_view = RecentNoteView(self.model, self.open_note_callback)
-        bottom_layout.addWidget(self.recent_view, stretch=3)
+        self.reference_widget = ReferenceWidget()
+        bottom_layout.addWidget(self.reference_widget, stretch=3)
+
 
         tz_layout = QVBoxLayout()
         tz_title = QLabel("Timezones")
