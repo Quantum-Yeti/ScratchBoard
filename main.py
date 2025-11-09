@@ -11,7 +11,7 @@ from views.sidebar_view import Sidebar
 from views.main_view import MainView
 from controllers.note_controller import NoteController
 from models.note_model import NoteModel
-from utils.resource_path import resource_path, configure_matplotlib
+from utils.resource_path import resource_path
 
 
 def load_styles(app):
@@ -85,12 +85,11 @@ class MainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
 
-    configure_matplotlib()  # needed for PyInstaller
-
     load_styles(app)
 
     # --- Splash Screen ---
     splash = SplashScreen(resource_path("resources/icons/astronautsplash.png"))
+
     run_startup(splash)
 
     # --- Window settings ---

@@ -1,11 +1,11 @@
 import time
 from views.splash_screen import SplashScreen
-from utils.resource_path import configure_matplotlib
+from utils.resource_path import resource_path
 
 def run_startup(splash):
     """Run initialization steps with progress updates on splash screen."""
     steps = [
-        ("Initializing...", configure_matplotlib),
+        ("Initializing...", lambda: time.sleep(1)),
         ("Loading models...", lambda: time.sleep(1)),
         ("Loading controllers...", lambda: time.sleep(1)),
         ("Loading resources...", lambda: time.sleep(1)),
