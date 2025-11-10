@@ -59,3 +59,11 @@ python main.py
 ```bash
 pip freeze > requirements.txt
 ```
+
+## License
+## License
+
+This software is provided for personal viewing and evaluation only.  
+Forking, redistribution, modification, and commercial use are strictly prohibited unless approved by the author.  
+
+See the [LICENSE](LICENSE) file for full terms.
