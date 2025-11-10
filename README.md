@@ -17,6 +17,9 @@
 
 ---
 
+![Scratch Board Dashboard](screenshots/sbscreenshot.png)
+
+
 ## Installation
 
 1. Clone the repository:
