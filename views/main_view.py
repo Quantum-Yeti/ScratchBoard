@@ -18,12 +18,6 @@ class MainView(QWidget):
         self.search_input.setPlaceholderText("Search notes...")
         controls_layout.addWidget(self.search_input)
 
-        self.category_filter = QComboBox()
-        self.category_filter.addItem("All Categories")
-        self.category_filter.addItems(categories)
-        controls_layout.addWidget(self.category_filter)
-        layout.addLayout(controls_layout)
-
         # Scrollable notes grid
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)

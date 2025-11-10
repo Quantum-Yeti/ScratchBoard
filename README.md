@@ -16,6 +16,7 @@
 - **Timezone Clocks:** View the military time for each timezone within the United States.
 
 ---
+## Screenshots
 
 ![Scratch Board Dashboard](screenshots/sbscreenshot.png)
 

@@ -44,9 +44,10 @@ class MacVendorView(QWidget):
                     vendor = data[0]
                     company = vendor.get("company", "Unknown")
                     country = vendor.get("country", "Unknown")
-                    self.result_label.setText(f"{company} ({country})")
+                    type = vendor.get("type", "Unknown")
+                    self.result_label.setText(f"{company} ({country})\n{type}")
                 else:
-                    QMessageBox.warning(self, "Error", "Vendor not found..")
+                    QMessageBox.warning(self, "Invalid MAC", "Vendor not found..")
             else:
                 self.result_label.setText("Vendor not found")
         except Exception as e:

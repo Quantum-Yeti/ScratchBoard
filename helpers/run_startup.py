@@ -9,8 +9,7 @@ def run_startup(splash):
         ("Loading models...", lambda: time.sleep(1)),
         ("Loading controllers...", lambda: time.sleep(1)),
         ("Loading resources...", lambda: time.sleep(1)),
-        ("Loading views...", lambda: time.sleep(1)),
-        ("Finalizing...", lambda: time.sleep(0.5)),
+        ("Finishing...", lambda: time.sleep(0.5)),
     ]
 
     total = len(steps)

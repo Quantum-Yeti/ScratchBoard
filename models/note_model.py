@@ -13,6 +13,8 @@ class NoteModel:
 
     def _setup_db(self):
         cur = self.conn.cursor()
+
+        # --- Categories ---
         cur.execute("""
             CREATE TABLE IF NOT EXISTS categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,6 +22,7 @@ class NoteModel:
             );
         """)
 
+        # --- Notes ---
         cur.execute("""
             CREATE TABLE IF NOT EXISTS notes (
                 id TEXT PRIMARY KEY,
@@ -35,17 +38,35 @@ class NoteModel:
             );
         """)
 
-        # Ensure default category always exists
-        cur.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Notes')")
+        # --- Contacts ---
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS contacts (
+                id TEXT PRIMARY KEY,
+                category_id INTEGER,
+                name TEXT NOT NULL,
+                phone TEXT,
+                website TEXT,
+                email TEXT,
+                created TEXT NOT NULL,
+                updated TEXT NOT NULL,
+                FOREIGN KEY(category_id) REFERENCES categories(id)
+                    ON DELETE SET NULL ON UPDATE CASCADE
+            );
+        """)
 
-        # Indexes for speed
+        # --- Default categories ---
+        cur.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Notes')")
+        cur.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Contacts')")
+
+        # --- Indexes ---
         cur.execute("CREATE INDEX IF NOT EXISTS idx_notes_cat ON notes(category_id)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_contacts_cat ON contacts(category_id)")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_notes_title ON notes(title)")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(updated)")
 
         self.conn.commit()
 
-    # --- Category handling ---
+    # --- Category methods ---
     def add_category(self, name):
         cur = self.conn.cursor()
         cur.execute("INSERT OR IGNORE INTO categories (name) VALUES (?)", (name,))
@@ -58,15 +79,7 @@ class NoteModel:
         cur.execute("SELECT name FROM categories ORDER BY name ASC")
         return [row["name"] for row in cur.fetchall()]
 
-    def get_note_count_by_category(self, category_name):
-        cur = self.conn.cursor()
-        cur.execute("""
-            SELECT COUNT(*) FROM notes
-            WHERE category_id=(SELECT id FROM categories WHERE name=?)
-        """, (category_name,))
-        return cur.fetchone()[0]
-
-    # --- Notes ---
+    # --- Notes methods ---
     def add_note(self, category_name, title, content, image_path=None):
         note_id = str(uuid.uuid4())
         color = random.choice(PASTEL_COLORS)
@@ -89,18 +102,14 @@ class NoteModel:
             LEFT JOIN categories ON notes.category_id = categories.id
             WHERE 1=1
         """
-
         if category_name and category_name != "All Categories":
             query += " AND categories.name=?"
             params.append(category_name)
-
         if search:
             term = f"%{search}%"
             query += " AND (title LIKE ? OR content LIKE ?)"
             params.extend([term, term])
-
         query += f" ORDER BY {order_by}"
-
         cur.execute(query, params)
         return cur.fetchall()
 
@@ -148,21 +157,87 @@ class NoteModel:
         self.conn.commit()
         return True
 
+    # --- Contacts methods ---
+    def add_contact(self, category_name, name, phone=None, website=None, email=None):
+        contact_id = str(uuid.uuid4())
+        now = datetime.now().isoformat()
+        category_id = self.add_category(category_name)
+        self.conn.execute("""
+            INSERT INTO contacts (id, category_id, name, phone, website, email, created, updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (contact_id, category_id, name, phone, website, email, now, now))
+        self.conn.commit()
+        return contact_id
+
+    def get_contacts(self, category_name=None):
+        cur = self.conn.cursor()
+        params = []
+        query = """
+            SELECT contacts.*, categories.name as category_name
+            FROM contacts
+            LEFT JOIN categories ON contacts.category_id = categories.id
+            WHERE 1=1
+        """
+        if category_name and category_name != "All Categories":
+            query += " AND categories.name=?"
+            params.append(category_name)
+        cur.execute(query, params)
+        return cur.fetchall()
+
+    def get_contact_by_id(self, contact_id):
+        cur = self.conn.cursor()
+        cur.execute("""
+            SELECT contacts.*, categories.name as category_name
+            FROM contacts
+            LEFT JOIN categories ON contacts.category_id = categories.id
+            WHERE contacts.id=?
+        """, (contact_id,))
+        return cur.fetchone()
+
+    def edit_contact(self, contact_id, name=None, phone=None, website=None, email=None):
+        contact = self.get_contact_by_id(contact_id)
+        if not contact:
+            return False
+
+        fields, params = [], []
+        if name is not None:
+            fields.append("name=?")
+            params.append(name)
+        if phone is not None:
+            fields.append("phone=?")
+            params.append(phone)
+        if website is not None:
+            fields.append("website=?")
+            params.append(website)
+        if email is not None:
+            fields.append("email=?")
+            params.append(email)
+
+        fields.append("updated=?")
+        params.append(datetime.now().isoformat())
+        params.append(contact_id)
+
+        query = f"UPDATE contacts SET {', '.join(fields)} WHERE id=?"
+        self.conn.execute(query, params)
+        self.conn.commit()
+        return True
+
+    def delete_contact(self, contact_id):
+        self.conn.execute("DELETE FROM contacts WHERE id=?", (contact_id,))
+        self.conn.commit()
+        return True
+
+    # --- Misc / Utilities ---
     def search_notes(self, term):
         return self.get_notes(search=term)
 
     def get_most_recent_note(self):
-        """Return the most recently created note across all categories."""
         categories = self.get_all_categories()
         notes = []
-
         for cat in categories:
             notes.extend(self.get_notes(category_name=cat))
-
         if not notes:
             return None
-
-        # Sort by created date (ISO format string)
         notes.sort(key=lambda n: n["created"], reverse=True)
         return notes[0]
 

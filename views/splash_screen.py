@@ -86,5 +86,6 @@ class SplashScreen(QWidget):
         self.progress.setValue(value)
         if message:
             self.message_label.setText(message)
+
         # Force UI to update immediately
         self.repaint()

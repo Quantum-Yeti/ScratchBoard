@@ -26,7 +26,7 @@ class EditorPanel(QDialog):
         self.delete_callback = delete_callback
         self._is_fullscreen = False
 
-        self.setWindowTitle("Edit Note")
+        self.setWindowTitle("Scratch Board: Edit Note")
         self.resize(1100, 700)
         self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
         self.setAcceptDrops(True)
@@ -53,6 +53,7 @@ class EditorPanel(QDialog):
 
         self.content_edit = QTextEdit()
         self.content_edit.setPlainText(content or "")
+        self.content_edit.setPlaceholderText("Start writing using markdown...")
         self.content_edit.textChanged.connect(self._schedule_preview)
         self.content_edit.textChanged.connect(self._update_word_stats)
         left_l.addWidget(self.content_edit, stretch=1)
@@ -61,6 +62,7 @@ class EditorPanel(QDialog):
         # ---------------- Right (Preview)
         self.preview = QTextBrowser()
         self.preview.setObjectName("PreviewPanel")
+        self.preview.setPlaceholderText("Markdown -> Html Preview")
         self.preview.setAutoFillBackground(True)
 
 
