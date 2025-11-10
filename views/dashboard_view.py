@@ -50,16 +50,39 @@ class DashboardView(QWidget):
         bottom_layout = QHBoxLayout()
         main_layout.addLayout(bottom_layout, stretch=2)
 
+        title_style = "font-weight: bold; font-size: 15px; color: white;"
+
+        # Helper function for section titles
+        def create_section_title(text, icon_name):
+            label = QLabel()
+            label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+            icon_path = resource_path(f"resources/icons/{icon_name}.png")
+            label.setText(f'<img src="{icon_path}" width="24" height="24" style="vertical-align: middle; margin-right: 6px">  {text}')
+            label.setStyleSheet(title_style)
+            return label
+
+        # Reference Section
         self.reference_widget = ReferenceWidget()
-        bottom_layout.addWidget(self.reference_widget, stretch=2)
+        ref_layout = QVBoxLayout()
+        ref_layout.addWidget(create_section_title("Reference", "reference"))
+        ref_layout.addWidget(self.reference_widget)
+        ref_layout.addStretch()
+        bottom_layout.addLayout(ref_layout, stretch=1)
+
+        # MAC Vendor Section
         self.mac_vendor_view = MacVendorView()
-        bottom_layout.addWidget(self.mac_vendor_view, stretch=1)
-        tz_layout = QVBoxLayout()
-        tz_title = QLabel("Timezones")
-        tz_title.setAlignment(Qt.AlignCenter)
-        tz_layout.addWidget(tz_title)
+        mac_layout = QVBoxLayout()
+        mac_layout.addWidget(create_section_title("MAC Lookup", "robot"))
+        mac_layout.addWidget(self.mac_vendor_view)
+        mac_layout.addStretch()
+        bottom_layout.addLayout(mac_layout, stretch=1)
+
+        # Time Zones Section
         self.timezone_clock = TimezoneClock()
+        tz_layout = QVBoxLayout()
+        tz_layout.addWidget(create_section_title("Timezones", "watch"))
         tz_layout.addWidget(self.timezone_clock)
+        tz_layout.addStretch()
         bottom_layout.addLayout(tz_layout, stretch=1)
 
         self.load_stylesheet()

@@ -47,5 +47,9 @@ htmlcov/
 *.tmp
 *.swp
 
+# Generated data files
+data
+notes.db
+
 # Resources folder cache (optional)
 *.cache
