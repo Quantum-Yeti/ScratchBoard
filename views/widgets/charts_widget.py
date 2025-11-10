@@ -106,7 +106,7 @@ def create_multi_line_chart(model, months_back=3):
             notes_by_month[date_key] = notes_by_month.get(date_key, 0) + 1
 
         # Build series with at least 2 points
-        series = QLineSeries()
+        series = QSplineSeries()
         series.setName(cat)
         series.setColor(QColor.fromHsv(hash(cat) % 360, 255, 200))
 
