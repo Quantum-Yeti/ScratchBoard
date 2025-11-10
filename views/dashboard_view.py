@@ -37,7 +37,7 @@ class DashboardView(QWidget):
         self.stats_widget = StatsWidget(self.model)
         top_layout.addWidget(self.stats_widget)
 
-        # --- Charts layout ---
+        # Charts layout
         charts_layout = QHBoxLayout()
         main_layout.addLayout(charts_layout, stretch=3)
 
@@ -51,7 +51,7 @@ class DashboardView(QWidget):
         self.multi_line_view.setRenderHint(QPainter.Antialiasing)
         charts_layout.addWidget(self.multi_line_view, stretch=1)
 
-        # --- Bottom widgets ---
+        # Bottom widgets
         bottom_layout = QHBoxLayout()
         main_layout.addLayout(bottom_layout, stretch=2)
 
@@ -59,9 +59,9 @@ class DashboardView(QWidget):
 
         def create_section_title(text, icon_name):
             label = QLabel()
-            label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+            label.setAlignment(Qt.AlignCenter | Qt.AlignTop)
             icon_path = resource_path(f"resources/icons/{icon_name}.png")
-            label.setText(f'<img src="{icon_path}" width="24" height="24" style="vertical-align: middle; margin-right: 6px">  {text}')
+            label.setText(f'<img src="{icon_path}" width="32" height="32" style="vertical-align: middle; margin-right: 6px">  {text}')
             label.setStyleSheet(title_style)
             return label
 
@@ -104,9 +104,7 @@ class DashboardView(QWidget):
         self.load_stylesheet()
         self.refresh_dashboard()
 
-    # ----------------------------
     # View switching
-    # ----------------------------
     def on_category_selected(self, category):
         if category == "Contacts":
             self.show_contacts_view()
@@ -136,15 +134,11 @@ class DashboardView(QWidget):
         self.multi_line_view.show()
         self.stats_widget.show()
 
-    # ----------------------------
     # Stats
-    # ----------------------------
     def update_stats(self, animated=True):
         self.stats_widget.refresh(animated=animated)
 
-    # ----------------------------
     # Charts
-    # ----------------------------
     def update_graphs(self):
         self.stacked_bar_chart = create_stacked_bar_chart(self.model)
         self.stacked_bar_view.setChart(self.stacked_bar_chart)
@@ -156,9 +150,7 @@ class DashboardView(QWidget):
         self.update_stats(animated=True)
         self.update_graphs()
 
-    # ----------------------------
     # Banner
-    # ----------------------------
     def update_banner(self):
         if not self.image_path:
             return
@@ -167,9 +159,7 @@ class DashboardView(QWidget):
             pixmap.scaled(200, self.height()//2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         )
 
-    # ----------------------------
     # Stylesheet
-    # ----------------------------
     def load_stylesheet(self):
         try:
             with open(resource_path("ui/themes/dark_theme.qss"), "r") as f:

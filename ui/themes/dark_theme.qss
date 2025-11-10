@@ -167,3 +167,31 @@ QTextEdit:focus {
     LINKS
     =========================== */
 a { color: #58a6ff; text-decoration: none; }
+
+
+# Contacts View ===============
+#headerLabel {
+    color: #3BC7C4;
+    font-size: 14px;
+    padding: 6px 0;
+}
+
+QLabel#contactCell {
+    background: transparent;
+    padding: 6px 4px;
+    border-radius: 3px;
+}
+
+/* Hover effect for individual cells (gives the illusion of row hover) */
+QLabel#contactCell:hover {
+    background-color: #3a3a3a;
+}
+
+/* Selected row cells */
+QLabel#contactCell[selected="true"] {
+    background-color: #3BC7C4;
+    color: black;
+}
+
+
+

@@ -1,8 +1,11 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt, Property, QPropertyAnimation, QEasingCurve
-from helpers.dashboard_stats import calculate_stats
+from utils.resource_path import resource_path
+from helpers.dashboard_stats import calculate_stats  # Make sure this returns new stats like avg words
+
 
 class StatCard(QWidget):
+    """A single dashboard stat card with animated value."""
     def __init__(self, title, value="0"):
         super().__init__()
         self._value = 0
@@ -28,7 +31,7 @@ class StatCard(QWidget):
 
 
 class StatsWidget(QWidget):
-    """Container for multiple StatCard widgets"""
+    """Container for multiple StatCard widgets."""
     def __init__(self, model):
         super().__init__()
         self.model = model
@@ -38,17 +41,23 @@ class StatsWidget(QWidget):
         layout.setSpacing(8)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        # Create cards
-        for key, title in [("total", "Total Notes"),
-                           ("cats", "Categories"),
-                           ("monthly", "Notes This Month")]:
+        # Create cards. You can add avg word count here
+        for key, title in [
+            ("total", "Total Notes"),
+            ("monthly", "Notes This Month"),
+            ("avg_words", "Avg Words/Note"),
+            ("longest_note", "Longest Note"),
+            ("shortest_note", "Shortest Note"),
+            ("today", "Notes Today")
+        ]:
             card = StatCard(title)
             layout.addWidget(card)
             self.cards[key] = card
 
     def refresh(self, animated=True):
-        """Update all stat cards from the model"""
-        values = calculate_stats(self.model)
+        """Update all stat cards from the model."""
+        values = calculate_stats(self.model)  # should return {'total': X, 'avg_words': Y, 'monthly': Z}
+
         for key, val in values.items():
             card = self.cards.get(key)
             if not card:
@@ -64,3 +73,11 @@ class StatsWidget(QWidget):
                 card._anim = anim
             else:
                 card._set_value(val)
+
+    def load_stylesheet(self):
+        """Load dark theme QSS."""
+        try:
+            with open(resource_path("ui/themes/dark_theme.qss"), "r") as f:
+                self.setStyleSheet(f.read())
+        except Exception as e:
+            print("Failed to load dark_theme.qss:", e)

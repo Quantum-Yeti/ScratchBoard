@@ -15,7 +15,6 @@ from controllers.contacts_controller import ContactsController
 from models.note_model import NoteModel
 from utils.resource_path import resource_path
 
-
 def load_styles(app):
     """Load dark theme QSS."""
     try:
@@ -23,7 +22,6 @@ def load_styles(app):
             app.setStyleSheet(f.read())
     except Exception as e:
         print("Failed to load stylesheet:", e)
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
