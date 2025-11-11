@@ -1,10 +1,10 @@
 import os
 import csv
-
+from utils.resource_path import resource_path
 
 class OUILookup:
     def __init__(self, csv_path="resources/ieee_oui.csv"):
-        self.csv_path = csv_path
+        self.csv_path = resource_path(csv_path)
         if not os.path.exists(self.csv_path):
             raise FileNotFoundError(f"OUI CSV not found: {self.csv_path}")
 

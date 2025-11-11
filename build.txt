@@ -6,6 +6,7 @@ pyinstaller `
     --name "ScratchBoard" `
     --icon "resources/icons/astronaut.ico" `
     --add-data "resources/icons;resources/icons" `
+    --add-data "resources/ieee_oui.csv;resources" `
     --add-data "ui/themes;ui/themes" `
     --hidden-import=markdown2 `
     --hidden-import=PySide6.QtCore `
