@@ -1,5 +1,5 @@
 from PySide6.QtCharts import QChartView
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
 from views.widgets.charts_widget import create_stacked_bar_chart, create_multi_line_chart
@@ -51,9 +51,14 @@ class DashboardView(QWidget):
         self.multi_line_view.setRenderHint(QPainter.Antialiasing)
         charts_layout.addWidget(self.multi_line_view, stretch=1)
 
+        #self.stacked_bar_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.multi_line_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
         # Bottom widgets
         bottom_layout = QHBoxLayout()
-        main_layout.addLayout(bottom_layout, stretch=2)
+        spacer = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        main_layout.addItem(spacer)
+        main_layout.addLayout(bottom_layout, stretch=1)
 
         title_style = "font-weight: bold; font-size: 15px; color: white;"
 

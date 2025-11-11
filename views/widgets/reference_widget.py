@@ -1,7 +1,7 @@
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices, Qt, QAction
 from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLayout, QLineEdit, QPushButton, QWidget, \
-    QMenu, QMessageBox
+    QMenu, QMessageBox, QLabel
 
 
 class ReferenceWidget(QWidget):
@@ -14,11 +14,11 @@ class ReferenceWidget(QWidget):
         layout.setSpacing(6)
 
         self.list_widget = QListWidget()
-
         self.list_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.list_widget.customContextMenuRequested.connect(self.show_context_menu)
 
         layout.addWidget(self.list_widget)
+
 
         # Input for adding new references
         input_layout = QHBoxLayout()
@@ -78,4 +78,3 @@ class ReferenceWidget(QWidget):
         if reply == QMessageBox.Yes:
             self.model.delete_reference(ref_id)
             self.load_references()
-
