@@ -57,6 +57,10 @@ QFrame#NoteCard {
     border: 1px solid #3A3A3A;
 }
 
+QFrame#NoteCard a {
+    color: #34deeb;
+}
+
 QLabel#NoteTitle {
     font-weight: bold;
     font-size: 14px;

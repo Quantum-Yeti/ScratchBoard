@@ -68,3 +68,18 @@ QTextBrowser#PreviewPanel {
     background-color: #0f1720;
     color: #dddddd;
 }
+
+/* Link colors */
+QTextBrowser#PreviewPanel a {
+    color: #34eb61;
+    text-decoration: none;
+}
+
+QTextBrowser#PreviewPanel a:hover {
+    color: #63b3ed;
+    text-decoration: underline;
+}
+
+QTextBrowser#PreviewPanel a:visited {
+    color: #eb34ab;
+}

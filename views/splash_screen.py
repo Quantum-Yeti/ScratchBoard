@@ -49,7 +49,7 @@ class SplashScreen(QWidget):
         self.dev_label = QLabel(self)
         self.dev_label.setText(
             '<a href="https://github.com/Quantum-Yeti/ScratchBoard"'
-            'style="text-decoration: none;">'
+            'style="text-decoration: none; color: cyan;">'
             'Developed by Quantum-Yeti</a>'
         )
         self.dev_label.setTextInteractionFlags(Qt.TextBrowserInteraction)  # allow clicking
