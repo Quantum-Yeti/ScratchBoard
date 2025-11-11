@@ -54,6 +54,18 @@ class NoteModel:
             );
         """)
 
+        # --- References ---
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS "reference_links" (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                url TEXT NOT NULL,
+                created TEXT NOT NULL,
+                updated TEXT NOT NULL
+            );
+        """)
+        cur.execute('CREATE INDEX IF NOT EXISTS idx_reference_links_title ON reference_links(title)')
+
         # --- Default categories ---
         cur.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Notes')")
         cur.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Contacts')")
@@ -226,6 +238,51 @@ class NoteModel:
         self.conn.execute("DELETE FROM contacts WHERE id=?", (contact_id,))
         self.conn.commit()
         return True
+
+    # --- References methods ---
+    def add_reference(self, title, url):
+        ref_id = str(uuid.uuid4())
+        now = datetime.now().isoformat()
+        self.conn.execute(
+            'INSERT INTO reference_links (id, title, url, created, updated) VALUES (?, ?, ?, ?, ?)',
+            (ref_id, title, url, now, now)
+        )
+        self.conn.commit()
+        return ref_id
+
+    def get_references(self):
+        cur = self.conn.cursor()
+        cur.execute('SELECT * FROM reference_links ORDER BY title ASC')
+        return cur.fetchall()
+
+    def edit_reference(self, ref_id, title=None, url=None):
+        ref = self.get_reference_by_id(ref_id)
+        if not ref:
+            return False
+        fields, params = [], []
+        if title is not None:
+            fields.append("title=?")
+            params.append(title)
+        if url is not None:
+            fields.append("url=?")
+            params.append(url)
+        fields.append("updated=?")
+        params.append(datetime.now().isoformat())
+        params.append(ref_id)
+        query = f"UPDATE reference_links SET {', '.join(fields)} WHERE id=?"
+        self.conn.execute(query, params)
+        self.conn.commit()
+        return True
+
+    def delete_reference(self, ref_id):
+        self.conn.execute("DELETE FROM reference_links WHERE id=?", (ref_id,))
+        self.conn.commit()
+        return True
+
+    def get_reference_by_id(self, ref_id):
+        cur = self.conn.cursor()
+        cur.execute("SELECT * FROM reference_links WHERE id=?", (ref_id,))
+        return cur.fetchone()
 
     # --- Misc / Utilities ---
     def search_notes(self, term):

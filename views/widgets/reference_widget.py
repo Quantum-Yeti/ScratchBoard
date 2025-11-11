@@ -1,40 +1,81 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QAbstractItemView
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices, Qt, QAction
+from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLayout, QLineEdit, QPushButton, QWidget, \
+    QMenu, QMessageBox
+
 
 class ReferenceWidget(QWidget):
-    def __init__(self, references=None):
+    def __init__(self, model):
         super().__init__()
-        self.setObjectName("ReferenceWidget")
+        self.model = model
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(6, 6, 6, 6)
+        layout.setContentsMargins(6,6,6,6)
         layout.setSpacing(6)
 
         self.list_widget = QListWidget()
+
+        self.list_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.list_widget.customContextMenuRequested.connect(self.show_context_menu)
+
         layout.addWidget(self.list_widget)
 
-        # Sample references if none provided
-        if references is None:
-            references = [
-                {"title": "DownDetector: End-User Reported Outages", "url": "https://downdetector.com"},
-                {"title": "Understanding Routers", "url": "https://ieeexplore.ieee.org/document/xxxxxx"},
-                {"title": "Digital Communication Basics", "url": "https://www.sciencedirect.com/science/article/pii/xxxxxx"},
-            ]
+        # Input for adding new references
+        input_layout = QHBoxLayout()
+        self.title_input = QLineEdit()
+        self.title_input.setPlaceholderText("Title")
+        self.url_input = QLineEdit()
+        self.url_input.setPlaceholderText("URL (https://...)")
+        self.add_button = QPushButton("Add")
+        self.add_button.clicked.connect(self.add_reference)
+        input_layout.addWidget(self.title_input)
+        input_layout.addWidget(self.url_input)
+        input_layout.addWidget(self.add_button)
+        layout.addLayout(input_layout)
 
-        for ref in references:
-            item = QListWidgetItem(ref["title"])
-            item.setData(Qt.UserRole, ref["url"])
-            self.list_widget.addItem(item)
-
+        self.load_references()
         self.list_widget.itemClicked.connect(self.open_reference)
 
-    def open_reference(self, item):
-        url = item.data(Qt.UserRole)
-        QDesktopServices.openUrl(QUrl(url))
+    def load_references(self):
+        self.list_widget.clear()
+        for ref in self.model.get_references():
+            item = QListWidgetItem(ref["title"])
+            item.setData(Qt.UserRole, ref["url"])
+            item.setData(Qt.UserRole + 1, ref["id"])  # store the database ID for deletion
+            self.list_widget.addItem(item)
 
-    def on_item_hover(self, item):
-        self.list_widget.setCursor(Qt.PointingHandCursor)
-    def leaveEvent(self, event):
-        self.list_widget.setCursor(Qt.ArrowCursor)
-        super().leaveEvent(event)
+    def add_reference(self):
+        title = self.title_input.text().strip()
+        url = self.url_input.text().strip()
+        if not title or not url:
+            return
+        self.model.add_reference(title, url)
+        self.load_references()
+        self.title_input.clear()
+        self.url_input.clear()
+
+    def open_reference(self, item):
+        QDesktopServices.openUrl(QUrl(item.data(Qt.UserRole)))
+
+    def show_context_menu(self, pos):
+        item = self.list_widget.itemAt(pos)
+        if item:
+            menu = QMenu()
+            delete_action = QAction("Delete", self)
+            # Pass the reference ID stored in Qt.UserRole (or store it when loading)
+            delete_action.triggered.connect(lambda: self.delete_reference(item))
+            menu.addAction(delete_action)
+            menu.exec(self.list_widget.mapToGlobal(pos))
+
+    def delete_reference(self, item):
+        ref_id = item.data(Qt.UserRole + 1)  # store the ref_id separately when loading
+        reply = QMessageBox.question(
+            self,
+            "Delete Reference",
+            f"Delete '{item.text()}'?",
+            QMessageBox.Yes | QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            self.model.delete_reference(ref_id)
+            self.load_references()
+

@@ -66,27 +66,30 @@ class DashboardView(QWidget):
             return label
 
         # Reference Section
-        self.reference_widget = ReferenceWidget()
+        self.reference_widget = ReferenceWidget(model)
         ref_layout = QVBoxLayout()
-        ref_layout.addWidget(create_section_title("Reference", "reference"))
+        ref_layout.setAlignment(Qt.AlignTop)  # ✅ top alignment
+        ref_layout.addWidget(create_section_title("Quick Links/Reference", "reference"))
         ref_layout.addWidget(self.reference_widget)
-        ref_layout.addStretch()
+        # remove ref_layout.addStretch()
         bottom_layout.addLayout(ref_layout, stretch=1)
 
         # MAC Vendor Section
         self.mac_vendor_view = MacVendorView()
         mac_layout = QVBoxLayout()
+        mac_layout.setAlignment(Qt.AlignTop)  # ✅ top alignment
         mac_layout.addWidget(create_section_title("MAC Lookup", "robot"))
         mac_layout.addWidget(self.mac_vendor_view)
-        mac_layout.addStretch()
+        # remove mac_layout.addStretch()
         bottom_layout.addLayout(mac_layout, stretch=1)
 
         # Time Zones Section
         self.timezone_clock = TimezoneClock()
         tz_layout = QVBoxLayout()
+        tz_layout.setAlignment(Qt.AlignTop)  # ✅ top alignment
         tz_layout.addWidget(create_section_title("Timezones", "watch"))
         tz_layout.addWidget(self.timezone_clock)
-        tz_layout.addStretch()
+        # remove tz_layout.addStretch()
         bottom_layout.addLayout(tz_layout, stretch=1)
 
         # --- Views ---
