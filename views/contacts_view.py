@@ -7,7 +7,7 @@ from helpers.floating_action import FloatingButton
 
 
 class ContactsView(QWidget):
-    contact_selected = Signal(dict)  # Optional signal if you want to handle selection elsewhere
+    contact_selected = Signal(dict)  # signal to call elsewhere, maybe but thinking unnecessary
 
     def __init__(self, categories):
         super().__init__()
@@ -48,9 +48,20 @@ class ContactsView(QWidget):
         for text, width in header_labels:
             lbl = QLabel(f"<b>{text}</b>")
             lbl.setStyleSheet("color: #3BC7C4; font-size: 14px;")
-            lbl.setFixedWidth(width)
-            header_layout.addWidget(lbl)
-        header_layout.addStretch()
+            #lbl.setFixedWidth(width)
+            lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            #header_layout.addWidget(lbl)
+
+            if text == "Name":
+                header_layout.addWidget(lbl, 2)
+            elif text == "Phone":
+                header_layout.addWidget(lbl, 1)
+            elif text == "Email":
+                header_layout.addWidget(lbl, 3)
+            elif text == "Website":
+                header_layout.addWidget(lbl, 3)
+
+        #header_layout.addStretch()
         main_layout.addLayout(header_layout)
 
         # Scrollable area for contact rows
@@ -79,7 +90,7 @@ class ContactsView(QWidget):
     def populate_contacts(self, contacts, on_click=None, store_all=True):
         """Fill the contact list with rows."""
         if store_all:
-            self.all_contacts = contacts  # only store once when loading full list
+            self.all_contacts = contacts  # store ONCE when loading full list
 
         self.contact_click_handler = on_click
         self.list_layout.setSpacing(4)
@@ -111,44 +122,56 @@ class ContactsView(QWidget):
 
             # Create labels for each column
             name_label = QLabel(contact["name"] if contact["name"] else "N/A")
-            name_label.setFixedWidth(150)
+            #name_label.setFixedWidth(150)
+            name_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             name_label.setStyleSheet("color: white;")
             name_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            row.addWidget(name_label)
+            name_label.setAttribute(Qt.WA_TransparentForMouseEvents)
+            row.addWidget(name_label, 2)
 
             phone_label = QLabel(contact["phone"] if contact["phone"] else "N/A")
-            phone_label.setFixedWidth(120)
+            #phone_label.setFixedWidth(120)
+            phone_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             phone_label.setStyleSheet("color: #aaa;")
             phone_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            row.addWidget(phone_label)
+            phone_label.setAttribute(Qt.WA_TransparentForMouseEvents)
+            row.addWidget(phone_label, 1)
 
             email_label = QLabel(contact["email"] if contact["email"] else "N/A")
-            email_label.setFixedWidth(180)
+            #email_label.setFixedWidth(180)
+            email_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             email_label.setStyleSheet("color: #aaa;")
             email_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            row.addWidget(email_label)
+            email_label.setAttribute(Qt.WA_TransparentForMouseEvents)
+            row.addWidget(email_label, 3)
 
             website_label = QLabel(contact["website"] if contact["website"] else "N/A")
-            website_label.setFixedWidth(200)
+            #website_label.setFixedWidth(200)
+            website_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             website_label.setStyleSheet("color: #aaa;")
             website_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            row.addWidget(website_label)
+            website_label.setAttribute(Qt.WA_TransparentForMouseEvents)
+            row.addWidget(website_label, 3)
 
-            row.addStretch()
+            #row.addStretch()
 
             # Row widget
             row_widget = QWidget()
+            row_widget.setObjectName("row")
             row_widget.setLayout(row)
             row_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
             row_widget.setFixedHeight(60)
             row_widget.setStyleSheet("""
                 QWidget {
                     background-color: #333;
-                    padding: 6px;
+                    padding-left: 0px;
+                    padding-right: 6px;
+                    padding-bottom: 6px;
+                    padding-top: 6px;
                     border-radius: 4px;
                 }
-                QWidget:hover {
-                    background-color: #444;
+                QWidget#row:hover {
+                    border: 2px solid #3498eb;
                 }
             """)
 
