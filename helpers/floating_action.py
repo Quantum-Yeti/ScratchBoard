@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt, QEvent, QPropertyAnimation, QEasingCurve, QPoint
 from utils.resource_path import resource_path
 
 class FloatingButton(QPushButton):
-    def __init__(self, parent, icon_path="resources/icons/edit.png", tooltip="Add", shortcut="Ctrl+N", size=60):
+    def __init__(self, parent, icon_path="resources/icons/add.png", tooltip="Add", shortcut="Ctrl+N", size=50):
         super().__init__(parent)
         self.setObjectName("FloatingButton")
         self.setToolTip(f"{tooltip} ({shortcut})")

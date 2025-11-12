@@ -30,8 +30,11 @@ class ContactsView(QWidget):
                 border-radius: 4px;
                 border: 1px solid #555;
             }
+            QLineEdit:hover {
+                border: 1px solid #3498eb;
+            }
             QLineEdit:focus {
-                border: 1px solid #3BC7C4;
+                border: 1px solid #3498eb;
             }
         """)
         main_layout.addWidget(self.search_bar)
@@ -57,6 +60,7 @@ class ContactsView(QWidget):
         self.list_layout = QVBoxLayout(self.list_widget)
         self.list_layout.setSpacing(4)
         self.list_layout.setContentsMargins(0, 0, 0, 0)
+        self.list_layout.setAlignment(Qt.AlignTop)
         self.scroll_area.setWidget(self.list_widget)
         main_layout.addWidget(self.scroll_area)
 
@@ -72,9 +76,11 @@ class ContactsView(QWidget):
         self.add_btn.reposition()
         super().resizeEvent(event)
 
-    def populate_contacts(self, contacts, on_click=None):
+    def populate_contacts(self, contacts, on_click=None, store_all=True):
         """Fill the contact list with rows."""
-        self.all_contacts = contacts
+        if store_all:
+            self.all_contacts = contacts  # only store once when loading full list
+
         self.contact_click_handler = on_click
         self.list_layout.setSpacing(4)
 
@@ -86,21 +92,22 @@ class ContactsView(QWidget):
                 w.setParent(None)
                 w.deleteLater()
 
-        if not self.all_contacts:
-            self.all_contacts = contacts
-        if on_click:
-            self.contact_click_handler = on_click
-
         if not contacts:
+            empty_contacts = QWidget()
+            empty_layout = QVBoxLayout(empty_contacts)
+            empty_layout.addStretch()  # top stretch
             empty_label = QLabel("No contacts found.")
             empty_label.setAlignment(Qt.AlignCenter)
-            empty_label.setStyleSheet("color: #aaa; padding: 10px;")
-            self.list_layout.addWidget(empty_label)
+            empty_label.setStyleSheet("color: #aaa; font-size: 16px;")
+            empty_layout.addWidget(empty_label)
+            empty_layout.addStretch()  # bottom stretch
+
+            self.list_layout.addWidget(empty_contacts)
             return
 
         for contact in contacts:
             row = QHBoxLayout()
-            row.setSpacing(12)
+            row.setSpacing(14)
 
             # Create labels for each column
             name_label = QLabel(contact["name"] if contact["name"] else "N/A")
@@ -132,6 +139,8 @@ class ContactsView(QWidget):
             # Row widget
             row_widget = QWidget()
             row_widget.setLayout(row)
+            row_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+            row_widget.setFixedHeight(60)
             row_widget.setStyleSheet("""
                 QWidget {
                     background-color: #333;
@@ -156,9 +165,11 @@ class ContactsView(QWidget):
 
     def filter_contacts(self, text):
         """Filter contacts based on search text."""
-        if not text.strip():
-            # Show full list
-            self.populate_contacts(self.all_contacts, self.contact_click_handler)
+        query = text.strip().lower()
+
+        if not query:
+            # Show full list again
+            self.populate_contacts(self.all_contacts, self.contact_click_handler, store_all=False)
             return
 
         filtered = [
@@ -168,4 +179,4 @@ class ContactsView(QWidget):
                or text.lower() in (c["email"] or "").lower()
                or text.lower() in (c["website"] or "").lower()
         ]
-        self.populate_contacts(filtered, self.contact_click_handler)
+        self.populate_contacts(filtered, self.contact_click_handler, store_all=False)

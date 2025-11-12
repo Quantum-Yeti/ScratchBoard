@@ -1,6 +1,7 @@
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QTextEdit
-from fontTools.merge import layout
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QTextEdit, QHBoxLayout
+from utils.resource_path import resource_path
 
 from helpers.oui_lookup import OUILookup
 
@@ -40,9 +41,21 @@ class MacVendorView(QWidget):
         layout.addWidget(self.console_output)
 
         # Query button
-        button = QPushButton("Lookup")
+        button_layout = QHBoxLayout()
+        button = QPushButton("Query")
+        button.setIcon(QIcon(resource_path("resources/icons/query.png")))
+        button.setIconSize(QSize(24, 24))
         button.clicked.connect(self.lookup_mac)
-        layout.addWidget(button)
+
+        # Clear button
+        clear_btn = QPushButton("Clear")
+        clear_btn.setIcon(QIcon(resource_path("resources/icons/clear.png")))
+        clear_btn.setIconSize(QSize(24, 24))
+        clear_btn.clicked.connect(self.clear_btn)
+
+        button_layout.addWidget(button)
+        button_layout.addWidget(clear_btn)
+        layout.addLayout(button_layout)
 
     def append_console(self, text):
         self.console_output.append(text)
@@ -65,3 +78,8 @@ class MacVendorView(QWidget):
         self.append_console(f"> Vendor: {vendor}")
         self.append_console(f"> Country: {address}")
         self.append_console(f"> Type: {prefix_type}")
+
+
+    def clear_btn(self):
+        self.input_mac.clear()
+        self.console_output.clear()

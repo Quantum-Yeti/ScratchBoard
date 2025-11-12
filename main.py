@@ -1,6 +1,8 @@
 import sys
+
+from PySide6.QtCore import QSharedMemory
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QWidget, QStackedLayout
+from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QWidget, QStackedLayout, QMessageBox
 
 from helpers.run_startup import run_startup
 from helpers.update_window_title import update_window_title
@@ -28,7 +30,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(f"Scratch Board")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
-        self.setGeometry(200, 200, 1200, 800)
+        self.setGeometry(200, 200, 1200, 820)
 
         # Update window title
         update_window_title(self)
@@ -105,6 +107,12 @@ class MainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     load_styles(app)
+
+    # Ensure only one instance of the program runs using QSharedMemory method
+    shared_mem = QSharedMemory("ScratchBoardAppInstance")
+    if not shared_mem.create(1):
+        QMessageBox.warning(None, "Already Running", "Scratch Board is already running.")
+        sys.exit(0)
 
     # --- Splash screen ---
     splash = SplashScreen(resource_path("resources/icons/astronaut_splash.png"))

@@ -1,7 +1,8 @@
 from PySide6.QtCore import QUrl
-from PySide6.QtGui import QDesktopServices, Qt, QAction
+from PySide6.QtGui import QDesktopServices, Qt, QAction, QIcon
 from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLayout, QLineEdit, QPushButton, QWidget, \
     QMenu, QMessageBox, QLabel
+from utils.resource_path import resource_path
 
 
 class ReferenceWidget(QWidget):
@@ -24,10 +25,14 @@ class ReferenceWidget(QWidget):
         input_layout = QHBoxLayout()
         self.title_input = QLineEdit()
         self.title_input.setPlaceholderText("Title")
+
         self.url_input = QLineEdit()
         self.url_input.setPlaceholderText("URL (https://...)")
+
         self.add_button = QPushButton("Add")
+        self.add_button.setIcon(QIcon(resource_path("resources/icons/add.png")))
         self.add_button.clicked.connect(self.add_reference)
+
         input_layout.addWidget(self.title_input)
         input_layout.addWidget(self.url_input)
         input_layout.addWidget(self.add_button)

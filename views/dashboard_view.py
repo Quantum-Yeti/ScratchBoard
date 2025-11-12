@@ -8,7 +8,7 @@ from views.widgets.mac_widget import MacVendorView
 from views.widgets.reference_widget import ReferenceWidget
 from views.widgets.time_widget import TimezoneClock
 from views.main_view import MainView
-from views.contacts_view import ContactsView  # New contacts view
+from views.contacts_view import ContactsView
 from utils.resource_path import resource_path
 
 class DashboardView(QWidget):
@@ -24,7 +24,7 @@ class DashboardView(QWidget):
         main_layout.setContentsMargins(12, 12, 12, 12)
         main_layout.setSpacing(12)
 
-        # --- Top layout (banner + stats) ---
+        # Top layout (banner + stats)
         top_layout = QHBoxLayout()
         main_layout.addLayout(top_layout)
 
@@ -60,20 +60,23 @@ class DashboardView(QWidget):
         main_layout.addItem(spacer)
         main_layout.addLayout(bottom_layout, stretch=1)
 
+        # Bottom widget title styling
         title_style = "font-weight: bold; font-size: 15px; color: white;"
 
+        # Keeping helper here for now, moving during refactor stage.
         def create_section_title(text, icon_name):
+            """Helper function that creates a section title with icon."""
             label = QLabel()
-            label.setAlignment(Qt.AlignCenter | Qt.AlignTop)
+            label.setAlignment(Qt.AlignCenter | Qt.AlignTop | Qt.AlignVCenter)
             icon_path = resource_path(f"resources/icons/{icon_name}.png")
-            label.setText(f'<img src="{icon_path}" width="32" height="32" style="vertical-align: middle; margin-right: 6px">  {text}')
+            label.setText(f'<img src="{icon_path}" width="32" height="32" style="vertical-align: middle; margin-right: 6px; margin-top: 6px;">  {text}')
             label.setStyleSheet(title_style)
             return label
 
         # Reference Section
         self.reference_widget = ReferenceWidget(model)
         ref_layout = QVBoxLayout()
-        ref_layout.setAlignment(Qt.AlignTop)  # top alignment
+        ref_layout.setAlignment(Qt.AlignTop | Qt.AlignVCenter)  # top alignment
         ref_layout.addWidget(create_section_title("Quick Links/Reference", "reference"))
         ref_layout.addWidget(self.reference_widget)
         # remove ref_layout.addStretch()
@@ -97,7 +100,7 @@ class DashboardView(QWidget):
         # remove tz_layout.addStretch()
         bottom_layout.addLayout(tz_layout, stretch=1)
 
-        # --- Views ---
+        # Views
         self.notes_view = MainView(self.model.get_all_categories())
         self.contacts_view = ContactsView(self.model.get_all_categories())
         main_layout.addWidget(self.notes_view)
@@ -105,7 +108,7 @@ class DashboardView(QWidget):
         self.contacts_view.hide()
         self.notes_view.add_btn.hide()
 
-        # --- Connect sidebar signals ---
+        # Connect sidebar signals
         self.sidebar.category_selected.connect(self.on_category_selected)
         self.sidebar.dashboard_clicked.connect(self.show_dashboard)
 

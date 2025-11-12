@@ -139,7 +139,7 @@ class ScratchNote(QDialog):
         if hasattr(self, "title_label"):
             self.title_label.setText(display_title)
 
-    # --- Dragging and resizing ---
+    # Dragging and resizing
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             rect = self.rect()

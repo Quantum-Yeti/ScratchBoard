@@ -1,7 +1,9 @@
-from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QComboBox, QLabel
-from PySide6.QtCore import Qt, QEvent
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QComboBox, QLabel, QHBoxLayout
+from PySide6.QtCore import Qt, QEvent, QSize
 from helpers.floating_action import FloatingButton
 from views.note_card_view import NoteCard
+from utils.resource_path import resource_path
 
 class MainView(QWidget):
     def __init__(self, categories):
@@ -29,7 +31,19 @@ class MainView(QWidget):
         layout.addWidget(self.scroll)
 
         # Floating add button
-        self.add_btn = FloatingButton(self, icon_path="resources/icons/edit.png", tooltip="Add note", shortcut="Ctrl+N")
+        self.add_btn = FloatingButton(self, icon_path="resources/icons/add.png", tooltip="Add note", shortcut="Ctrl+N")
+        self.add_btn.setIconSize(self.size() * 0.6)  # 60% of button size
+        self.setStyleSheet("""
+            QPushButton#FloatingButton {
+                border: none;
+                background-color: #3498eb;
+                border-radius: 30px;
+                
+            }
+            QPushButton#FloatingButton::icon {
+                padding-left: 10px;
+            }
+        """)
 
     def resizeEvent(self, event):
         self.add_btn.reposition()
@@ -49,9 +63,20 @@ class MainView(QWidget):
                 widget.deleteLater()
 
         if not notes:
-            empty_label = QLabel("No notes found.")
-            empty_label.setAlignment(Qt.AlignCenter)
-            self.grid_layout.addWidget(empty_label, 0, 0)
+            empty_notes = QWidget()
+            layout = QHBoxLayout(empty_notes)
+            layout.setAlignment(Qt.AlignCenter)
+
+            icon_label = QLabel()
+            icon_label.setPixmap(QPixmap(resource_path("resources/icons/null.png")).scaled(48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+
+            text_label = QLabel("No notes found.")
+            text_label.setStyleSheet("color: white; font-size: 24px;")
+
+            layout.addWidget(icon_label)
+            layout.addWidget(text_label)
+
+            self.grid_layout.addWidget(empty_notes, 0, 0)
             return
 
         cols = 3
