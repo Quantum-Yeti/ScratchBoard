@@ -7,7 +7,7 @@ from views.scratch_view import ScratchNote
 from utils.resource_path import resource_path
 import random
 
-PASTEL_COLORS = ["#FFEBEE", "#FFF3E0", "#E8F5E9", "#E3F2FD", "#F3E5F5"]
+PASTEL_COLORS = ["#A8D0FF", "#D7A8FF", "#A8FFB8", "#FFA8A8", "#FFD8A8"]
 
 class ScratchManager(QWidget):
     def __init__(self, model):
@@ -20,6 +20,8 @@ class ScratchManager(QWidget):
         self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setMinimumWidth(200)
         self.setMinimumHeight(100)
+        self.setMaximumWidth(200)
+        self.setMaximumHeight(100)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(4, 4, 4, 4)
