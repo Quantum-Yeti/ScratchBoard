@@ -1,18 +1,21 @@
 # Scratch Board
 
-**Scratch Board** is a lightweight desktop productivity app that combines note-taking, scratch notes (sticky notes), and fun interactive tools like a built-in Pac-Man game. Designed for quick note capture and playful exploration, it keeps your ideas organized while adding a touch of fun.
+**Scratch Board** is a lightweight desktop productivity app that combines note-taking, scratch notes (sticky notes), and interactive tools such as a MAC vendor lookup. Designed for capturing quick notes and playful exploration, it keeps your ideas organized while adding a touch of fun.
 
 ---
 
 ## Features
 
 - **Scratch Notes:** Create colorful, draggable, and resizable sticky notes with auto-save.  
-- **Markdown Text Formatting:** Use markdown formatting to jot down notes and preview the html version side by side in a preview panel.  
+- **Basic Markdown Text Formatting:** Use markdown formatting to jot down notes and preview the html version side by side in a preview panel.  
 - **Dashboard:** Modern dashboard that includes statistics, graphs, and helpful widgets.  
-- **Sidebar Navigation:** Quickly switch between different views of the app.  
+- **Sidebar Navigation:** Quickly switch between different views of the app.
+- **Execute Batch Files:** Quickly select and execute a windows batch file.
 - **Pac-Man Game:** Take a break with a built-in, playable Pac-Man game.   
 - **Custom Colors:** Change the color of your scratch notes using the color picker.  
-- **Mac Lookup:** Search a MAC address to find the company and country of origin.
+- **Mac Vendor Lookup:** Search a MAC address to find the company and country of origin.
+- **Contacts Rolodex:** Add, edit, and delete contacts with names, emails, phone numbers, and websites.
+- **Quick Links/References:** Add and delete quick links to helpful online resources.
 - **Timezone Clocks:** View the military time for each timezone within the United States.
 
 ---
