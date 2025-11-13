@@ -23,7 +23,7 @@ class NoteCard(QFrame):
         # Content (rendered Markdown)
         content_view = QTextBrowser()
         content_view.setOpenExternalLinks(True)
-        content_view.setStyleSheet("background: transparent; border: none;")
+        content_view.setStyleSheet("background: transparent; border: none; a { color: #5DADE2; text-decoration: none;}")
         content_view.setHtml(markdown.markdown(note["content"]))
 
         # Hide scrollbars but keep original size

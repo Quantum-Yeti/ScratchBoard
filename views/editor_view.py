@@ -122,7 +122,7 @@ class EditorPanel(QDialog):
         add("bold.png", "**", "**", "Bold")
         add("italic.png", "_", "_", "Italic")
         add("header.png", "# ", "", "Header")
-        add("link.png", "[", "](https://)", "Link")
+        add("link.png", "[Website title...", "](https://...)", "Link")
         add("code_block.png", "```\n", "\n```", "Code Block")
         add("quote.png", "> ", "", "Quote")
         add("bullet.png", "- ", "", "Bullet List")

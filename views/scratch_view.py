@@ -1,15 +1,23 @@
+import random
+
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QLabel, QColorDialog
 from PySide6.QtCore import Qt, QTimer, QPoint, QSize
 from PySide6.QtGui import QColor, QIcon, QPixmap
+from helpers.text_color_switcher import get_text_color
 from utils.resource_path import resource_path
 
-PASTEL_COLORS = ["#FFEBEE", "#FFF3E0", "#E8F5E9", "#E3F2FD", "#F3E5F5"]
-
-def get_text_color(bg_color):
-    """Return black or white depending on background brightness."""
-    c = QColor(bg_color)
-    brightness = (c.red()*299 + c.green()*587 + c.blue()*114) / 1000
-    return "#000000" if brightness > 128 else "#FFFFFF"
+PASTEL_COLORS = [
+    "#BFD8F7",  # Soft Sky Blue
+    "#A3CFF7",  # Light Cerulean
+    "#89BFF7",  # Powder Blue
+    "#97D3E6",  # Muted Cyan
+    "#A3D6E8",  # Soft Aqua
+    "#B0CFF7",  # Pale Cornflower
+    "#A0C8E8",  # Light Steel Blue
+    "#B2D8F2",  # Gentle Ice Blue
+    "#9EC1E1",  # Frosted Blue
+    "#ADD8E6"   # Classic Light Blue
+]
 
 class ScratchNote(QDialog):
     RESIZE_MARGIN = 8
@@ -19,7 +27,7 @@ class ScratchNote(QDialog):
         super().__init__()
         self.model = model
         self.note_id = note_id
-        self.color = color or PASTEL_COLORS[0]
+        self.color = color or random.choice(PASTEL_COLORS)
         self.on_new_note = on_new_note
 
         self.setWindowTitle(title)
@@ -52,6 +60,7 @@ class ScratchNote(QDialog):
             padding-left: 6px;""")
         top_bar.addWidget(self.title_label)
 
+        # Adds a stretch between the title_label and the buttons
         top_bar.addStretch()
 
         # Add button
@@ -90,6 +99,7 @@ class ScratchNote(QDialog):
         self.close_btn.clicked.connect(self.close)
         top_bar.addWidget(self.close_btn)
 
+        # Add top_bar to the layout
         layout.addLayout(top_bar)
 
         # Text edit
@@ -148,7 +158,7 @@ class ScratchNote(QDialog):
             - If the note already exists (`self.note_id` is set), updates the existing record.
             - Otherwise, creates a new note entry in the database and assigns its new ID.
             - Updates the window title and visible note title label to match the saved title.
-            """
+        """
         text = self.text_edit.toPlainText().strip()
         title = text.split("\n")[0][:20] or "Sticky Note"
 
@@ -174,7 +184,7 @@ class ScratchNote(QDialog):
             - Calls the base class implementation to ensure default event handling.
             Args:
                 event (QMouseEvent): The mouse press event.
-            """
+        """
         if event.button() == Qt.LeftButton:
             rect = self.rect()
             pos = event.pos()
@@ -208,7 +218,7 @@ class ScratchNote(QDialog):
             - Calls the base class implementation to ensure default event handling.
             Args:
                 event (QMouseEvent): The mouse move event.
-            """
+        """
         rect = self.rect()
 
         if self._drag_active:
@@ -277,6 +287,12 @@ class ScratchNote(QDialog):
         """)
 
     def update_top_bar_icons(self):
+        """
+           Update the icons on the note's top bar based on the current background color.
+           Determines whether the background color is light or dark, then switches
+           the top bar button icons (add, close, color picker, delete) to a version
+           that ensures sufficient contrast for visibility.
+        """
         c = QColor(self.color)
         brightness = (c.red() * 299 + c.green() * 587 + c.blue() * 114) / 1000
         icon_suffix = "_white" if brightness <= 128 else "_black"

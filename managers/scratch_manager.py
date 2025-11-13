@@ -7,7 +7,18 @@ from views.scratch_view import ScratchNote
 from utils.resource_path import resource_path
 import random
 
-PASTEL_COLORS = ["#A8D0FF", "#D7A8FF", "#A8FFB8", "#FFA8A8", "#FFD8A8"]
+PASTEL_COLORS = [
+    "#BFD8F7",  # Soft Sky Blue
+    "#A3CFF7",  # Light Cerulean
+    "#89BFF7",  # Powder Blue
+    "#97D3E6",  # Muted Cyan
+    "#A3D6E8",  # Soft Aqua
+    "#B0CFF7",  # Pale Cornflower
+    "#A0C8E8",  # Light Steel Blue
+    "#B2D8F2",  # Gentle Ice Blue
+    "#9EC1E1",  # Frosted Blue
+    "#ADD8E6"   # Classic Light Blue
+]
 
 class ScratchManager(QWidget):
     def __init__(self, model):
