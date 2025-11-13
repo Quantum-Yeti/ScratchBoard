@@ -44,17 +44,23 @@ class MacVendorView(QWidget):
         button_layout = QHBoxLayout()
         button = QPushButton("Query")
         button.setIcon(QIcon(resource_path("resources/icons/query.png")))
+        button.setMaximumSize(80, 40)
         button.setIconSize(QSize(24, 24))
         button.clicked.connect(self.lookup_mac)
 
         # Clear button
         clear_btn = QPushButton("Clear")
         clear_btn.setIcon(QIcon(resource_path("resources/icons/clear.png")))
+        clear_btn.setMaximumSize(80, 40)
         clear_btn.setIconSize(QSize(24, 24))
         clear_btn.clicked.connect(self.clear_btn)
 
+        button_layout.addStretch()
+
         button_layout.addWidget(button)
         button_layout.addWidget(clear_btn)
+
+        button_layout.addStretch()
         layout.addLayout(button_layout)
 
     def append_console(self, text):

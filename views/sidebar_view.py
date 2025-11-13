@@ -31,7 +31,7 @@ class Sidebar(QWidget):
             btn.setIcon(QIcon(resource_path(icon_file)))
             btn.setIconSize(QSize(32, 32))
             btn.setCursor(Qt.PointingHandCursor)
-            # Use a lambda to capture `name` correctly
+            # lambda to capture `name` correctly
             btn.clicked.connect(lambda checked, c=name: self.category_selected.emit(c))
             layout.addWidget(btn)
 
