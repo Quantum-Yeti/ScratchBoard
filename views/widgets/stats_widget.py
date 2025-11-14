@@ -5,7 +5,7 @@ from helpers.dashboard_stats import calculate_stats  # Make sure this returns ne
 
 
 class StatCard(QWidget):
-    """A single dashboard stat card with animated value."""
+    """Dashboard stat card with animated value."""
     def __init__(self, title, value="0"):
         super().__init__()
         self._value = 0

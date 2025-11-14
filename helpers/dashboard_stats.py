@@ -8,8 +8,16 @@ def calculate_stats(model):
     - average words per note
     - longest note (in words)
     - shortest note (in words)
-    - notes created today
+    - notes created today (or target date if overridden)
     """
+
+    # date override for charts
+    date_override = getattr(model, "override_date_for_stats", None)
+
+    if date_override is None:
+        target_date = datetime.now().date()
+    else:
+        target_date = date_override
 
     categories = model.get_all_categories()
     all_notes = [
@@ -29,12 +37,11 @@ def calculate_stats(model):
            and datetime.fromisoformat(n["created"]).year == now.year
     )
 
-    # Notes today
-    today = now.date()
+    # notes_today uses target_date
     notes_today = sum(
         1
         for n in all_notes
-        if datetime.fromisoformat(n["created"]).date() == today
+        if datetime.fromisoformat(n["created"]).date() == target_date
     )
 
     # Word count statistics
@@ -49,5 +56,5 @@ def calculate_stats(model):
         "avg_words": avg_words,
         "longest_note": longest_note,
         "shortest_note": shortest_note,
-        "today": notes_today,
+        "today": notes_today,  # now "target_date"
     }

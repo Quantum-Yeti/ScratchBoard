@@ -61,7 +61,7 @@ class DashboardView(QWidget):
         main_layout.addLayout(bottom_layout, stretch=1)
 
         # Bottom widget title styling
-        title_style = "font-weight: bold; font-size: 15px; color: white;"
+        title_style = "font-weight: bold; font-size: 15px; color: white; margin-top: 10px;"
 
         # Keeping helper here for now, moving during refactor stage.
         def create_section_title(text, icon_name):
@@ -69,7 +69,10 @@ class DashboardView(QWidget):
             label = QLabel()
             label.setAlignment(Qt.AlignCenter | Qt.AlignTop | Qt.AlignVCenter)
             icon_path = resource_path(f"resources/icons/{icon_name}.png")
-            label.setText(f'<img src="{icon_path}" width="32" height="32" style="vertical-align: middle; margin-right: 6px; margin-top: 6px;">  {text}')
+            label.setText(f'''
+                            <img src="{icon_path}" width="32" height="32" style="vertical-align: middle; margin-right:6px;"> 
+                            <span style="vertical-align: middle;">{text}</span>
+            ''')
             label.setStyleSheet(title_style)
             return label
 

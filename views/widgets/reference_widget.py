@@ -1,3 +1,4 @@
+from PySide6 import QtCore
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices, Qt, QAction, QIcon
 from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLayout, QLineEdit, QPushButton, QWidget, \
@@ -8,8 +9,10 @@ from utils.resource_path import resource_path
 class ReferenceWidget(QWidget):
     def __init__(self, model):
         super().__init__()
+        # Initialize model
         self.model = model
 
+        # Vertical box layout
         layout = QVBoxLayout(self)
         layout.setContentsMargins(6,6,6,6)
         layout.setSpacing(6)
@@ -20,16 +23,15 @@ class ReferenceWidget(QWidget):
 
         layout.addWidget(self.list_widget)
 
-
         # Input for adding new references
         input_layout = QHBoxLayout()
         self.title_input = QLineEdit()
-        self.title_input.setPlaceholderText("Title")
+        self.title_input.setPlaceholderText("Title...")
 
         self.url_input = QLineEdit()
         self.url_input.setPlaceholderText("URL (https://...)")
 
-        self.add_button = QPushButton("Add")
+        self.add_button = QPushButton("")
         self.add_button.setIcon(QIcon(resource_path("resources/icons/add.png")))
         self.add_button.clicked.connect(self.add_reference)
 
@@ -38,15 +40,21 @@ class ReferenceWidget(QWidget):
         input_layout.addWidget(self.add_button)
         layout.addLayout(input_layout)
 
+        # Initialize the loading of references
         self.load_references()
+        # Allow reference to open on click
         self.list_widget.itemClicked.connect(self.open_reference)
 
     def load_references(self):
         self.list_widget.clear()
         for ref in self.model.get_references():
-            item = QListWidgetItem(ref["title"])
+            item = QListWidgetItem(f"> {ref["title"]}")
             item.setData(Qt.UserRole, ref["url"])
             item.setData(Qt.UserRole + 1, ref["id"])  # store the database ID for deletion
+
+            # Adds extra vertical spacing
+            item.setSizeHint(item.sizeHint() + QtCore.QSize(0, 3))
+
             self.list_widget.addItem(item)
 
     def add_reference(self):

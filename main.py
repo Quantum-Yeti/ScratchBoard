@@ -114,15 +114,17 @@ def main():
         QMessageBox.warning(None, "Already Running", "Scratch Board is already running.")
         sys.exit(0)
 
-    # --- Splash screen ---
+    # Splash screen
     splash = SplashScreen(resource_path("resources/icons/astronaut_splash.png"))
     run_startup(splash)
 
-    # --- Main window ---
+    # Main window
     window = MainWindow()
 
-    window.show()
-    splash.close()
+    splash.close()  # hide splash first
+    window.show()  # show main window
+    window.raise_()  # bring to front
+    window.activateWindow()  # give keyboard focus
 
     sys.exit(app.exec())
 

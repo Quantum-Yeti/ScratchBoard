@@ -44,8 +44,10 @@ class ContactsView(QWidget):
         # Header labels
         header_layout = QHBoxLayout()
         header_layout.setSpacing(12)
-        header_labels = [("Name", 150), ("Phone", 120), ("Email", 180), ("Website", 200)]
-        for text, width in header_labels:
+        self.column_stretch = [2, 1, 3, 3]
+
+        header_labels = ["Name", "Phone", "Email", "Website"]
+        for text, stretch in zip(header_labels, self.column_stretch):
             lbl = QLabel(f"<b>{text}</b>")
             lbl.setStyleSheet("color: #3BC7C4; font-size: 14px;")
             #lbl.setFixedWidth(width)
@@ -118,7 +120,8 @@ class ContactsView(QWidget):
 
         for contact in contacts:
             row = QHBoxLayout()
-            row.setSpacing(14)
+            row.setSpacing(12)
+            row.setContentsMargins(0, 0, 0, 0)  # remove default margins
 
             # Create labels for each column
             name_label = QLabel(contact["name"] if contact["name"] else "N/A")
@@ -170,9 +173,17 @@ class ContactsView(QWidget):
                     padding-top: 6px;
                     border-radius: 4px;
                 }
+                QWidget#row {
+                    background-color: #333;
+                    padding: 6px 6px 6px 0px;
+                    border-radius: 4px;
+                    border: 2px solid transparent;
+                }
+
                 QWidget#row:hover {
                     border: 2px solid #3498eb;
                 }
+
             """)
 
             # Double click to open

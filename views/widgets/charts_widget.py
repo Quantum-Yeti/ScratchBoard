@@ -1,8 +1,13 @@
 from datetime import datetime, timedelta
-from PySide6.QtCharts import QChart, QChartView, QSplineSeries, QLineSeries, QBarSet, QBarSeries, QValueAxis, QCategoryAxis
+from PySide6.QtCharts import QChart, QChartView, QSplineSeries, QLineSeries, QBarSet, QBarSeries, QValueAxis, \
+    QCategoryAxis, QLegendMarker
 from PySide6.QtGui import QColor
 from PySide6.QtCore import Qt
 
+from helpers.chart_pastel_list import PASTEL_CHART_COLORS
+from helpers.dashboard_stats import calculate_stats
+
+# Stacked bar chart
 def create_stacked_bar_chart(model):
     chart = QChart()
     chart.setAnimationOptions(QChart.SeriesAnimations)
@@ -71,71 +76,82 @@ def create_stacked_bar_chart(model):
 
     return chart
 
-
-
-def create_multi_line_chart(model, months_back=3):
+# Multi-line chart
+def create_multi_line_chart(model, days_back=30):
     """
-    Multi-line chart showing number of notes added per category per month.
-    - months_back: how many past months to include
+    Multi-line chart showing dashboard stats over time.
+    The stats come from calculate_stats(model), ensuring the
+    graph matches the dashboard's stat cards.
     """
+
     chart = QChart()
     chart.setAnimationOptions(QChart.AllAnimations)
     chart.setBackgroundVisible(False)
+    chart.setTitle("Note Activity Trends (Past 30 Days)")
+    chart.setTitleBrush(QColor("white"))
 
-    # --- Generate month keys ---
-    now = datetime.now()
-    months = []
-    for i in reversed(range(months_back)):
-        m = (now.replace(day=1) - timedelta(days=i*30)).replace(day=1)
-        months.append(m.strftime("%Y-%m"))
+    # Time range
+    today = datetime.now().date()
+    dates = [(today - timedelta(days=i)) for i in reversed(range(days_back))]
 
-    categories = model.get_all_categories()
-    overall_max = 0
-    series_list = []
+    # Stats to plot
+    stat_keys = [
+        ("total",         "Total Notes"),
+        ("monthly",       "Notes This Month"),
+        ("today",         "Notes Today"),
+        ("avg_words",     "Avg Words/Note"),
+        ("longest_note",  "Longest Note"),
+        ("shortest_note", "Shortest Note"),
+    ]
 
-    # --- Create series for each category ---
-    for cat in categories:
-        notes = model.get_notes(category_name=cat)
-        if not notes:
-            continue
+    # Precompute stats for each day from the model
+    daily_stats = []
+    for d in dates:
+        model.override_date_for_stats = d
+        stats = calculate_stats(model)
+        daily_stats.append(stats)
 
-        # Count notes per month
-        notes_by_month = {}
-        for n in notes:
-            date_key = datetime.fromisoformat(n["created"]).strftime("%Y-%m")
-            notes_by_month[date_key] = notes_by_month.get(date_key, 0) + 1
-
-        # Build series with at least 2 points
+    # Generate a series for each stat
+    max_value = 0
+    for idx, (key, name) in enumerate(stat_keys):
         series = QSplineSeries()
-        series.setName(cat)
-        series.setColor(QColor.fromHsv(hash(cat) % 360, 255, 200))
+        series.setName(name)
+        series.setUseOpenGL(True)
 
-        points = [(i, notes_by_month.get(month, 0)) for i, month in enumerate(months)]
-        if len(points) == 1:
-            points.append((1, points[0][1]))  # duplicate single point
+        # Apply curated color palette
+        color = QColor(PASTEL_CHART_COLORS[idx % len(PASTEL_CHART_COLORS)])
+        series.setColor(color)
 
-        for x, y in points:
-            overall_max = max(overall_max, y)
-            series.append(x, y)
+        # Line thickness
+        pen = series.pen()
+        pen.setWidth(2)
+        pen.setColor(color)
+        series.setPen(pen)
+
+        for i, stats in enumerate(daily_stats):
+            val = stats.get(key, 0)
+            max_value = max(max_value, val)
+            series.append(i, val)
 
         chart.addSeries(series)
-        series_list.append(series)
 
-    if not series_list:
-        return chart  # no data
+        # Legend styling
+        chart.legend().setVisible(True)
+        chart.legend().setLabelColor(QColor("white"))
 
-    # --- X Axis ---
+    # X axis (dates)
     axis_x = QCategoryAxis()
-    for i, month in enumerate(months):
-        axis_x.append(month, i)
-    axis_x.setLabelsColor(QColor("white"))
-    axis_x.setLineVisible(False)
     axis_x.setGridLineVisible(False)
+    axis_x.setVisible(False)
+    for i, d in enumerate(dates):
+        if i % 5 == 0:   # fewer labels
+            axis_x.append(d.strftime("%b %d"), i)
+    axis_x.setLabelsColor(QColor("white"))
     chart.addAxis(axis_x, Qt.AlignBottom)
 
-    # --- Y Axis ---
+    # Y axis
     axis_y = QValueAxis()
-    axis_y.setRange(0, overall_max + 1)
+    axis_y.setRange(0, max_value + 2)
     axis_y.setLabelFormat("%d")
     axis_y.setLabelsColor(QColor("white"))
     axis_y.setLineVisible(False)
@@ -143,16 +159,26 @@ def create_multi_line_chart(model, months_back=3):
     axis_y.setVisible(False)
     chart.addAxis(axis_y, Qt.AlignLeft)
 
-    # --- Attach axes ---
-    for s in series_list:
+    # Starts the y-axis at a minimum of -1 to prevent lines visually dipping below 0
+    axis_y.setMin(-1)
+
+    # Attach axes
+    for s in chart.series():
         s.attachAxis(axis_x)
         s.attachAxis(axis_y)
 
-    # --- Styling ---
+    # Legend
     chart.legend().setVisible(True)
     chart.legend().setLabelColor(QColor("white"))
-    chart.setTitle("Notes Added per Category per Month")
-    chart.setTitleBrush(QColor("white"))
+
+    # Makes the legend marker outlines more pronounced
+    for marker in chart.legend().markers():
+        pen = marker.pen()
+        pen.setWidth(1)
+        marker.setPen(pen)
+
+        brush = marker.brush()
+        marker.setBrush(brush)
 
     return chart
 

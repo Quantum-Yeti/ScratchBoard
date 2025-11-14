@@ -33,8 +33,8 @@ class MacVendorView(QWidget):
         self.console_output.setMinimumHeight(100)
         self.console_output.setStyleSheet("""
                     background-color: #111;
-                    color: #00FF7F;
-                    font-family: Consolas, monospace;
+                    color: #9ACEEB;
+                    font-family: JetBrains Mono, Consolas, monospace;
                     border: 1px solid #444;
                     padding: 6px;
                 """)
@@ -45,7 +45,7 @@ class MacVendorView(QWidget):
         button = QPushButton("Query")
         button.setIcon(QIcon(resource_path("resources/icons/query.png")))
         button.setMaximumSize(80, 40)
-        button.setIconSize(QSize(24, 24))
+        button.setIconSize(QSize(22, 22))
         button.clicked.connect(self.lookup_mac)
 
         # Clear button
