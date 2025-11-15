@@ -1,4 +1,3 @@
-# views/editor_panel.py
 import os
 import re
 from pathlib import Path

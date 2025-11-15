@@ -2,6 +2,8 @@ from PySide6.QtWidgets import (
     QWidget, QScrollArea, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QSizePolicy
 )
 from PySide6.QtCore import Qt, QEvent, Signal
+
+from helpers.contacts_copy_context_menu import CopyableLabel
 from utils.resource_path import resource_path
 from helpers.floating_action import FloatingButton
 
@@ -132,12 +134,12 @@ class ContactsView(QWidget):
             name_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(name_label, 2)
 
-            phone_label = QLabel(contact["phone"] if contact["phone"] else "N/A")
+            phone_label = CopyableLabel(contact["phone"] if contact["phone"] else "N/A")
             #phone_label.setFixedWidth(120)
             phone_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             phone_label.setStyleSheet("color: #aaa;")
             phone_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            phone_label.setAttribute(Qt.WA_TransparentForMouseEvents)
+            #phone_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(phone_label, 1)
 
             email_label = QLabel(contact["email"] if contact["email"] else "N/A")
@@ -148,12 +150,14 @@ class ContactsView(QWidget):
             email_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(email_label, 3)
 
-            website_label = QLabel(contact["website"] if contact["website"] else "N/A")
+            website_label = CopyableLabel()
+            website_label.setText(f'<a href="{contact["website"]}">{contact["website"]}</a>')
             #website_label.setFixedWidth(200)
             website_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            website_label.setStyleSheet("color: #aaa;")
-            website_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
-            website_label.setAttribute(Qt.WA_TransparentForMouseEvents)
+            website_label.setOpenExternalLinks(True)
+            website_label.setStyleSheet("color: #B0E0E6")
+            website_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+            #website_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(website_label, 3)
 
             #row.addStretch()
