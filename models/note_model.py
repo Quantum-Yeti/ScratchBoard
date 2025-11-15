@@ -22,7 +22,7 @@ class NoteModel:
             );
         """)
 
-        # --- Notes ---
+        # Notes
         cur.execute("""
             CREATE TABLE IF NOT EXISTS notes (
                 id TEXT PRIMARY KEY,
@@ -38,7 +38,7 @@ class NoteModel:
             );
         """)
 
-        # --- Contacts ---
+        # Contacts
         cur.execute("""
             CREATE TABLE IF NOT EXISTS contacts (
                 id TEXT PRIMARY KEY,
@@ -54,7 +54,7 @@ class NoteModel:
             );
         """)
 
-        # --- References ---
+        # Quick Links/References
         cur.execute("""
             CREATE TABLE IF NOT EXISTS "reference_links" (
                 id TEXT PRIMARY KEY,
