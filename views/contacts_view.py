@@ -49,7 +49,7 @@ class ContactsView(QWidget):
         header_labels = ["Name", "Phone", "Email", "Website"]
         for text, stretch in zip(header_labels, self.column_stretch):
             lbl = QLabel(f"<b>{text}</b>")
-            lbl.setStyleSheet("color: #3BC7C4; font-size: 14px;")
+            lbl.setStyleSheet("color: #B0E0E6; font-size: 14px;")
             #lbl.setFixedWidth(width)
             lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             #header_layout.addWidget(lbl)
@@ -71,7 +71,7 @@ class ContactsView(QWidget):
         self.scroll_area.setWidgetResizable(True)
         self.list_widget = QWidget()
         self.list_layout = QVBoxLayout(self.list_widget)
-        self.list_layout.setSpacing(4)
+        self.list_layout.setSpacing(8)
         self.list_layout.setContentsMargins(0, 0, 0, 0)
         self.list_layout.setAlignment(Qt.AlignTop)
         self.scroll_area.setWidget(self.list_widget)
@@ -162,6 +162,7 @@ class ContactsView(QWidget):
             row_widget = QWidget()
             row_widget.setObjectName("row")
             row_widget.setLayout(row)
+            row_widget.setMouseTracking(True)
             row_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
             row_widget.setFixedHeight(60)
             row_widget.setStyleSheet("""
@@ -171,19 +172,15 @@ class ContactsView(QWidget):
                     padding-right: 6px;
                     padding-bottom: 6px;
                     padding-top: 6px;
-                    border-radius: 4px;
+                    border-radius: 6px;
+                    margin-bottom: 6px;
                 }
                 QWidget#row {
                     background-color: #333;
                     padding: 6px 6px 6px 0px;
                     border-radius: 4px;
-                    border: 2px solid transparent;
+                    border: 0px solid transparent;
                 }
-
-                QWidget#row:hover {
-                    border: 2px solid #3498eb;
-                }
-
             """)
 
             # Double click to open

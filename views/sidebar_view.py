@@ -18,7 +18,7 @@ class Sidebar(QWidget):
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(4)
 
-        # Categories
+        # Note categories and their resource path to icons.
         self.categories = {
             "Contacts": "resources/icons/contacts.png",
             "CoPilot": "resources/icons/copilot.png",
@@ -39,6 +39,7 @@ class Sidebar(QWidget):
             btn.clicked.connect(lambda checked, c=name: self.category_selected.emit(c))
             layout.addWidget(btn)
 
+        # Stretch moves buttons not related to category notes to the bottom.
         layout.addStretch()
 
         # Dashboard button
@@ -78,7 +79,6 @@ class Sidebar(QWidget):
         self._scratch_pad = None
 
     # Sidebar helper functions
-
     def open_scratch_pad(self):
         """
         Open the Scratch Pad window.

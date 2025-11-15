@@ -30,7 +30,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(f"Scratch Board")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
-        self.setGeometry(100, 100, 1200, 900)
+        self.setGeometry(100, 100, 1280, 900)
 
         # Update window title
         update_window_title(self)

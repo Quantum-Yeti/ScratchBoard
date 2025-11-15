@@ -9,6 +9,22 @@ from helpers.dashboard_stats import calculate_stats
 
 # Stacked bar chart
 def create_stacked_bar_chart(model):
+    """
+    Creates a stacked bar chart showing the number of notes added per day
+    for each category over the last 10 days.
+    Parameters:
+        model (NoteModel): The NoteModel instance to fetch categories and notes from.
+    Returns:
+        QChart: A Qt QChart object configured as a stacked bar chart.
+            - X-axis represents dates (last 10 days).
+            - Y-axis represents the number of notes added.
+            - Each bar is color-coded by category.
+            - Chart includes a legend and a title.
+        Notes:
+            - If there are fewer than 10 days of notes, only the available dates are shown.
+            - Categories without notes on a given day will show as zero-height bars.
+            - The chart uses pastel coloring derived from the category name.
+    """
     chart = QChart()
     chart.setAnimationOptions(QChart.SeriesAnimations)
     chart.setBackgroundVisible(False)
@@ -25,6 +41,8 @@ def create_stacked_bar_chart(model):
     if not all_dates:
         return chart
 
+    all_dates = all_dates[-10:] # Limit to the last 10 days
+
     bar_series = QBarSeries()
     overall_max = 0
 
@@ -33,7 +51,8 @@ def create_stacked_bar_chart(model):
         notes_by_date = {}
         for n in notes:
             d = datetime.fromisoformat(n["created"]).date()
-            notes_by_date[d] = notes_by_date.get(d, 0) + 1
+            if d in all_dates:
+                notes_by_date[d] = notes_by_date.get(d, 0) + 1
 
         values = [notes_by_date.get(d, 0) for d in all_dates]
         overall_max = max(overall_max, max(values, default=0))
@@ -79,11 +98,32 @@ def create_stacked_bar_chart(model):
 # Multi-line chart
 def create_multi_line_chart(model, days_back=30):
     """
-    Multi-line chart showing dashboard stats over time.
-    The stats come from calculate_stats(model), ensuring the
-    graph matches the dashboard's stat cards.
-    """
+    Creates a multi-line chart showing note activity trends over time.
 
+    Each line represents a different statistic calculated from the model,
+    matching the dashboard stat cards. Stats include total notes, notes added
+    today, notes this month, average words per note, longest note, and shortest note.
+
+    Parameters:
+        model (NoteModel): The model instance used to calculate stats.
+        days_back (int, optional): Number of past days to include in the chart.
+                                   Defaults to 30.
+
+    Returns:
+        QChart: A Qt QChart object configured as a multi-line chart.
+                - X-axis represents days (from `days_back` to today).
+                - Y-axis represents the statistic values.
+                - Each line is color-coded and labeled according to the stat.
+                - Includes a legend with visible markers and a title.
+                - Uses a pastel color palette for lines and OpenGL for rendering.
+
+    Notes:
+        - Only every 5th date is labeled on the X-axis to prevent clutter.
+        - Y-axis minimum is set to -1 to avoid lines visually dipping below 0.
+        - Stats are recalculated for each day by temporarily overriding
+          the date in the model.
+        - Chart background is hidden and animations are enabled.
+    """
     chart = QChart()
     chart.setAnimationOptions(QChart.AllAnimations)
     chart.setBackgroundVisible(False)
