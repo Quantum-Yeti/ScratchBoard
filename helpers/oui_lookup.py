@@ -47,24 +47,24 @@ class OUILookup:
         mac = mac.replace(":", "").replace("-", "").replace(".", "").upper()
 
         if len(mac) < 6:
-            return ("Invalid MAC", "", "")
+            return "Invalid MAC", "", ""
 
         # MA-S: longest match first (36 bit)
         prefix_36 = mac[:9]
         if prefix_36 in self.oui_36:
             name, address = self.oui_36[prefix_36]
-            return (name, address, "MA-S (36-bit)")
+            return name, address, "MA-S (36-bit)"
 
         # MA-M: next longest match (28 bit)
         prefix_28 = mac[:7]
         if prefix_28 in self.oui_28:
             name, address = self.oui_28[prefix_28]
-            return (name, address, "MA-M (28-bit)")
+            return name, address, "MA-M (28-bit)"
 
         # MA-L: fallback (24 bit)
         prefix_24 = mac[:6]
         if prefix_24 in self.oui_24:
             name, address = self.oui_24[prefix_24]
-            return (name, address, "MA-L (24-bit)")
+            return name, address, "MA-L (24-bit)"
 
-        return ("Unknown Vendor", "Unknown", "")
+        return "Unknown Vendor", "Unknown", ""

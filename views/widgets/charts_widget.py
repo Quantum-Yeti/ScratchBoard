@@ -150,7 +150,6 @@ def create_multi_line_chart(model, days_back=14):
         ("rolling_words", "Avg Words/Day"),
         ("total_ratio", "Note Ratio"),
         ("cumulative_wave", "Words/Week"),
-
     ]
 
     # Precompute stats for each day from the model
@@ -230,4 +229,5 @@ def create_multi_line_chart(model, days_back=14):
         marker.setBrush(brush)
 
     return chart
+
 

@@ -1,5 +1,5 @@
 from PySide6.QtGui import QIcon, QDesktopServices
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QFrame
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
 import subprocess
 from utils.resource_path import resource_path
@@ -22,11 +22,11 @@ class Sidebar(QWidget):
         self.categories = {
             "Contacts": "resources/icons/contacts.png",
             "CoPilot": "resources/icons/copilot.png",
-            "Notes": "resources/icons/notes.png",
             "Tasks": "resources/icons/tasks.png",
+            "Projects": "resources/icons/projects.png",
+            "Notes": "resources/icons/notes.png",
             "Ideas": "resources/icons/ideas.png",
             "Journal": "resources/icons/journal.png",
-            "Projects": "resources/icons/projects.png",
             "Personal": "resources/icons/personal.png"
         }
 
@@ -35,9 +35,18 @@ class Sidebar(QWidget):
             btn.setIcon(QIcon(resource_path(icon_file)))
             btn.setIconSize(QSize(32, 32))
             btn.setCursor(Qt.PointingHandCursor)
-            # lambda to capture `name` correctly
+            # lambda to captures name of the category
             btn.clicked.connect(lambda checked, c=name: self.category_selected.emit(c))
             layout.addWidget(btn)
+
+            if name == "Projects":
+                separator = QFrame()
+                separator.setStyleSheet("background-color: #1F1F1F;")
+                separator.setFrameShape(QFrame.StyledPanel)
+                separator.setFrameShadow(QFrame.Sunken)
+                separator.setLineWidth(2)
+                separator.setFixedHeight(15)
+                layout.addWidget(separator)
 
         # Stretch moves buttons not related to category notes to the bottom.
         layout.addStretch()

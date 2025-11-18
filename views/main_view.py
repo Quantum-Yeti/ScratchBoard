@@ -38,7 +38,6 @@ class MainView(QWidget):
                 border: none;
                 background-color: #3498eb;
                 border-radius: 30px;
-                
             }
             QPushButton#FloatingButton::icon {
                 padding-left: 10px;

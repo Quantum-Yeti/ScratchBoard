@@ -50,9 +50,6 @@ class AboutWidget(QDialog):
         license_label_txt.setStyleSheet("font-size: 12px;")
         layout.addWidget(license_label_txt)
 
-        # Spacer between text and buttons
-        layout.addStretch()
-
         # License button
         license_btn_icon = QIcon(resource_path("resources/icons/license.png"))
         license_btn = QPushButton("View License")
