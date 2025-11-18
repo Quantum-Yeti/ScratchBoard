@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import uuid
 import random
@@ -6,7 +7,11 @@ from datetime import datetime
 PASTEL_COLORS = ["#FFEBEE", "#FFF3E0", "#E8F5E9", "#E3F2FD", "#F3E5F5"]
 
 class NoteModel:
-    def __init__(self, db_path="notes.db"):
+    def __init__(self, db_path=None):
+        if db_path is None:
+            os.makedirs("data", exist_ok=True)
+            db_path = os.path.join("data", "notes.db")
+
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row
         self._setup_db()
