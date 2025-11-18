@@ -2,7 +2,12 @@ import sys
 
 from PySide6.QtCore import QSharedMemory
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QWidget, QStackedLayout, QMessageBox
+from PySide6.QtWidgets import (QApplication,
+                               QMainWindow,
+                               QHBoxLayout,
+                               QWidget,
+                               QStackedLayout,
+                               QMessageBox)
 
 from helpers.run_startup import run_startup
 from helpers.update_window_title import update_window_title
@@ -20,7 +25,7 @@ from utils.resource_path import resource_path
 def load_styles(app):
     """Load dark theme QSS."""
     try:
-        with open(resource_path("ui/themes/dark_theme.qss"), "r") as f:
+        with open(resource_path("ui/themes/main_theme.qss"), "r") as f:
             app.setStyleSheet(f.read())
     except Exception as e:
         print("Failed to load stylesheet:", e)
@@ -57,6 +62,7 @@ class MainWindow(QMainWindow):
 
         # Menu bar
         self.menu_bar = MainMenuBar(self)
+        self.menu_bar.set_sidebar(self.sidebar)
         self.setMenuBar(self.menu_bar)
 
         # Layout

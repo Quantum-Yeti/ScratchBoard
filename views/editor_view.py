@@ -27,23 +27,24 @@ class EditorPanel(QDialog):
 
         self.setWindowTitle("Scratch Board: Edit Note")
         self.resize(1100, 700)
-        self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        #self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
+        self.setWindowFlags (Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
         self.setAcceptDrops(True)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 12, 12, 12)
         layout.setSpacing(8)
 
-        # ---------------- Title
+        # Title
         self.title_edit = QLineEdit(title)
         self.title_edit.setPlaceholderText("Title...")
         layout.addWidget(self.title_edit)
 
-        # ---------------- Splitter
+        # Splitter
         splitter = QSplitter(Qt.Horizontal)
         layout.addWidget(splitter, stretch=1)
 
-        # ---------------- Left (Editor)
+        # Left (Editor)
         left = QWidget()
         left_l = QVBoxLayout(left)
         self.toolbar = QToolBar()
@@ -58,11 +59,14 @@ class EditorPanel(QDialog):
         left_l.addWidget(self.content_edit, stretch=1)
         splitter.addWidget(left)
 
-        # ---------------- Right (Preview)
+        # Right (Preview)
         self.preview = QTextBrowser()
         self.preview.setObjectName("PreviewPanel")
         self.preview.setPlaceholderText("Markdown -> Html Preview")
         self.preview.setAutoFillBackground(True)
+        self.preview.setOpenLinks(False)
+        self.preview.anchorClicked.connect(self._on_preview_link_clicked)
+        self.preview.installEventFilter(self)
 
 
         left_l.addWidget(self.preview, stretch=1)
@@ -74,7 +78,7 @@ class EditorPanel(QDialog):
 
         splitter.setSizes([620, 480])
 
-        # ---------------- Bottom Row
+        # Bottom Row
         bottom = QHBoxLayout()
         self.word_label = QLabel("Words: 0 — Chars: 0")
         bottom.addWidget(self.word_label)
@@ -97,10 +101,10 @@ class EditorPanel(QDialog):
 
         layout.addLayout(bottom)
 
-        # ---------------- Keyboard Shortcuts
+        # Keyboard Shortcuts
         self._bind_shortcuts()
 
-        # ---------------- Debounce timer for preview
+        # Debounce timer for preview
         self._preview_timer = QTimer(self)
         self._preview_timer.setSingleShot(True)
         self._preview_timer.setInterval(200)
@@ -144,6 +148,19 @@ class EditorPanel(QDialog):
             cur.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, len(end))
         self._schedule_preview()
 
+    def eventFilter(self, obj, event):
+        if obj is self.preview and event.type() == QEvent.MouseButtonDblClick:
+            cursor = self.preview.cursorForPosition(event.pos())
+            anchor = cursor.charFormat().anchorHref()
+
+            if anchor:
+                # Trigger the full-view popup
+                from PySide6.QtCore import QUrl
+                self._on_preview_link_clicked(QUrl(anchor))
+                return True
+
+        return super().eventFilter(obj, event)
+
     # Preview Rendering
     def _schedule_preview(self):
         self._preview_timer.start()
@@ -186,7 +203,16 @@ class EditorPanel(QDialog):
             abs_path = os.path.abspath(path).replace("\\", "/")
             return f'src="file:///{abs_path}"'
 
-        return re.sub(r'src="([^"]+)"', replace, html)
+        html = re.sub(r'src="([^"]+)"', replace, html)
+
+        # Wrap IMG in clickable <a>
+        html = re.sub(
+            r'<img([^>]+)src="([^"]+)"([^>]*)>',
+            r'<a href="\2"><img\1src="\2"\3></a>',
+            html
+        )
+
+        return html
 
     def _insert_image_dialog(self):
         from PySide6.QtWidgets import QFileDialog
@@ -239,10 +265,39 @@ class EditorPanel(QDialog):
             self.showFullScreen()
         self._is_fullscreen = not self._is_fullscreen
 
+    def _on_preview_link_clicked(self, url):
+        """Opens images in a full-window dialog."""
+        path = url.toLocalFile()
+
+        if not os.path.exists(path):
+            return
+
+        from PySide6.QtWidgets import QDialog, QLabel, QVBoxLayout, QScrollArea
+        from PySide6.QtGui import QPixmap
+
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Image Viewer")
+        dlg.resize(900, 700)
+
+        layout = QVBoxLayout(dlg)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        layout.addWidget(scroll)
+
+        lbl = QLabel()
+        lbl.setAlignment(Qt.AlignCenter)
+
+        pix = QPixmap(path)
+        lbl.setPixmap(pix)
+        scroll.setWidget(lbl)
+
+        dlg.exec()
+
     # Style
     def load_stylesheet(self):
         try:
-            with open(resource_path("ui/themes/editor.qss"), "r", encoding="utf-8") as f:
+            with open(resource_path("ui/themes/editor_view_theme.qss"), "r", encoding="utf-8") as f:
                 self.setStyleSheet(f.read())
         except Exception as e:
-            print("Failed to load editor.qss:", e)
+            print("Failed to load editor_view_theme.qss:", e)

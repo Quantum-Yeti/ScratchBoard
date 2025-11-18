@@ -1,5 +1,5 @@
 from PySide6.QtGui import QIcon, QDesktopServices
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
 import subprocess
 from utils.resource_path import resource_path
@@ -112,7 +112,6 @@ class Sidebar(QWidget):
         Returns:
             None
         """
-        from PySide6.QtWidgets import QFileDialog
         file_path, _ = QFileDialog.getOpenFileName(self, "Select a *.bat file", "", "*.bat")
         if file_path:
             try:

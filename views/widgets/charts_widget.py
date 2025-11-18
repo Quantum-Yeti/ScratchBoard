@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta
 from PySide6.QtCharts import QChart, QChartView, QSplineSeries, QLineSeries, QBarSet, QBarSeries, QValueAxis, \
     QCategoryAxis, QLegendMarker
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QFont
 from PySide6.QtCore import Qt
 
 from helpers.chart_pastel_list import PASTEL_CHART_COLORS
 from helpers.dashboard_stats import calculate_stats
+
+segoe = QFont("Segoe UI", 11)
 
 # Stacked bar chart
 def create_stacked_bar_chart(model):
@@ -26,6 +28,9 @@ def create_stacked_bar_chart(model):
             - The chart uses pastel coloring derived from the category name.
     """
     chart = QChart()
+    chart.setFont(segoe)
+    chart.setTitleFont(QFont("Segoe UI", 12))
+    chart.legend().setFont(segoe)
     chart.setAnimationOptions(QChart.SeriesAnimations)
     chart.setBackgroundVisible(False)
 
@@ -96,7 +101,7 @@ def create_stacked_bar_chart(model):
     return chart
 
 # Multi-line chart
-def create_multi_line_chart(model, days_back=30):
+def create_multi_line_chart(model, days_back=14):
     """
     Creates a multi-line chart showing note activity trends over time.
 
@@ -107,7 +112,7 @@ def create_multi_line_chart(model, days_back=30):
     Parameters:
         model (NoteModel): The model instance used to calculate stats.
         days_back (int, optional): Number of past days to include in the chart.
-                                   Defaults to 30.
+                                   Defaults to 7.
 
     Returns:
         QChart: A Qt QChart object configured as a multi-line chart.
@@ -118,16 +123,19 @@ def create_multi_line_chart(model, days_back=30):
                 - Uses a pastel color palette for lines and OpenGL for rendering.
 
     Notes:
-        - Only every 5th date is labeled on the X-axis to prevent clutter.
+        - Only every 5th date is labeled on the X-axis to prevent clutter and its actual visibility is set to false.
         - Y-axis minimum is set to -1 to avoid lines visually dipping below 0.
         - Stats are recalculated for each day by temporarily overriding
           the date in the model.
         - Chart background is hidden and animations are enabled.
     """
     chart = QChart()
+    chart.setFont(segoe)
+    chart.setTitleFont(QFont("Segoe UI", 12))
+    chart.legend().setFont(segoe)
     chart.setAnimationOptions(QChart.AllAnimations)
     chart.setBackgroundVisible(False)
-    chart.setTitle("Note Activity Trends (Past 30 Days)")
+    chart.setTitle("Note Activity Trends")
     chart.setTitleBrush(QColor("white"))
 
     # Time range
@@ -136,12 +144,13 @@ def create_multi_line_chart(model, days_back=30):
 
     # Stats to plot
     stat_keys = [
-        ("total",         "Total Notes"),
-        ("monthly",       "Notes This Month"),
-        ("today",         "Notes Today"),
-        ("avg_words",     "Avg Words/Note"),
-        ("longest_note",  "Longest Note"),
-        ("shortest_note", "Shortest Note"),
+        ("daily_notes", "Daily Notes"),
+        ("daily_words", "Daily Words"),
+        #("rolling_notes", "Avg Notes/Day"),
+        ("rolling_words", "Avg Words/Day"),
+        ("total_ratio", "Note Ratio"),
+        ("cumulative_wave", "Words/Week"),
+
     ]
 
     # Precompute stats for each day from the model

@@ -77,7 +77,7 @@ class StatsWidget(QWidget):
     def load_stylesheet(self):
         """Load dark theme QSS."""
         try:
-            with open(resource_path("ui/themes/dark_theme.qss"), "r") as f:
+            with open(resource_path("ui/themes/main_theme.qss"), "r") as f:
                 self.setStyleSheet(f.read())
         except Exception as e:
-            print("Failed to load dark_theme.qss:", e)
+            print("Failed to load main_theme.qss:", e)

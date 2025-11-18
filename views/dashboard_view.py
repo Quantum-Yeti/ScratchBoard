@@ -18,16 +18,31 @@ class DashboardView(QWidget):
         self.sidebar = sidebar
         self.image_path = resource_path(image_path) if image_path else None
 
+        # Set current view to null
         self.current_view = None
 
+        # Main layout setup
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(12, 12, 12, 12)
+        main_layout.setContentsMargins(12, 12, 12, 0) # 0 is the bottom margin to ensure bottom widgets stick to bottom
         main_layout.setSpacing(12)
+
+        # Views
+        self.notes_view = MainView(self.model.get_all_categories())
+        self.contacts_view = ContactsView(self.model.get_all_categories())
+        main_layout.addWidget(self.notes_view)
+        main_layout.addWidget(self.contacts_view)
+        self.contacts_view.hide()
+        self.notes_view.add_btn.hide()
+
+        # Connect sidebar signals
+        self.sidebar.category_selected.connect(self.on_category_selected)
+        self.sidebar.dashboard_clicked.connect(self.show_dashboard)
 
         # Top layout (banner + stats)
         top_layout = QHBoxLayout()
         main_layout.addLayout(top_layout)
 
+        # Add the banner image widget
         if image_path:
             self.banner = QLabel(alignment=Qt.AlignCenter)
             top_layout.addWidget(self.banner)
@@ -54,9 +69,13 @@ class DashboardView(QWidget):
         #self.stacked_bar_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         #self.multi_line_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
+        # Add vertical stretch to push bottom widgets to the bottom of the window
+        #main_layout.addStretch()
+        #main_layout.addStretch()
+
         # Bottom widgets
         bottom_layout = QHBoxLayout()
-        #bottom_layout.addStretch()
+        bottom_layout.addStretch()
         spacer = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         main_layout.addItem(spacer)
         main_layout.addLayout(bottom_layout, stretch=1)
@@ -106,22 +125,14 @@ class DashboardView(QWidget):
         # remove tz_layout.addStretch()
         bottom_layout.addLayout(tz_layout, stretch=1)
 
-        # Views
-        self.notes_view = MainView(self.model.get_all_categories())
-        self.contacts_view = ContactsView(self.model.get_all_categories())
-        main_layout.addWidget(self.notes_view)
-        main_layout.addWidget(self.contacts_view)
-        self.contacts_view.hide()
-        self.notes_view.add_btn.hide()
-
-        # Connect sidebar signals
-        self.sidebar.category_selected.connect(self.on_category_selected)
-        self.sidebar.dashboard_clicked.connect(self.show_dashboard)
+        # Bottom spacing to give bottom widgets some breathing room from the window edge
+        bottom_spacing = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        main_layout.addItem(bottom_spacing)
 
         self.load_stylesheet()
         self.refresh_dashboard()
 
-    # View switching
+    """/* View Switching Logic */"""
     def on_category_selected(self, category):
         if category == "Contacts":
             self.show_contacts_view()
@@ -153,22 +164,27 @@ class DashboardView(QWidget):
 
     # Stats
     def update_stats(self, animated=True):
+        """Function that updates the stats widget."""
         self.stats_widget.refresh(animated=animated)
 
     # Charts
     def update_graphs(self):
+        """Function that updates the graphs from the model."""
         self.stacked_bar_chart = create_stacked_bar_chart(self.model)
         self.stacked_bar_view.setChart(self.stacked_bar_chart)
 
         self.multi_line_chart = create_multi_line_chart(self.model)
         self.multi_line_view.setChart(self.multi_line_chart)
 
+    # Dashboard refresh
     def refresh_dashboard(self):
+        """Function that refreshes the numerical stats and the graphs."""
         self.update_stats(animated=True)
         self.update_graphs()
 
     # Banner
     def update_banner(self):
+        """This function populates the "banner" of the dashboard. It returns an image to the left of the numerical stats."""
         if not self.image_path:
             return
         pixmap = QPixmap(self.image_path)
@@ -179,7 +195,7 @@ class DashboardView(QWidget):
     # Stylesheet
     def load_stylesheet(self):
         try:
-            with open(resource_path("ui/themes/dark_theme.qss"), "r") as f:
+            with open(resource_path("ui/themes/main_theme.qss"), "r") as f:
                 self.setStyleSheet(f.read())
         except Exception as e:
-            print("Failed to load dark_theme.qss:", e)
+            print("Failed to load main_theme.qss:", e)

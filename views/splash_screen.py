@@ -75,10 +75,10 @@ class SplashScreen(QWidget):
     # Helper Methods
     def apply_dark_theme(self):
         try:
-            with open(resource_path("ui/themes/dark_theme.qss"), "r") as f:
+            with open(resource_path("ui/themes/main_theme.qss"), "r") as f:
                 self.setStyleSheet(f.read())
         except Exception as e:
-            print(f" Failed to load {resource_path('ui/themes/dark_theme.qss')}: {e}")
+            print(f" Failed to load {resource_path('ui/themes/main_theme.qss')}: {e}")
 
     def set_progress(self, value: int, message: str = ""):
         """Update progress bar and optional message"""

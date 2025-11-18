@@ -1,10 +1,21 @@
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEvent
 import markdown
 from utils.resource_path import resource_path
 
 class NoteCard(QFrame):
+    """
+        A visual card representing a single note with title and rendered Markdown content.
+        Supports double-clicking anywhere on the card to trigger a callback.
+    """
+
     def __init__(self, note, on_double_click):
+        """
+            Initialize a NoteCard.
+            Args:
+                note (dict): A dictionary containing note data, must have "title" and "content".
+                on_double_click (callable): Callback function invoked when the card is double-clicked.
+        """
         super().__init__()
         self.note = note
         self.on_double_click = on_double_click
@@ -23,7 +34,9 @@ class NoteCard(QFrame):
         # Content (rendered Markdown)
         content_view = QTextBrowser()
         content_view.setOpenExternalLinks(True)
-        content_view.setStyleSheet("background: transparent; border: none; a { color: #5DADE2; text-decoration: none;}")
+        content_view.setStyleSheet(
+            "background: transparent; border: none; a { color: #5DADE2; text-decoration: none;}"
+        )
 
         html = markdown.markdown(self.note["content"])
         html = f"""
@@ -46,6 +59,10 @@ class NoteCard(QFrame):
             content_view.sizePolicy().verticalPolicy()
         )
 
+        # Make sure double-click anywhere works within the box, does not work on text, links, or images
+        for child in self.findChildren(QTextBrowser) + self.findChildren(QLabel):
+            child.installEventFilter(self)
+
         # Content
         layout.addWidget(content_view)
 
@@ -53,14 +70,34 @@ class NoteCard(QFrame):
         self.load_stylesheet()
 
     def load_stylesheet(self):
-        """Load external stylesheet for consistent dark theme."""
+        """Load the external stylesheet for consistent dark theme styling."""
         try:
-            qss_path = resource_path("ui/themes/note_card.qss")
+            qss_path = resource_path("ui/themes/note_card_theme.qss")
             with open(qss_path, "r") as f:
                 self.setStyleSheet(f.read())
         except Exception as e:
-            print("Failed to load note_card.qss:", e)
+            print("Failed to load note_card_theme.qss:", e)
 
     def mouseDoubleClickEvent(self, event):
+        """
+        Handle double-clicks on the card itself.
+        Args:
+            event (QMouseEvent): The mouse event triggering the double click.
+        """
         if event.button() == Qt.LeftButton and callable(self.on_double_click):
             self.on_double_click(self.note)
+
+    def eventFilter(self, obj, event):
+        """
+            Filter child events to catch double-clicks on labels or QTextBrowser content.
+            Args:
+                obj (QObject): The child object where the event occurred.
+                event (QEvent): The event to filter.
+            Returns:
+                bool: True if the event was handled, otherwise False.
+        """
+        if event.type() == QEvent.MouseButtonDblClick:
+            if callable(self.on_double_click):
+                self.on_double_click(self.note)
+            return True  # stop further handling
+        return super().eventFilter(obj, event)
