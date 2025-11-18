@@ -19,6 +19,7 @@ class MainView(QWidget):
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search notes...")
         controls_layout.addWidget(self.search_input)
+        layout.addLayout(controls_layout)
 
         # Scrollable notes grid
         self.scroll = QScrollArea()
@@ -36,13 +37,16 @@ class MainView(QWidget):
         self.setStyleSheet("""
             QPushButton#FloatingButton {
                 border: none;
-                background-color: #3498eb;
                 border-radius: 30px;
+            }
+            QPushButton#FloatingButton:hover {
+                background-color: #3498eb;
             }
             QPushButton#FloatingButton::icon {
                 padding-left: 10px;
             }
         """)
+
 
     def resizeEvent(self, event):
         self.add_btn.reposition()
@@ -63,11 +67,12 @@ class MainView(QWidget):
 
         if not notes:
             empty_notes = QWidget()
+
             layout = QHBoxLayout(empty_notes)
             layout.setAlignment(Qt.AlignCenter)
 
             icon_label = QLabel()
-            icon_label.setPixmap(QPixmap(resource_path("resources/icons/null.png")).scaled(48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            icon_label.setPixmap(QPixmap(resource_path("resources/icons/astronaut_splash.png")).scaled(48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation))
 
             text_label = QLabel("No notes found.")
             text_label.setStyleSheet("color: white; font-size: 24px;")

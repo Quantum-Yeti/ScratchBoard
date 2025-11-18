@@ -49,7 +49,7 @@ htmlcov/
 
 # Generated data files
 data
-notes.db
+data/notes.db
 
 # Resources folder cache (optional)
 *.cache

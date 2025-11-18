@@ -278,7 +278,7 @@ class ScratchNote(QDialog):
     def update_title_color(self):
         c = QColor(self.color)
         brightness = (c.red() * 299 + c.green() * 587 + c.blue() * 114) / 1000
-        text_color = "#000000" if brightness > 128 else "#FFFFFF"
+        text_color = "#000000" if brightness > 150 else "#FFFFFF"
 
         self.title_label.setStyleSheet(f"""
             background-color: transparent; 
@@ -295,7 +295,7 @@ class ScratchNote(QDialog):
         """
         c = QColor(self.color)
         brightness = (c.red() * 299 + c.green() * 587 + c.blue() * 114) / 1000
-        icon_suffix = "_white" if brightness <= 128 else "_black"
+        icon_suffix = "_white" if brightness <= 150 else "_black"
 
         self.add_button.setIcon(QIcon(resource_path(f"resources/icons/add_button{icon_suffix}.png")))
         self.close_btn.setIcon(QIcon(resource_path(f"resources/icons/close{icon_suffix}.png")))

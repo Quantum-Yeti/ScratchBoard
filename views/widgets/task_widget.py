@@ -1,7 +1,7 @@
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QPushButton,
-    QLabel, QHBoxLayout, QListWidget, QListWidgetItem, QCheckBox
+    QLabel, QHBoxLayout, QListWidget, QListWidgetItem, QCheckBox, QDialog, QTextEdit
 )
 
 from utils.resource_path import resource_path
@@ -23,7 +23,7 @@ class TaskWidget(QWidget):
         """)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(2, 2, 2, 2)
         layout.setSpacing(10)
 
         # Reminder list
@@ -55,6 +55,14 @@ class TaskWidget(QWidget):
         item_layout.setContentsMargins(0, 0, 0, 0)
         item_layout.setSpacing(5)
 
+        # Pencil edit button
+        edit_button = QPushButton()
+        edit_button.setIcon(QIcon(resource_path("resources/icons/edit.png")))
+        edit_button.setStyleSheet("background-color: transparent;")
+        edit_button.setFixedSize(24, 24)
+        edit_button.clicked.connect(lambda _, iw=item_widget: self.open_edit_dialog(iw))
+        item_layout.addWidget(edit_button)
+
         # Reminder text
         label = QLabel(text)
         label.setStyleSheet("background-color: transparent; color: #9ACEEB;")
@@ -74,6 +82,7 @@ class TaskWidget(QWidget):
         list_item.setSizeHint(item_widget.sizeHint())
         self.reminder_list.addItem(list_item)
         self.reminder_list.setItemWidget(list_item, item_widget)
+        self.reminder_list.itemDoubleClicked.connect(self.edit_reminder)
 
         self.input_field.clear()
 
@@ -84,3 +93,52 @@ class TaskWidget(QWidget):
             if self.reminder_list.itemWidget(list_item) == item_widget:
                 self.reminder_list.takeItem(i)
                 break
+
+    def edit_reminder(self, list_item):
+        item_widget = self.reminder_list.itemWidget(list_item)
+        if not item_widget:
+            return
+
+        # Find the label inside the item widget
+        label = item_widget.findChild(QLabel)
+
+        dialog = EditDialog(label.text())
+        if dialog.exec():
+            new_text = dialog.get_text()
+            if new_text:
+                label.setText(new_text)
+
+    def open_edit_dialog(self, item_widget):
+        label = item_widget.findChild(QLabel)
+        if not label:
+            return
+
+        dialog = EditDialog(label.text())
+        if dialog.exec():
+            new_text = dialog.get_text()
+            if new_text:
+                label.setText(new_text)
+
+
+class EditDialog(QDialog):
+    def __init__(self, original_text):
+        super().__init__()
+        self.setWindowTitle("Edit Task")
+        self.setFixedSize(350, 220)
+
+        layout = QVBoxLayout(self)
+
+        layout.addWidget(QLabel("Edit task:"))
+
+        # Multi-line text editor
+        self.text_edit = QTextEdit()
+        self.text_edit.setPlainText(original_text)
+        layout.addWidget(self.text_edit)
+
+        save_btn = QPushButton("Save")
+        save_btn.clicked.connect(self.accept)
+        layout.addWidget(save_btn)
+
+    def get_text(self):
+        return self.text_edit.toPlainText().strip()
+
