@@ -111,7 +111,7 @@ class DashboardView(QWidget):
         self.task_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         task_layout = QVBoxLayout()
         task_layout.setAlignment(Qt.AlignTop)
-        task_layout.addWidget(create_section_title("Tasks", "task_widget"))
+        task_layout.addWidget(create_section_title("Daily Tasks", "task_widget"))
         task_layout.addWidget(self.task_widget)
         bottom_layout.addLayout(task_layout, stretch=1)
 

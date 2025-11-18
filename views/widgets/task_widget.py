@@ -1,7 +1,11 @@
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QPushButton,
-    QLabel, QHBoxLayout, QListWidget, QListWidgetItem
+    QLabel, QHBoxLayout, QListWidget, QListWidgetItem, QCheckBox
 )
+
+from utils.resource_path import resource_path
+
 
 class TaskWidget(QWidget):
     def __init__(self):
@@ -32,7 +36,9 @@ class TaskWidget(QWidget):
         self.input_field.setPlaceholderText("Enter a reminder...")
         input_layout.addWidget(self.input_field)
 
-        self.add_button = QPushButton("Add")
+        self.add_button = QPushButton()
+        self.add_button.setToolTip("Add Task")
+        self.add_button.setIcon(QIcon(resource_path("resources/icons/add.png")))
         self.add_button.clicked.connect(self.add_reminder)
         input_layout.addWidget(self.add_button)
         layout.addLayout(input_layout)
@@ -44,20 +50,22 @@ class TaskWidget(QWidget):
 
         # Create a horizontal layout for each item
         item_widget = QWidget()
+        item_widget.setStyleSheet("background-color: transparent;")
         item_layout = QHBoxLayout()
         item_layout.setContentsMargins(0, 0, 0, 0)
         item_layout.setSpacing(5)
 
         # Reminder text
         label = QLabel(text)
-        label.setStyleSheet("background-color: #2e2e2e; color: #9ACEEB;")
+        label.setStyleSheet("background-color: transparent; color: #9ACEEB;")
         item_layout.addWidget(label)
 
         # Mark done button
-        done_button = QPushButton("Done")
-        done_button.setMaximumWidth(60)
-        done_button.clicked.connect(lambda _, iw=item_widget: self.mark_done(iw))
-        item_layout.addWidget(done_button)
+        done_check = QCheckBox("Done")
+        done_check.setStyleSheet("background-color: transparent;")
+        done_check.setMaximumWidth(60)
+        done_check.clicked.connect(lambda _, iw=item_widget: self.mark_done(iw))
+        item_layout.addWidget(done_check)
 
         item_widget.setLayout(item_layout)
 
