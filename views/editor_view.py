@@ -11,6 +11,7 @@ from PySide6.QtGui import QAction
 
 from helpers.count_words import count_words
 from helpers.drag_drop_image import save_qimage, save_file_drop
+from helpers.markdown_preview import get_markdown_guide
 from helpers.markdown_to_html import render_markdown_to_html
 from utils.resource_path import resource_path
 
@@ -55,7 +56,7 @@ class EditorPanel(QDialog):
 
         self.content_edit = QTextEdit()
         self.content_edit.setPlainText(content or "")
-        self.content_edit.setPlaceholderText("Start writing using markdown...")
+        self.content_edit.setPlaceholderText(get_markdown_guide())
         self.content_edit.textChanged.connect(self._schedule_preview)
         self.content_edit.textChanged.connect(self._update_word_stats)
         left_l.addWidget(self.content_edit, stretch=1)
