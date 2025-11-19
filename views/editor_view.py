@@ -32,8 +32,8 @@ class EditorPanel(QDialog):
         self.setAcceptDrops(True)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(12, 12, 12, 12)
-        layout.setSpacing(8)
+        layout.setContentsMargins(12, 6, 12, 12)
+        layout.setSpacing(10)
 
         # Title
         self.title_edit = QLineEdit(title)
@@ -42,11 +42,13 @@ class EditorPanel(QDialog):
 
         # Splitter
         splitter = QSplitter(Qt.Horizontal)
+        splitter.setHandleWidth(8)
         layout.addWidget(splitter, stretch=1)
 
-        # Left (Editor)
+        # Left side (Editor)
         left = QWidget()
         left_l = QVBoxLayout(left)
+
         self.toolbar = QToolBar()
         self._add_toolbar_actions()
         left_l.addWidget(self.toolbar)
@@ -57,30 +59,34 @@ class EditorPanel(QDialog):
         self.content_edit.textChanged.connect(self._schedule_preview)
         self.content_edit.textChanged.connect(self._update_word_stats)
         left_l.addWidget(self.content_edit, stretch=1)
+
         splitter.addWidget(left)
 
-        # Right (Preview)
+        # Right side (Preview)
         self.preview = QTextBrowser()
         self.preview.setObjectName("PreviewPanel")
         self.preview.setPlaceholderText("Markdown -> Html Preview")
         self.preview.setAutoFillBackground(True)
+        self.preview.setContentsMargins(0,0,6,0)
         self.preview.setOpenLinks(False)
-        self.preview.anchorClicked.connect(self._on_preview_link_clicked)
         self.preview.installEventFilter(self)
-
-
-        left_l.addWidget(self.preview, stretch=1)
         self.preview.setOpenExternalLinks(True)
+
         self._opacity = QGraphicsOpacityEffect(self.preview)
         self.preview.setGraphicsEffect(self._opacity)
         self._opacity.setOpacity(1)
+
         splitter.addWidget(self.preview)
 
-        splitter.setSizes([620, 480])
+
+        # initial sizes for left and right panels
+        splitter.setStretchFactor(0, 1)
+        splitter.setStretchFactor(1, 1)
 
         # Bottom Row
         bottom = QHBoxLayout()
         self.word_label = QLabel("Words: 0 — Chars: 0")
+        self.word_label.setContentsMargins(10, 0, 0, 0)
         bottom.addWidget(self.word_label)
         bottom.addStretch()
 
@@ -124,7 +130,9 @@ class EditorPanel(QDialog):
 
         add("bold.png", "**", "**", "Bold")
         add("italic.png", "_", "_", "Italic")
-        add("header.png", "# ", "", "Header")
+        add("header1.png", "# ", "", "Header")
+        add("header2.png", "## ", "", "Header 2")
+        add("header3.png", "### ", "", "Header 3")
         add("link.png", "[Website title...", "](https://...)", "Link")
         add("code_block.png", "```\n", "\n```", "Code Block")
         add("quote.png", "> ", "", "Quote")
@@ -169,7 +177,17 @@ class EditorPanel(QDialog):
         md = self.content_edit.toPlainText()
         html = render_markdown_to_html(md)
         html = self._convert_image_paths(html)
-        self.preview.setHtml(html)
+
+        # Force background from HTML so QTextBrowser obeys it
+        style = """
+            <style>
+            body {
+                background-color: #333;
+            }
+            </style>
+            """
+
+        self.preview.setHtml(style + html)
 
     # Word Count
     def _update_word_stats(self):
@@ -218,7 +236,7 @@ class EditorPanel(QDialog):
         from PySide6.QtWidgets import QFileDialog
         path, _ = QFileDialog.getOpenFileName(self, "Insert Image", "", "Images (*.png *.jpg *.jpeg *.gif *.webp)")
         if path:
-            dst_dir = Path("data/images")
+            dst_dir = Path("sb_data/images")
             dst_dir.mkdir(parents=True, exist_ok=True)
             dst = dst_dir / Path(path).name
             import shutil

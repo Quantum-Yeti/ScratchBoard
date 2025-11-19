@@ -129,7 +129,7 @@ class ContactsView(QWidget):
             name_label = QLabel(contact["name"] if contact["name"] else "N/A")
             #name_label.setFixedWidth(150)
             name_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            name_label.setStyleSheet("color: white;")
+            name_label.setStyleSheet("color: white; font-weight: bold; padding-left: 2px;")
             name_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             name_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(name_label, 2)
@@ -137,7 +137,7 @@ class ContactsView(QWidget):
             phone_label = CopyableLabel(contact["phone"] if contact["phone"] else "N/A")
             #phone_label.setFixedWidth(120)
             phone_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            phone_label.setStyleSheet("color: #aaa;")
+            phone_label.setStyleSheet("color: #fff;")
             phone_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             #phone_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(phone_label, 1)
@@ -145,13 +145,15 @@ class ContactsView(QWidget):
             email_label = QLabel(contact["email"] if contact["email"] else "N/A")
             #email_label.setFixedWidth(180)
             email_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            email_label.setStyleSheet("color: #aaa;")
+            email_label.setStyleSheet("color: #fff;")
             email_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             email_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(email_label, 3)
 
             website_label = CopyableLabel()
-            website_label.setText(f'<a href="{contact["website"]}">{contact["website"]}</a>')
+            website_label.setTextFormat(Qt.RichText)
+            website_label.setStyleSheet("color: #B0E0E6;")
+            website_label.setText(f'<a href="{contact["website"]}" style="color: #B0E0E6; text-decoration: none;">{contact["website"]}</a>')
             #website_label.setFixedWidth(200)
             website_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             website_label.setOpenExternalLinks(True)
@@ -171,7 +173,7 @@ class ContactsView(QWidget):
             row_widget.setFixedHeight(60)
             row_widget.setStyleSheet("""
                 QWidget {
-                    background-color: #333;
+                    background-color: transparent;
                     padding-left: 0px;
                     padding-right: 6px;
                     padding-bottom: 6px;
@@ -184,6 +186,9 @@ class ContactsView(QWidget):
                     padding: 6px 6px 6px 0px;
                     border-radius: 4px;
                     border: 0px solid transparent;
+                }
+                QWidget#row:hover {
+                    background-color: #444;
                 }
             """)
 

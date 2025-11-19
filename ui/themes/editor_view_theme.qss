@@ -65,7 +65,7 @@ QPushButton#CancelButton:hover {
 }
 
 QTextBrowser#PreviewPanel {
-    background-color: #0f1720;
+    background-color: #333;
     color: #dddddd;
 }
 
@@ -83,3 +83,5 @@ QTextBrowser#PreviewPanel a:hover {
 QTextBrowser#PreviewPanel a:visited {
     color: #eb34ab;
 }
+
+
