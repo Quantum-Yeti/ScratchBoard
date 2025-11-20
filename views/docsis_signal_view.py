@@ -108,6 +108,20 @@ class SignalReference(QDialog):
                 "explanation": "Indicates provisioning or upstream communication problem.",
                 "steps": "Restart modem, check cabling, verify CMTS reachable."
             },
+            {
+                "name": "MER (Modulation Error Ratio)",
+                "range": "≥ 35 dB (DOCSIS 3.0), ≥ 30 dB (DOCSIS 3.1)",
+                "symptoms": "Low → errors, poor signal quality",
+                "explanation": "Measures modulation quality on downstream channels.",
+                "steps": "Check cabling, connectors, and interference sources."
+            },
+            {
+                "name": "Channel Bonding / Frequency",
+                "range": "Varies by ISP",
+                "symptoms": "Channels drop or fail to bond",
+                "explanation": "Shows channel tuning and frequency stability.",
+                "steps": "Inspect coax, splitters, or contact ISP for channel issues."
+            },
         ]
 
         self.table.setRowCount(len(signals))
