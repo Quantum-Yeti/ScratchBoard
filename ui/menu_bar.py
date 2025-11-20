@@ -2,6 +2,7 @@ from PySide6.QtGui import QAction, QCursor, QIcon, Qt
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication
 
 from utils.resource_path import resource_path
+from views.docsis_signal_view import SignalReference
 from views.modem_log_view import ModemLogParserView
 from views.widgets.about_widget import AboutWidget
 
@@ -90,6 +91,13 @@ class MainMenuBar(QMenuBar):
         self.modem_action.setIcon(QIcon(resource_path("resources/icons/network.png")))
         tool_menu.addAction(self.modem_action)
 
+        # DOCSIS Signal Reference
+        self.docsis_action = QAction("DOCSIS Signal Reference", self)
+        self.docsis_action.setToolTip("DOCSIS Signal Reference")
+        self.docsis_action.setShortcut("Ctrl+D")
+        self.docsis_action.setIcon(QIcon(resource_path("resources/icons/signal.png")))
+        tool_menu.addAction(self.docsis_action)
+
         # Separator
         tool_menu.addSeparator()
 
@@ -142,6 +150,7 @@ class MainMenuBar(QMenuBar):
         self.scratch_action.triggered.connect(self.sidebar.open_scratch_pad) # open the scratch notes
         self.bat_action.triggered.connect(self.sidebar.open_bat_file) # run a batch file
         self.modem_action.triggered.connect(self._open_modem_parser)
+        self.docsis_action.triggered.connect(self._open_docsis_signal)
         self.contact_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Contacts")) # open contacts view
         self.tasks_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Tasks")) # open tasks view
         self.project_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Projects")) # open projects view
@@ -150,3 +159,7 @@ class MainMenuBar(QMenuBar):
     def _open_modem_parser(self):
         dlg = ModemLogParserView(self.parent())
         dlg.exec()  # modal; blocks main window until closed
+
+    def _open_docsis_signal(self):
+        sgnl = SignalReference(self.parent())
+        sgnl.exec()
