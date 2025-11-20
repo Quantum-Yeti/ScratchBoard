@@ -105,7 +105,9 @@ class ReferenceWidget(QWidget):
         if item:
             menu = QMenu()
             delete_action = QAction("Delete", self)
-            # Pass the reference ID stored in Qt.UserRole (or store it when loading)
+            delete_action.setToolTip("Delete")
+            delete_action.setIcon(QIcon(resource_path("resources/icons/delete.png")))
+
             delete_action.triggered.connect(lambda: self.delete_reference(item))
             menu.addAction(delete_action)
             menu.exec(self.list_widget.mapToGlobal(pos))

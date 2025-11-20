@@ -50,6 +50,7 @@ htmlcov/
 # Generated data files
 data
 data/notes.db
+sb_data
 
 # Resources folder cache (optional)
 *.cache
