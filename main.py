@@ -109,7 +109,6 @@ class MainWindow(QMainWindow):
 
         update_window_title(self)
 
-
 def main():
     app = QApplication(sys.argv)
     load_styles(app)

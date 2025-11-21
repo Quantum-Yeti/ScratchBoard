@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication
 from utils.resource_path import resource_path
 from views.docsis_signal_view import SignalReference
 from views.modem_log_view import ModemLogParserView
+from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
 
 
@@ -81,6 +82,10 @@ class MainMenuBar(QMenuBar):
         self.scratch_action = QAction("Scratch Note", self)
         self.scratch_action.setIcon(QIcon(resource_path("resources/icons/stickynote.png")))
         tools.addAction(self.scratch_action)
+
+        self.notepad_action = QAction("Notepad", self)
+        self.notepad_action.setIcon(QIcon(resource_path("resources/icons/notepad.png")))
+        tools.addAction(self.notepad_action)
 
         self.bat_action = QAction("Run *.bat", self)
         self.bat_action.setIcon(QIcon(resource_path("resources/icons/run.png")))
@@ -159,6 +164,7 @@ class MainMenuBar(QMenuBar):
 
         # Wire the tools
         self.scratch_action.triggered.connect(self.sidebar.open_scratch_pad) # open the scratch notes
+        self.notepad_action.triggered.connect(self._open_notepad)
         self.bat_action.triggered.connect(self.sidebar.open_bat_file) # run a batch file
         self.modem_action.triggered.connect(self._open_modem_parser)
         self.docsis_action.triggered.connect(self._open_docsis_signal)
@@ -175,6 +181,10 @@ class MainMenuBar(QMenuBar):
 
         # Wire the dialog window for the about menu item
         self.about_action.triggered.connect(lambda: AboutWidget().exec_())
+
+    def _open_notepad(self):
+        dlg = NotepadDialog(self.parent())
+        dlg.exec()  # modal dialog
 
     def _open_modem_parser(self):
         dlg = ModemLogParserView(self.parent())
