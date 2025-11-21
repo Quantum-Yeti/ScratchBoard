@@ -4,6 +4,8 @@ from PySide6.QtCore import Signal, QSize, Qt, QUrl
 import subprocess
 from utils.resource_path import resource_path
 from managers.scratch_manager import ScratchManager
+from views.notepad_view import NotepadDialog
+
 
 class Sidebar(QWidget):
     category_selected = Signal(str)
@@ -66,6 +68,13 @@ class Sidebar(QWidget):
         self.scratch_btn.setCursor(Qt.PointingHandCursor)
         self.scratch_btn.clicked.connect(self.open_scratch_pad)
         layout.addWidget(self.scratch_btn)
+
+        note_btn = QPushButton("Notepad")
+        note_btn.setIcon(QIcon(resource_path("resources/icons/notepad.png")))
+        note_btn.setIconSize(QSize(32, 32))
+        note_btn.setCursor(Qt.PointingHandCursor)
+        note_btn.clicked.connect(self._open_notepad)
+        layout.addWidget(note_btn)
 
         # Run .bat button
         bat_btn = QPushButton("Run *.bat")
@@ -137,3 +146,7 @@ class Sidebar(QWidget):
             None
         """
         QDesktopServices.openUrl(QUrl("https://github.com/Quantum-Yeti/ScratchBoard"))
+
+    def _open_notepad(self):
+        dlg = NotepadDialog(self.parent())
+        dlg.exec()  # modal dialog
