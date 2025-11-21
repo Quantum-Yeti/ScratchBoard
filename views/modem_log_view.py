@@ -1,20 +1,23 @@
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QStyle, \
     QApplication
 from helpers.modem_log_parser import ModemLogParser
 from PySide6.QtCore import Qt, QSize
 
+from utils.resource_path import resource_path
+
 
 class ModemLogParserView(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)  # important to pass parent
-        self.setWindowTitle("Modem Log Parser")
+        self.setWindowTitle("Scratch Board: Modem Log Parser")
         self.setWindowModality(Qt.ApplicationModal)  # makes it modal
 
         self.parser = ModemLogParser()
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(8)
+        layout.setSpacing(6)
 
         # Input field
         self.input = QTextEdit()
@@ -23,12 +26,25 @@ class ModemLogParserView(QDialog):
         layout.addWidget(self.input)
 
         # Parse button
-        btn = QPushButton("Parse Logs")
-        btn.clicked.connect(self.parse_logs)
-        layout.addWidget(btn)
+        parse_btn = QPushButton("Parse Logs")
+        parse_btn.setIcon(QIcon(resource_path("resources/icons/query.png")))
+        parse_btn.clicked.connect(self.parse_logs)
+
+        # Clear button
+        clear_btn = QPushButton("Clear Logs")
+        clear_btn.setIcon(QIcon(resource_path("resources/icons/clear.png")))
+        clear_btn.clicked.connect(self.clear_logs)
+
+        # Aligns parse + clear buttons
+        btn_row = QHBoxLayout()
+        btn_row.addStretch()
+        btn_row.addWidget(parse_btn)
+        btn_row.addWidget(clear_btn)
+        btn_row.addStretch()
+        layout.addLayout(btn_row)
 
         # Output summary
-        self.summary_label = QLabel("")
+        self.summary_label = QLabel()
         self.summary_label.setAlignment(Qt.AlignLeft)
         self.summary_label.setWordWrap(True)
         layout.addWidget(self.summary_label)
@@ -37,6 +53,7 @@ class ModemLogParserView(QDialog):
         self.output = QTextEdit()
         self.output.setPlaceholderText("Log output...")
         self.output.setReadOnly(True)
+        self.output.setMinimumHeight(350)
         layout.addWidget(self.output)
 
         self.resize(900, 700)
@@ -83,3 +100,7 @@ class ModemLogParserView(QDialog):
 
         self.output.setPlainText("\n".join(lines))
 
+    def clear_logs(self):
+        self.input.clear()
+        self.output.clear()
+        self.summary_label.clear()
