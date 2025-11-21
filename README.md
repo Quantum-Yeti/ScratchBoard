@@ -6,22 +6,39 @@
 
 ## Features
 
-- **Scratch Notes:** Create colorful, draggable, and resizable sticky notes with auto-save.  
-- **Basic Markdown Text Formatting:** Use Markdown formatting to jot down notes and preview the html version side by side in a preview panel.  
+### Main Tools
+- **Scratch Notes:** Create colorful, draggable, and resizable sticky notes with auto-save.
+- **Quick Links/References:** Add and delete quick links to helpful online resources.
+- **Modem Log Parser:** Parse DOCSIS modem logs to troubleshoot connection issues.
+- **DOCSIS Signal Reference:** Reference charts for DOCSIS modem signals.
+- **Execute Batch Files:** Quickly select and execute a windows batch file. 
+- **Notepad:** Notepad similar to the Windows Notepad program. Allows saving, editing, and opening of plain-text files.
+- **Mac Vendor Lookup:** Query a MAC address to find the company and country of origin from the IEEE oui database.
+
+### Views
 - **Dashboard:** Modern dashboard that includes statistics, graphs, and helpful widgets.  
 - **Sidebar Navigation:** Quickly switch between different views of the app.
-- **Execute Batch Files:** Quickly select and execute a windows batch file. 
-- **Custom Colors:** Change the color of your scratch notes using the color picker.  
-- **Mac Vendor Lookup:** Query a MAC address to find the company and country of origin.
 - **Contacts Rolodex:** Add, edit, and delete contacts with names, emails, phone numbers, and websites.
-- **Quick Links/References:** Add and delete quick links to helpful online resources.
-- **Modem Log Parser** Parse DOCSIS modem logs to troubleshoot connection issues.
-- **DOCSIS Signal Reference** Reference charts for DOCSIS modem signals.
+- **CoPilot:** A note category to save important information from knowledge domains.
+- **Notes:** Includes categories such as Tasks, Projects, General Notes, Ideas, Journal, and Personal.
+
+### Extras
+- **Basic Markdown Text Formatting:** Use Markdown formatting to jot down notes and preview the html version side by side in a preview panel.  
 
 ---
 ## Screenshots
 
+### Dashboard
 ![Scratch Board Dashboard](screenshots/sbscreenshot.png)
+
+### Notepad
+![Notepad](screenshots/notepad.png)
+
+### Modem Log Parser
+![LogParser](screenshots/logparser.png)
+
+### Scratch Notes
+![ScratchNotes](screenshots/scratchnotes.png)
 
 
 ## Installation
