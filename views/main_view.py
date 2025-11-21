@@ -2,6 +2,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QComboBox, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt, QEvent, QSize
 from helpers.floating_action import FloatingButton
+from ui.note_placeholder_text import example_placeholder_text
 from views.note_card_view import NoteCard
 from utils.resource_path import resource_path
 
@@ -67,20 +68,46 @@ class MainView(QWidget):
 
         if not notes:
             empty_notes = QWidget()
+            main_layout = QVBoxLayout(empty_notes)
+            main_layout.setAlignment(Qt.AlignCenter)
+            main_layout.setSpacing(12)
 
-            layout = QHBoxLayout(empty_notes)
-            layout.setAlignment(Qt.AlignCenter)
+            # Horizontal row: icon + text
+            top_row = QHBoxLayout()
+            top_row.setAlignment(Qt.AlignCenter)
+            top_row.setSpacing(8)
 
-            icon_label = QLabel()
-            icon_label.setPixmap(QPixmap(resource_path("resources/icons/astronaut_splash.png")).scaled(48, 48, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            text_label = QLabel("No notes found. Add some notes using Markdown or plain text.")
+            text_label.setStyleSheet("color: white; font-size: 26px; font-weight: bold; font-style: italic;")
+            text_label.setAlignment(Qt.AlignCenter)
+            text_label.setWordWrap(True)
 
-            text_label = QLabel("No notes found.")
-            text_label.setStyleSheet("color: white; font-size: 24px;")
+            top_row.addWidget(text_label)
 
-            layout.addWidget(icon_label)
-            layout.addWidget(text_label)
+            # Example placeholder below the HBox
+            example_label = QLabel()
+            example_label.setText(example_placeholder_text)
+            example_label.setStyleSheet("color: #ccc; font-size: 16px;")
+            example_label.setWordWrap(True)
+            example_label.setAlignment(Qt.AlignCenter)
 
-            self.grid_layout.addWidget(empty_notes, 0, 0)
+            main_layout.addLayout(top_row)
+            main_layout.addWidget(example_label)
+
+            # Make the empty_notes widget expand to fill the scroll area
+            empty_notes.setSizePolicy(
+                self.scroll.sizePolicy().horizontalPolicy(),
+                self.scroll.sizePolicy().verticalPolicy()
+            )
+
+            # Wrap in a container to center inside scroll area
+            container = QWidget()
+            container_layout = QVBoxLayout(container)
+            container_layout.addStretch()  # top spacer
+            container_layout.addWidget(empty_notes, alignment=Qt.AlignCenter)
+            container_layout.addStretch()  # bottom spacer
+
+            self.grid_layout.addWidget(container, 0, 0, 1, -1)
             return
 
         cols = 3
