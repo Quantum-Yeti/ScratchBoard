@@ -5,16 +5,16 @@ from utils.resource_path import resource_path
 
 class NoteCard(QFrame):
     """
-        A visual card representing a single note with title and rendered Markdown content.
-        Supports double-clicking anywhere on the card to trigger a callback.
+    A visual card representing a single note with title and rendered Markdown content.
+    Supports double-clicking anywhere on the card (*not the content) to trigger a callback.
     """
 
     def __init__(self, note, on_double_click):
         """
-            Initialize a NoteCard.
-            Args:
-                note (dict): A dictionary containing note data, must have "title" and "content".
-                on_double_click (callable): Callback function invoked when the card is double-clicked.
+        Initialize a NoteCard.
+        Args:
+            note (dict): A dictionary containing note data, must have "title" and "content".
+            on_double_click (callable): Callback function invoked when the card is double-clicked.
         """
         super().__init__()
         self.note = note
@@ -89,12 +89,12 @@ class NoteCard(QFrame):
 
     def eventFilter(self, obj, event):
         """
-            Filter child events to catch double-clicks on labels or QTextBrowser content.
-            Args:
-                obj (QObject): The child object where the event occurred.
-                event (QEvent): The event to filter.
-            Returns:
-                bool: True if the event was handled, otherwise False.
+        Filter child events to catch double-clicks on labels or QTextBrowser content.
+        Args:
+            obj (QObject): The child object where the event occurred.
+            event (QEvent): The event to filter.
+        Returns:
+            bool: True if the event was handled, otherwise False.
         """
         if event.type() == QEvent.MouseButtonDblClick:
             if callable(self.on_double_click):

@@ -1,10 +1,10 @@
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import QSize
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QTextEdit, QHBoxLayout, \
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QMessageBox, QTextEdit, QHBoxLayout, \
     QSizePolicy
 from utils.resource_path import resource_path
 
-from helpers.oui_lookup import OUILookup
+from helpers.modules.oui_lookup import OUILookup
 
 
 class MacVendorView(QWidget):

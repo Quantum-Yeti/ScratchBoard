@@ -6,6 +6,15 @@ from views.note_card_view import NoteCard
 
 
 class MainView(QWidget):
+    """
+    Main notes view widget.
+
+    Provides a searchable, scrollable grid of note cards along with a
+    floating action button for creating new notes. Handles layout
+    initialization, category filtering, and dynamic population of the
+    note grid.
+    """
+
     def __init__(self, categories):
         super().__init__()
         self.categories = categories
@@ -47,13 +56,21 @@ class MainView(QWidget):
             }
         """)
 
-
     def resizeEvent(self, event):
+        """
+        Repositions the floating action button on window resize.
+
+        Ensures the button remains anchored in its intended location
+        whenever the view is resized.
+        """
         self.add_btn.reposition()
         super().resizeEvent(event)
 
     def populate_notes(self, notes, on_click):
-        """Display notes in a grid safely."""
+        """
+        Populate the notes grid with note cards. If note card category
+        is empty, an empty-state message is displayed.
+        """
         if not hasattr(self, "grid_layout") or self.grid_layout is None:
             return  # layout destroyed
 

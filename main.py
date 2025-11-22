@@ -23,7 +23,7 @@ from models.note_model import NoteModel
 from utils.resource_path import resource_path
 
 def load_styles(app):
-    """Load dark theme QSS."""
+    """Load dark theme QSS globally."""
     try:
         with open(resource_path("ui/themes/main_theme.qss"), "r") as f:
             app.setStyleSheet(f.read())
