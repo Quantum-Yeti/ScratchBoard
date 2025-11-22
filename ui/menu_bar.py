@@ -1,10 +1,9 @@
-from PySide6.QtCore import QEvent
-from PySide6.QtGui import QAction, QCursor, QIcon, Qt
+from PySide6.QtGui import QAction, QCursor, QIcon
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication
 
 from utils.resource_path import resource_path
-from views.docsis_signal_view import SignalReference
-from views.modem_log_view import ModemLogParserView
+from views.widgets.docsis_widget import SignalReference
+from views.widgets.log_widget import ModemLogParserView
 from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
 

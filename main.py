@@ -12,9 +12,9 @@ from PySide6.QtWidgets import (QApplication,
 from helpers.run_startup import run_startup
 from helpers.update_window_title import update_window_title
 from ui.menu_bar import MainMenuBar
-from views.splash_screen import SplashScreen
+from views.splash.splash_screen import SplashScreen
 from views.dashboard_view import DashboardView
-from views.sidebar_view import Sidebar
+from views.sidebar.sidebar_view import Sidebar
 from views.main_view import MainView
 from views.contacts_view import ContactsView
 from controllers.note_controller import NoteController

@@ -1,6 +1,5 @@
 import time
-from views.splash_screen import SplashScreen
-from utils.resource_path import resource_path
+
 
 def run_startup(splash):
     """Run initialization steps with progress updates on splash screen."""
