@@ -1,0 +1,12 @@
+main_font_list = [  "Arial",
+                    "Courier New",
+                    "Times New Roman",
+                    "Verdana",
+                    "Consolas",
+                    "Georgia",
+                    "Calibri",
+                    "Garamond",
+                    "Tahoma",
+                    "TrebuchetMS",
+                    "Helvetica",
+                    ]

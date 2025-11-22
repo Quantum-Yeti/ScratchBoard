@@ -51,7 +51,7 @@ class ReferenceWidget(QWidget):
 
         self.add_button = QPushButton()
         self.add_button.setToolTip("Add")
-        self.add_button.setIcon(QIcon(resource_path("resources/icons/add_link.png")))
+        self.add_button.setIcon(QIcon(resource_path("resources/icons/add_circle.png")))
         self.add_button.setIconSize(QSize(18, 18))
         self.add_button.clicked.connect(self.add_reference)
 
@@ -90,8 +90,16 @@ class ReferenceWidget(QWidget):
     def add_reference(self):
         title = self.title_input.text().strip()
         url = self.url_input.text().strip()
+
         if not title or not url:
+            error = QMessageBox(self)
+            error.setIcon(QMessageBox.Warning)
+            error.setWindowTitle("Error")
+            error.setText("Title and URL are required.")
+            error.setStandardButtons(QMessageBox.Ok)
+            error.exec()
             return
+
         self.model.add_reference(title, url)
         self.load_references()
         self.title_input.clear()
