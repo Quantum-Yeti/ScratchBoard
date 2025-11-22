@@ -1,7 +1,7 @@
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QStyle, \
+from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QStyle, \
     QApplication
-from helpers.modem_log_parser import ModemLogParser
+from helpers.modules.modem_log_parser import ModemLogParser
 from PySide6.QtCore import Qt, QSize
 
 from utils.resource_path import resource_path

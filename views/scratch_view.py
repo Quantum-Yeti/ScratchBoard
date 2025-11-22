@@ -3,7 +3,7 @@ import random
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QLabel, QColorDialog
 from PySide6.QtCore import Qt, QTimer, QPoint, QSize
 from PySide6.QtGui import QColor, QIcon, QPixmap
-from helpers.text_color_switcher import get_text_color
+from helpers.ui_helpers.text_color_switcher import get_text_color
 from utils.resource_path import resource_path
 
 PASTEL_COLORS = [

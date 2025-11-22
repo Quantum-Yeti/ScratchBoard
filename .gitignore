@@ -36,7 +36,7 @@ Thumbs.db
 *.pyc
 *.pyo
 
-# Qt / PySide generated files (if using .ui converted to .py)
+# Qt / PySide generated files (if using .ui_helpers converted to .py)
 *.ui.py
 
 # Coverage reports

@@ -3,9 +3,9 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QEvent, Signal
 
-from helpers.contacts_copy_context_menu import CopyableLabel
+from helpers.modules.contacts_copy_menu import CopyableLabel
 from utils.resource_path import resource_path
-from helpers.floating_action import FloatingButton
+from helpers.ui_helpers.floating_action import FloatingButton
 
 
 class ContactsView(QWidget):

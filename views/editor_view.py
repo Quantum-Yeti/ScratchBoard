@@ -1,18 +1,18 @@
 import os
 import re
 from pathlib import Path
-from PySide6.QtCore import Qt, QTimer, QEvent, QSize, QPropertyAnimation
+from PySide6.QtCore import Qt, QTimer, QEvent
 from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit, QPushButton, QLabel,
-    QSplitter, QTextBrowser, QSizePolicy, QMessageBox, QWidget, QToolBar, QGraphicsOpacityEffect
+    QSplitter, QTextBrowser, QMessageBox, QWidget, QToolBar, QGraphicsOpacityEffect
 )
 from PySide6.QtGui import QAction
 
-from helpers.count_words import count_words
-from helpers.drag_drop_image import save_qimage, save_file_drop
-from helpers.markdown_preview import get_markdown_guide
-from helpers.markdown_to_html import render_markdown_to_html
+from helpers.calc_helpers.count_words import count_words
+from helpers.image_helpers.drag_drop_image import save_qimage, save_file_drop
+from helpers.markdown_helpers.markdown_preview import get_markdown_guide
+from helpers.markdown_helpers.markdown_to_html import render_markdown_to_html
 from utils.resource_path import resource_path
 
 
@@ -237,7 +237,7 @@ class EditorPanel(QDialog):
         from PySide6.QtWidgets import QFileDialog
         path, _ = QFileDialog.getOpenFileName(self, "Insert Image", "", "Images (*.png *.jpg *.jpeg *.gif *.webp)")
         if path:
-            dst_dir = Path("sb_data/images")
+            dst_dir = Path("sb_data/image_helpers")
             dst_dir.mkdir(parents=True, exist_ok=True)
             dst = dst_dir / Path(path).name
             import shutil
@@ -285,7 +285,7 @@ class EditorPanel(QDialog):
         self._is_fullscreen = not self._is_fullscreen
 
     def _on_preview_link_clicked(self, url):
-        """Opens images in a full-window dialog."""
+        """Opens image_helpers in a full-window dialog."""
         path = url.toLocalFile()
 
         if not os.path.exists(path):

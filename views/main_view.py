@@ -1,10 +1,9 @@
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QComboBox, QLabel, QHBoxLayout
-from PySide6.QtCore import Qt, QEvent, QSize
-from helpers.floating_action import FloatingButton
+from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout
+from PySide6.QtCore import Qt
+from helpers.ui_helpers.floating_action import FloatingButton
 from ui.note_placeholder_text import example_placeholder_text
 from views.note_card_view import NoteCard
-from utils.resource_path import resource_path
+
 
 class MainView(QWidget):
     def __init__(self, categories):

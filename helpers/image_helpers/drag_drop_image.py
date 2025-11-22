@@ -7,13 +7,13 @@ from PySide6.QtGui import QPixmap
 IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp")
 
 def ensure_image_dir() -> Path:
-    dst_dir = Path(os.getcwd()) / "data" / "images"
+    dst_dir = Path(os.getcwd()) / "data" / "image_helpers"
     dst_dir.mkdir(parents=True, exist_ok=True)
     return dst_dir
 
 
 def save_qimage(image) -> str | None:
-    """Save an image from clipboard-drag data and return markdown path."""
+    """Save an image from clipboard-drag data and return markdown_helpers path."""
     dst = ensure_image_dir()
 
     # Using a timestamp avoids collisions
@@ -25,7 +25,7 @@ def save_qimage(image) -> str | None:
 
 
 def save_file_drop(local_path: str) -> str | None:
-    """Copy a dropped file into images folder and return markdown path."""
+    """Copy a dropped file into image_helpers folder and return markdown_helpers path."""
     if not Path(local_path).is_file():
         return None
 

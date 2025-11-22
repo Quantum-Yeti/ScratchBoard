@@ -59,7 +59,7 @@ class NoteCard(QFrame):
             content_view.sizePolicy().verticalPolicy()
         )
 
-        # Make sure double-click anywhere works within the box, does not work on text, links, or images
+        # Make sure double-click anywhere works within the box, does not work on text, links, or image_helpers
         for child in self.findChildren(QTextBrowser) + self.findChildren(QLabel):
             child.installEventFilter(self)
 

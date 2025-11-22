@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
-from PySide6.QtCharts import QChart, QChartView, QSplineSeries, QLineSeries, QBarSet, QBarSeries, QValueAxis, \
-    QCategoryAxis, QLegendMarker
+from PySide6.QtCharts import QChart, QSplineSeries, QBarSet, QBarSeries, QValueAxis, \
+    QCategoryAxis
 from PySide6.QtGui import QColor, QFont
 from PySide6.QtCore import Qt
 
-from helpers.chart_pastel_list import PASTEL_CHART_COLORS
-from helpers.dashboard_stats import calculate_stats
+from helpers.ui_helpers.chart_pastel_list import PASTEL_CHART_COLORS
+from helpers.calc_helpers.dashboard_stats import calculate_stats
 
 segoe = QFont("Segoe UI", 11)
 

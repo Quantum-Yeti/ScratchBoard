@@ -124,7 +124,7 @@ def _highlight_code_blocks(html: str) -> str:
 
 def render_markdown_to_html(md_text: str) -> str:
     """
-    Render markdown -> full HTML snippet styled for QTextBrowser.
+    Render markdown_helpers -> full HTML snippet styled for QTextBrowser.
     Uses markdown2 extras and applies Pygments to code blocks.
     """
     # extras: fenced code blocks, tables, autolink, strike, task lists (checkboxes supported by markdown2 via 'extras' isn't native,
@@ -152,9 +152,9 @@ def render_markdown_to_html(md_text: str) -> str:
 # Optional utility for saving an image (used by EditorPanel)
 def save_dropped_image(bytes_data: bytes, filename_hint: str = "pasted") -> str:
     """
-    Save bytes_data to data/images under project root. Returns relative path (forward slashes).
+    Save bytes_data to data/image_helpers under project root. Returns relative path (forward slashes).
     """
-    base = os.path.abspath(os.path.join(os.getcwd(), "data", "images"))
+    base = os.path.abspath(os.path.join(os.getcwd(), "data", "image_helpers"))
     os.makedirs(base, exist_ok=True)
     # try to determine extension from hint, else default .png
     name = f"{filename_hint}".replace(" ", "_")
@@ -169,6 +169,6 @@ def save_dropped_image(bytes_data: bytes, filename_hint: str = "pasted") -> str:
         i += 1
     with open(candidate, "wb") as f:
         f.write(bytes_data)
-    # return relative path for markdown link
+    # return relative path for markdown_helpers link
     rel = os.path.relpath(candidate, os.getcwd()).replace("\\", "/")
     return rel
