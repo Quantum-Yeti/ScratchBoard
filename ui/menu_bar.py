@@ -84,17 +84,17 @@ class MainMenuBar(QMenuBar):
 
         self.dash_action = QAction("Dashboard", self)
         self.dash_action.setIcon(QIcon(resource_path("resources/icons/dashboard.png")))
-        self.dash_action.setShortcut("Ctrl+H")
+        self.dash_action.setShortcut("F10")
         tools.addAction(self.dash_action)
 
         self.scratch_action = QAction("Scratch Note", self)
         self.scratch_action.setIcon(QIcon(resource_path("resources/icons/stickynote.png")))
-        self.scratch_action.setShortcut("Ctrl+S")
+        self.scratch_action.setShortcut("F11")
         tools.addAction(self.scratch_action)
 
         self.notepad_action = QAction("Notepad", self)
         self.notepad_action.setIcon(QIcon(resource_path("resources/icons/notepad.png")))
-        self.notepad_action.setShortcut("Ctrl+N")
+        self.notepad_action.setShortcut("F12")
         tools.addAction(self.notepad_action)
 
         self.bat_action = QAction("Run *.bat", self)
@@ -106,7 +106,7 @@ class MainMenuBar(QMenuBar):
 
         self.modem_action = QAction("Log Parser", self)
         self.modem_action.setIcon(QIcon(resource_path("resources/icons/network.png")))
-        self.modem_action.setShortcut("Ctrl+M")
+        self.modem_action.setShortcut("Ctrl+L")
         tools.addAction(self.modem_action)
 
         self.docsis_action = QAction("Signal Reference", self)

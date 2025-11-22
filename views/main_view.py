@@ -1,7 +1,8 @@
-from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel
 from PySide6.QtCore import Qt
 from helpers.ui_helpers.floating_action import FloatingButton
-from ui.note_placeholder_text import example_placeholder_text
+from utils.resource_path import resource_path
 from views.note_card_view import NoteCard
 
 
@@ -88,27 +89,20 @@ class MainView(QWidget):
             main_layout.setAlignment(Qt.AlignCenter)
             main_layout.setSpacing(12)
 
-            # Horizontal row: icon + text
-            top_row = QHBoxLayout()
-            top_row.setAlignment(Qt.AlignCenter)
-            top_row.setSpacing(8)
-
-            text_label = QLabel("No notes found. Add some notes using Markdown or plain text.")
-            text_label.setStyleSheet("color: white; font-size: 26px; font-weight: bold; font-style: italic;")
+            # Text message
+            text_label = QLabel("No notes found.\nAdd a note using Markdown or PlainText.")
+            text_label.setStyleSheet("color: white; font-size: 20px; font-weight: bold; font-style: italic;")
             text_label.setAlignment(Qt.AlignCenter)
             text_label.setWordWrap(True)
+            main_layout.addWidget(text_label)
 
-            top_row.addWidget(text_label)
+            # Astronaut icon
+            icon_label = QLabel()
+            pixmap = QPixmap(resource_path("resources/icons/astronaut_splash.png"))
 
-            # Example placeholder below the HBox
-            example_label = QLabel()
-            example_label.setText(example_placeholder_text)
-            example_label.setStyleSheet("color: #ccc; font-size: 16px;")
-            example_label.setWordWrap(True)
-            example_label.setAlignment(Qt.AlignCenter)
-
-            main_layout.addLayout(top_row)
-            main_layout.addWidget(example_label)
+            icon_label.setPixmap(pixmap)
+            icon_label.setAlignment(Qt.AlignCenter)
+            main_layout.addWidget(icon_label)
 
             # Make the empty_notes widget expand to fill the scroll area
             empty_notes.setSizePolicy(
