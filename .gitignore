@@ -12,6 +12,8 @@ env/
 # PyInstaller / build
 dist/
 build/
+setup/
+test_files/
 *.spec
 
 # IDEs / Editors
