@@ -10,8 +10,14 @@ class NotepadDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Scratch Board: Notepad")
-        self.setModal(True)
+        #self.setModal(True)
         self.resize(800, 600)
+
+        # Allow to minimize and close
+        self.setWindowFlags(
+            Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
+        )
+        self.setWindowModality(Qt.NonModal)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)

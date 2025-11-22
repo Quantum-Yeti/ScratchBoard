@@ -148,5 +148,14 @@ class Sidebar(QWidget):
         QDesktopServices.openUrl(QUrl("https://github.com/Quantum-Yeti/ScratchBoard"))
 
     def _open_notepad(self):
-        dlg = NotepadDialog(self.parent())
-        dlg.exec()  # modal dialog
+        if hasattr(self, "_notepad") and self._notepad:
+            if self._notepad.isVisible():
+                if self._notepad.isMinimized():
+                    self._notepad.showNormal()  # restore if minimized
+                self._notepad.raise_()
+                self._notepad.activateWindow()
+                return
+
+            # Create a new dialog if none exists
+        self._notepad = NotepadDialog(self.parent())
+        self._notepad.show()
