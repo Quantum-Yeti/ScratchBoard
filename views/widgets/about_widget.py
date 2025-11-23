@@ -1,7 +1,22 @@
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
+
+import requests
+
 from utils.resource_path import resource_path
+
+def get_latest_release(repo_owner="Quantum-Yeti", repo_name="ScratchBoard"):
+    """Fetches the latest release tag from GitHub."""
+    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        return data.get("tag_name")  # e.g., "v1.0.1"
+    except Exception as e:
+        print("Failed to fetch latest release:", e)
+        return None
 
 class AboutWidget(QDialog):
     def __init__(self):
@@ -32,8 +47,15 @@ class AboutWidget(QDialog):
         title_label.setStyleSheet("font-size: 20px; font-weight: bold;")
         layout.addWidget(title_label)
 
-        # Version
-        version_label = QLabel("Version 1.0")
+        # Version label
+        current_version = "v1.1"
+        latest_version = get_latest_release()
+        if latest_version and latest_version != current_version:
+            version_text = f"Version {current_version} (Update available: {latest_version})"
+        else:
+            version_text = f"Version {current_version} (Up-to-date)"
+
+        version_label = QLabel(version_text)
         version_label.setAlignment(Qt.AlignCenter)
         version_label.setStyleSheet("font-size: 14px;")
         layout.addWidget(version_label)
@@ -76,3 +98,20 @@ class AboutWidget(QDialog):
         btn_layout.addWidget(license_btn)
         #btn_layout.addWidget(close_btn)
         layout.addLayout(btn_layout)
+
+    def update_version_label(self):
+        latest_version = get_latest_release()
+        if latest_version:
+            # Remove leading 'v' if present
+            latest_version_clean = latest_version.lstrip("vV")
+            current_version_clean = self.current_version.lstrip("vV")
+
+            if latest_version_clean != current_version_clean:
+                self.version_label.setText(
+                    f"Version {self.current_version} (Update available: {latest_version_clean})"
+                )
+            else:
+                self.version_label.setText(f"Version {self.current_version} (Up-to-date)")
+        else:
+            self.version_label.setText(f"Version {self.current_version} (Check failed)")
+
