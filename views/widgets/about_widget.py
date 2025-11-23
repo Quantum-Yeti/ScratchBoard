@@ -17,14 +17,14 @@ class AboutWidget(QDialog):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(15)
-        layout.setAlignment(Qt.AlignCenter)
+        layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter | Qt.AlignVCenter)  # Top and center horizontally
 
         # App Icon
         icon_label = QLabel()
         icon = QIcon(resource_path("resources/icons/astronaut.ico"))
         icon_label.setPixmap(icon.pixmap(64, 64))
         icon_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(icon_label)
+        layout.addWidget(icon_label, alignment=Qt.AlignCenter)
 
         # App Name
         title_label = QLabel("Scratch Board")
@@ -45,8 +45,11 @@ class AboutWidget(QDialog):
         layout.addWidget(copyright_label)
 
         # License text
-        license_label_txt = QLabel("Use of this software is an agreement to the license below:")
+        license_label_txt = QLabel(
+            "Use of this software is an agreement to the license below:"
+        )
         license_label_txt.setAlignment(Qt.AlignCenter)
+        license_label_txt.setWordWrap(True)  # wrap long text
         license_label_txt.setStyleSheet("font-size: 12px;")
         layout.addWidget(license_label_txt)
 
@@ -54,22 +57,22 @@ class AboutWidget(QDialog):
         license_btn_icon = QIcon(resource_path("resources/icons/license.png"))
         license_btn = QPushButton("View License")
         license_btn.setIcon(license_btn_icon)
+        license_btn.setFixedWidth(120)
         license_btn.clicked.connect(lambda: QDesktopServices.openUrl(
             QUrl("https://github.com/Quantum-Yeti/ScratchBoard/blob/master/LICENSE.md")
         ))
 
         # Close button
-        #btn_icon = QIcon(resource_path("resources/icons/cancel.png"))
+        #close_btn_icon = QIcon(resource_path("resources/icons/cancel.png"))
         #close_btn = QPushButton("Close")
-        #close_btn.setIcon(btn_icon)
-        #close_btn.setFixedWidth(70)
+        #close_btn.setIcon(close_btn_icon)
+        #close_btn.setFixedWidth(80)
         #close_btn.clicked.connect(self.close)
 
-        # Combined button layout
+        # Buttons layout (centered)
         btn_layout = QHBoxLayout()
-        btn_layout.addStretch()
+        btn_layout.setAlignment(Qt.AlignCenter)  # center horizontally
+        btn_layout.setSpacing(20)  # space between buttons
         btn_layout.addWidget(license_btn)
-        btn_layout.addSpacing(20)  # Space between buttons
         #btn_layout.addWidget(close_btn)
-        btn_layout.addStretch()
         layout.addLayout(btn_layout)

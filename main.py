@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (QApplication,
 from helpers.startup.run_startup import run_startup
 from helpers.ui_helpers.update_window_title import update_window_title
 from ui.menu_bar import MainMenuBar
+from updater.auto_update import UpdateDialog
 from views.splash.splash_screen import SplashScreen
 from views.dashboard_view import DashboardView
 from views.sidebar.sidebar_view import Sidebar
@@ -130,6 +131,9 @@ def main():
     window.show()  # show main window
     window.raise_()  # bring to front
     window.activateWindow()  # give keyboard focus
+
+    #update_dialog = UpdateDialog()
+    #update_dialog.exec()
 
     sys.exit(app.exec())
 
