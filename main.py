@@ -44,7 +44,7 @@ class MainWindow(QMainWindow):
         self.model = NoteModel()
 
         # Views
-        categories = ["Contacts", "CoPilot", "Tasks", "Projects", "Notes", "Ideas", "Journal", "Personal"]
+        categories = ["Contacts", "CoPilot", "Internet", "Phone", "Video", "Streaming", "Notes", "Ideas"]
         self.main_view = MainView(categories)
         self.contacts_view = ContactsView(categories)
 

@@ -24,12 +24,12 @@ class Sidebar(QWidget):
         self.categories = {
             "Contacts": "resources/icons/contacts.png",
             "CoPilot": "resources/icons/copilot.png",
-            "Tasks": "resources/icons/tasks.png",
-            "Projects": "resources/icons/projects.png",
+            "Internet": "resources/icons/internet.png",
+            "Phone": "resources/icons/landline.png",
+            "Video": "resources/icons/video.png",
+            "Streaming": "resources/icons/streaming.png",
             "Notes": "resources/icons/notes.png",
             "Ideas": "resources/icons/ideas.png",
-            "Journal": "resources/icons/journal.png",
-            "Personal": "resources/icons/personal.png"
         }
 
         for name, icon_file in self.categories.items():
@@ -41,13 +41,12 @@ class Sidebar(QWidget):
             btn.clicked.connect(lambda checked, c=name: self.category_selected.emit(c))
             layout.addWidget(btn)
 
-            if name == "Projects":
+            if name == "CoPilot" or name == "Streaming":
                 separator = QFrame()
-                separator.setStyleSheet("background-color: #1F1F1F;")
-                separator.setFrameShape(QFrame.StyledPanel)
-                separator.setFrameShadow(QFrame.Sunken)
-                separator.setLineWidth(2)
-                separator.setFixedHeight(15)
+                separator.setFrameShape(QFrame.HLine)  # Horizontal line
+                separator.setFrameShadow(QFrame.Sunken)  # Gives subtle 3D effect
+                separator.setStyleSheet("color: #1F1F1F; background-color: #1F1F1F;")  # Dark gray
+                separator.setFixedHeight(4)  # Thin line
                 layout.addWidget(separator)
 
         # Stretch moves buttons not related to category notes to the bottom.

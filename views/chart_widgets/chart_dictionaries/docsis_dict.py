@@ -1,57 +1,4 @@
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout
-from PySide6.QtCore import Qt, QSize
-
-from utils.resource_path import resource_path
-
-
-class SignalReference(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("DOCSIS Signal Reference")
-        self.setWindowModality(Qt.ApplicationModal)
-        self.resize(1000, 700)  # initial size
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(8)
-
-        # Table
-        self.table = QTableWidget()
-        self.table.setColumnCount(5)
-        self.table.setHorizontalHeaderLabels([
-            "Signal",
-            "Normal Range",
-            "Symptoms / Common Issues",
-            "Explanation",
-            "Troubleshooting Steps"
-        ])
-        self.table.setWordWrap(True)
-        layout.addWidget(self.table)
-
-        # Close button
-        close_btn = QPushButton("Close")
-        close_btn.setIcon(QIcon(resource_path("resources/icons/close_white.png")))
-        close_btn.setIconSize(QSize(32, 32))
-        close_btn.clicked.connect(self.close)
-
-        # Close button wrapped horizontal layout for alignment
-        btn_layout = QHBoxLayout()
-        btn_layout.addStretch()  # left space
-        btn_layout.addWidget(close_btn)  # button
-        btn_layout.addStretch()  # right space for centering
-
-        # Add the horizontal layout to the main vertical layout
-        layout.addLayout(btn_layout)
-
-        # Populate table
-        self._populate_table()
-
-        # Resize columns and rows for readability
-        self._resize_table()
-
-    def _populate_table(self):
-        signals = [
+docsis_signals = [
             {
                 "name": "Downstream Power (dBmV)",
                 "range": "-8 to +10",
@@ -123,27 +70,3 @@ class SignalReference(QDialog):
                 "steps": "Inspect coax, splitters, or contact ISP for channel issues."
             },
         ]
-
-        self.table.setRowCount(len(signals))
-        for row, sig in enumerate(signals):
-            for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
-                item = QTableWidgetItem(sig[key])
-                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                item.setToolTip(sig[key])
-                self.table.setItem(row, col, item)
-
-    def _resize_table(self):
-        # Set initial column widths (helps with wrapping)
-        self.table.setColumnWidth(0, 180)  # Signal
-        self.table.setColumnWidth(1, 100)  # Range
-        self.table.setColumnWidth(2, 200)  # Symptoms
-        self.table.setColumnWidth(3, 300)  # Explanation
-        self.table.setColumnWidth(4, 250)  # Steps
-
-        # Resize rows to fit wrapped text
-        self.table.resizeRowsToContents()
-
-        # Stretch last column to use remaining space
-        self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)

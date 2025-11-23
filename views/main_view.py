@@ -89,13 +89,6 @@ class MainView(QWidget):
             main_layout.setAlignment(Qt.AlignCenter)
             main_layout.setSpacing(12)
 
-            # Text message
-            text_label = QLabel("No notes found.\nAdd a note using Markdown or PlainText.")
-            text_label.setStyleSheet("color: white; font-size: 20px; font-weight: bold; font-style: italic;")
-            text_label.setAlignment(Qt.AlignCenter)
-            text_label.setWordWrap(True)
-            main_layout.addWidget(text_label)
-
             # Astronaut icon
             icon_label = QLabel()
             pixmap = QPixmap(resource_path("resources/icons/astronaut_splash.png"))
@@ -103,6 +96,13 @@ class MainView(QWidget):
             icon_label.setPixmap(pixmap)
             icon_label.setAlignment(Qt.AlignCenter)
             main_layout.addWidget(icon_label)
+
+            # Text message
+            text_label = QLabel("No notes found.\nAdd a note using MarkDown or PlainText.")
+            text_label.setStyleSheet("color: white; font-size: 20px; font-weight: bold; font-style: italic;")
+            text_label.setAlignment(Qt.AlignCenter)
+            text_label.setWordWrap(True)
+            main_layout.addWidget(text_label)
 
             # Make the empty_notes widget expand to fill the scroll area
             empty_notes.setSizePolicy(

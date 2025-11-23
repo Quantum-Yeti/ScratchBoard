@@ -1,0 +1,189 @@
+/* -----------------------------------------
+   Global Charts Styling
+----------------------------------------- */
+
+QDialog {
+    background: #181a21; /* rich dark slate */
+    color: #e8e8e8;
+    border-radius: 12px;
+}
+
+/* SUBTLE DROP SHADOW */
+QDialog QWidget {
+    background: transparent;
+}
+QDialog {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   TABLE WIDGET
+   ============================================ */
+
+QTableWidget {
+    background: #1e222a;
+    border: 1px solid #2a303a;
+    border-radius: 10px;
+    gridline-color: #323844;
+    color: #e8e8e8;
+    selection-background-color: #3e88f7;
+    selection-color: #ffffff;
+    font-size: 15px;
+    outline: none;
+}
+
+/* STRIPED ROWS */
+QTableWidget::item {
+    padding: 10px;
+}
+
+QTableWidget::item:selected {
+    background: #3e88f7;
+    border-radius: 6px;
+}
+
+/* header */
+QHeaderView::section {
+    background: #242833;
+    color: #dcdcdc;
+    font-weight: bold;
+    border: none;
+    padding: 10px;
+    border-right: 1px solid #323844;
+    font-size: 15px;
+}
+
+QHeaderView::section:last {
+    border-right: none;
+}
+
+/* eliminate ugly white focus rectangle */
+QTableWidget::item:focus {
+    outline: none;
+}
+
+/* ============================================
+   SCROLLBARS
+   ============================================ */
+
+QScrollBar:vertical {
+    background: #16191f;
+    width: 14px;
+    margin: 0;
+    border-radius: 7px;
+}
+
+QScrollBar::handle:vertical {
+    background: #363d4a;
+    border-radius: 7px;
+    min-height: 30px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #4d87ff;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+/* horizontal scrollbar */
+QScrollBar:horizontal {
+    background: #16191f;
+    height: 14px;
+    margin: 0;
+    border-radius: 7px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #363d4a;
+    border-radius: 7px;
+    min-width: 30px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #4d87ff;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0;
+}
+
+/* ============================================
+   PUSH BUTTONS
+   ============================================ */
+
+QPushButton {
+    background: #2b3140;
+    color: #e8e8e8;
+    border: 1px solid #3a4152;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+QPushButton:hover {
+    background: #3a4152;
+    border-color: #4d87ff;
+}
+
+QPushButton:pressed {
+    background: #28303d;
+}
+
+/* ============================================
+   HEADERS, LABELS, TEXT
+   ============================================ */
+
+QLabel {
+    color: #f0f0f0;
+    font-size: 16px;
+}
+
+QLabel#title {
+    font-size: 22px;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+QLineEdit {
+    background: #1f242c;
+    border: 1px solid #2f353f;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4d87ff;
+}
+
+/* ============================================
+   COMBO BOXES (if used)
+   ============================================ */
+
+QComboBox {
+    background: #1f242c;
+    border: 1px solid #2f353f;
+    padding: 6px 10px;
+    color: white;
+    border-radius: 6px;
+}
+
+QComboBox:hover {
+    border-color: #4d87ff;
+}
+
+QComboBox::drop-down {
+    border: none;
+}
+
+/* dropdown popup */
+QComboBox QAbstractItemView {
+    background: #1c1f26;
+    color: white;
+    selection-background-color: #4d87ff;
+    outline: none;
+}

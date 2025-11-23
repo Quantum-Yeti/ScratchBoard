@@ -59,17 +59,17 @@ class AboutWidget(QDialog):
         ))
 
         # Close button
-        btn_icon = QIcon(resource_path("resources/icons/cancel.png"))
-        close_btn = QPushButton("Close")
-        close_btn.setIcon(btn_icon)
-        close_btn.setFixedWidth(70)
-        close_btn.clicked.connect(self.close)
+        #btn_icon = QIcon(resource_path("resources/icons/cancel.png"))
+        #close_btn = QPushButton("Close")
+        #close_btn.setIcon(btn_icon)
+        #close_btn.setFixedWidth(70)
+        #close_btn.clicked.connect(self.close)
 
         # Combined button layout
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
         btn_layout.addWidget(license_btn)
         btn_layout.addSpacing(20)  # Space between buttons
-        btn_layout.addWidget(close_btn)
+        #btn_layout.addWidget(close_btn)
         btn_layout.addStretch()
         layout.addLayout(btn_layout)

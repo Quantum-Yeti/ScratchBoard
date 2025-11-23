@@ -1,4 +1,4 @@
-/* === Modern dark style for EditorPanel === */
+/* === Dark style for EditorPanel === */
 
 #EditorPanel {
     background-color: #1e1e1e;

@@ -237,7 +237,7 @@ class EditorPanel(QDialog):
         from PySide6.QtWidgets import QFileDialog
         path, _ = QFileDialog.getOpenFileName(self, "Insert Image", "", "Images (*.png *.jpg *.jpeg *.gif *.webp)")
         if path:
-            dst_dir = Path("sb_data/image_helpers")
+            dst_dir = Path("sb_data/images")
             dst_dir.mkdir(parents=True, exist_ok=True)
             dst = dst_dir / Path(path).name
             import shutil

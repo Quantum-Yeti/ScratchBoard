@@ -112,7 +112,7 @@ def _highlight_code_blocks(html: str) -> str:
             lexer = TextLexer()
         formatter = HtmlFormatter(nowrap=True, noclasses=True)
         highlighted = highlight(code, lexer, formatter)
-        # embed in <pre><code class="codehilite"> for consistent CSS
+
         return f'<pre><code class="codehilite">{highlighted}</code></pre>'
 
     pattern = re.compile(
@@ -152,9 +152,9 @@ def render_markdown_to_html(md_text: str) -> str:
 # Optional utility for saving an image (used by EditorPanel)
 def save_dropped_image(bytes_data: bytes, filename_hint: str = "pasted") -> str:
     """
-    Save bytes_data to data/image_helpers under project root. Returns relative path (forward slashes).
+    Save bytes_data to data/images under project root. Returns relative path (forward slashes).
     """
-    base = os.path.abspath(os.path.join(os.getcwd(), "data", "image_helpers"))
+    base = os.path.abspath(os.path.join(os.getcwd(), "data", "images"))
     os.makedirs(base, exist_ok=True)
     # try to determine extension from hint, else default .png
     name = f"{filename_hint}".replace(" ", "_")
