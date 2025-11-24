@@ -79,7 +79,7 @@ class AboutWidget(QDialog):
         ))
 
         # Change log button
-        change_btn = QPushButton("Change Logs")
+        change_btn = QPushButton("Commits")
         change_btn.setIcon(QIcon(resource_path("resources/icons/changelog.png")))
         change_btn.setFixedWidth(120)
         change_btn.clicked.connect(lambda: QDesktopServices.openUrl("https://github.com/Quantum-Yeti/ScratchBoard/commits/release"))
