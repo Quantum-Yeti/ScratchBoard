@@ -46,8 +46,6 @@ class MainMenuBar(QMenuBar):
         # Calls the note model to allow import/export
         self.note_model = model
 
-
-
         # File Menu
         self.import_action = None
         self.export_action = None
@@ -353,6 +351,9 @@ class MainMenuBar(QMenuBar):
             try:
                 self.note_model.import_from_zip(path)
                 QMessageBox.information(self, "Success", f"Notes imported from {path}")
+
+                # OK button triggers dashboard view
+                self.sidebar.dashboard_clicked.emit()  # Emits the signal to trigger dashboard view
 
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Import failed:\n{e}")

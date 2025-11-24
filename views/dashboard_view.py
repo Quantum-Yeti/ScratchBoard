@@ -183,7 +183,10 @@ class DashboardView(QWidget):
             pixmap.scaled(200, self.height()//2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         )
 
-
+    def go_to_dashboard(self):
+        """Helper method to switch to the dashboard view and refresh it."""
+        self.set_current_view(self.content_widget)  # Switch to dashboard view (content_widget in this case)
+        self.refresh_dashboard()  # Refresh the dashboard stats and graphs
 
     # Stylesheet
     def load_stylesheet(self):
