@@ -29,7 +29,7 @@
 ## Screenshots
 
 ### Dashboard
-![Scratch Board Dashboard](screenshots/sbscreenshot.png)
+![Scratch Board Dashboard](screenshots/screenshotdash.png)
 
 ### Notepad
 ![Notepad](screenshots/notepad.png)
