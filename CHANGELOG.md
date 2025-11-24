@@ -8,8 +8,6 @@ All notable changes to this project will be documented in this file.
   - Introduced `UpdateCheckWorker` to fetch latest GitHub release asynchronously.
   - Display update status in AboutWidget without blocking the UI.
   - Show "Get Update" button when a new version is available.
-- **Help menu** includes "Check for Updates" option.
-  - Runs background update check from about dialog.
   - Updates About dialog version label when check completes.
 
 ### Fixed
@@ -23,4 +21,4 @@ All notable changes to this project will be documented in this file.
   - Improved overall layout with consistent vertical spacing.
 
 ### Documentation
-- Initial `CHANGELOG.md` entries starting with v1.1 summarizing new features and fixes.
+- Initial `CHANGELOG.md` entries start with v1.1 summarizing new features and fixes.
