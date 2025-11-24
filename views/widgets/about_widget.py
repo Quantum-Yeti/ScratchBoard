@@ -2,7 +2,7 @@ from PySide6.QtCore import Qt, QUrl, QThread
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
 
-import requests
+from datetime import datetime
 
 from helpers.update_helpers.update_checker import UpdateCheckWorker
 from utils.resource_path import resource_path
@@ -57,7 +57,8 @@ class AboutWidget(QDialog):
         layout.addLayout(self.update_btn_layout)
 
         # Copyright
-        copyright_label = QLabel("© 2025 Quantum Yeti")
+        year = datetime.now().year
+        copyright_label = QLabel(f"© {year} Quantum Yeti")
         copyright_label.setAlignment(Qt.AlignCenter)
         copyright_label.setStyleSheet("font-size: 12px; color: gray;")
         layout.addWidget(copyright_label)
