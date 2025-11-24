@@ -1,6 +1,7 @@
-from PySide6.QtGui import QAction, QCursor, QIcon
-from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication
+from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap
+from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog
 
+from models.note_model import NoteModel
 from ui.themes.top_menu_theme import top_menu_style
 from utils.resource_path import resource_path
 from views.chart_widgets.fiber_chart import FiberReferenceDialog
@@ -12,7 +13,6 @@ from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
 from views.chart_widgets.wifi_standards_widget import WifiStandardsReference
 from views.widgets.md_widget import MarkdownGuideWidget
-
 
 # Internal tooltip hover function
 def _connect_hover_tooltips(menu):
@@ -38,10 +38,13 @@ class MainMenuBar(QMenuBar):
     Initializes the menu bar, applies custom styling, defines all action
     placeholders, and constructs the menus.
     """
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, model: NoteModel | None = None):
         super().__init__(parent)
 
-        # init actions to avoid attribute errors before menus are built
+        # Calls the note model to allow import/export
+        self.note_model = model
+
+
 
         # File Menu
         self.import_action = None
@@ -97,6 +100,12 @@ class MainMenuBar(QMenuBar):
         self.export_action = QAction("Export Notes", self)
         self.export_action.setIcon(QIcon(resource_path("resources/icons/export.png")))
         file_menu.addAction(self.export_action)
+
+        file_menu.addSeparator()
+
+        self.delete_db_action = QAction("Delete Database", self)
+        self.delete_db_action.setIcon(QIcon(resource_path("resources/icons/delete_db.png")))
+        file_menu.addAction(self.delete_db_action)
 
         file_menu.addSeparator()
 
@@ -249,6 +258,11 @@ class MainMenuBar(QMenuBar):
         # Wire dashboard view
         self.dash_action.triggered.connect(self.sidebar.dashboard_clicked) # show dashboard
 
+        # Wire the file menu
+        self.import_action.triggered.connect(self._import_notes)
+        self.export_action.triggered.connect(self._export_notes)
+        self.delete_db_action.triggered.connect(self._delete_database)
+
         # Wire the tools
         self.scratch_action.triggered.connect(self.sidebar.open_scratch_pad) # open the scratch notes
         self.notepad_action.triggered.connect(self._open_notepad)
@@ -309,3 +323,63 @@ class MainMenuBar(QMenuBar):
         if not hasattr(self, '_md_widget'):
             self._md_widget = MarkdownGuideWidget()
         self._md_widget.show()
+
+    def _export_notes(self):
+        if not self.note_model:
+            QMessageBox.warning(self, "Error", "Note model is not initialized.")
+            return
+
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export Notes to ZIP", "", "ZIP Files (*.zip)"
+        )
+        if path:
+            try:
+                self.note_model.export_to_zip(path)
+                QMessageBox.information(self, "Success", f"Notes exported to {path}")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Export failed:\n{e}")
+
+    def _import_notes(self):
+        if not self.note_model:
+            QMessageBox.warning(self, "Error", "Note model is not initialized.")
+            return
+
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Import Notes from ZIP", "", "ZIP Files (*.zip)"
+        )
+        if path:
+            try:
+                self.note_model.import_from_zip(path)
+                QMessageBox.information(self, "Success", f"Notes imported from {path}")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Import failed:\n{e}")
+
+    def _delete_database(self):
+        if not self.note_model:
+            QMessageBox.warning(self, "Error", "Note model is not initialized.")
+            return
+
+        # Loads a skull icon
+        skull_icon = QPixmap(resource_path("resources/icons/skull.png"))
+        skull_icon = skull_icon.scaled(72, 72)
+
+        # Danger Popup with custom icon
+        confirm = QMessageBox(self)
+        confirm.setWindowTitle("Scratch Board: Delete Database")
+        confirm.setText(
+            "This action will permanently delete the entire database.\n"
+        )
+        confirm.setIconPixmap(skull_icon)
+        confirm.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        confirm.setDefaultButton(QMessageBox.No)
+        confirm.setDetailedText("This can not be undone. Make sure you have a backup before proceeding.")
+        confirm.setEscapeButton(QMessageBox.No)  # ESC cancels
+
+        response = confirm.exec()
+
+        if response == QMessageBox.Yes:
+            try:
+                self.note_model.delete_all_notes()
+                QMessageBox.information(self, "Scratch Board: Database Deleted", "All data has been deleted.")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to delete notes:\n{e}")

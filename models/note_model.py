@@ -1,8 +1,14 @@
+import json
 import os
+import shutil
 import sqlite3
 import uuid
 import random
 from datetime import datetime
+from zipfile import ZipFile, ZIP_DEFLATED
+from pathlib import Path
+
+from helpers.image_helpers.drag_drop_image import save_file_drop
 
 PASTEL_COLORS = ["#FFEBEE", "#FFF3E0", "#E8F5E9", "#E3F2FD", "#F3E5F5"]
 
@@ -305,3 +311,127 @@ class NoteModel:
 
     def close(self):
         self.conn.close()
+
+    # Import / Export Database
+    def export_to_zip(self, zip_path: str):
+        """
+        Export all data (notes, contacts, references, categories) and images
+        into a single ZIP file.
+        """
+        temp_dir = Path("sb_temp_export")
+        temp_dir.mkdir(parents=True, exist_ok=True)
+
+        # Copy images to a temp folder
+        images_dir = temp_dir / "images"
+        images_dir.mkdir(exist_ok=True)
+
+        export_data = {
+            "categories": self.get_all_categories(),
+            "notes": [],
+            "contacts": [],
+            "references": []
+        }
+
+        # Export notes
+        for note in self.get_notes():
+            note_dict = dict(note)
+            img_path = note_dict.get("image_path")
+            if img_path:
+                src = Path(img_path)
+                if src.is_file():
+                    dst = images_dir / src.name
+                    shutil.copy(src, dst)
+                    note_dict["image_path"] = f"images/{dst.name}"  # relative path
+            export_data["notes"].append(note_dict)
+
+        # Export contacts
+        for contact in self.get_contacts():
+            export_data["contacts"].append(dict(contact))
+
+        # Export references
+        for ref in self.get_references():
+            export_data["references"].append(dict(ref))
+
+        # Write JSON
+        json_path = temp_dir / "notes_export.json"
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(export_data, f, indent=2, ensure_ascii=False)
+
+        # Create ZIP
+        with ZipFile(zip_path, "w", ZIP_DEFLATED) as zipf:
+            # Add JSON file
+            zipf.write(json_path, arcname="notes_export.json")
+            # Add images
+            for img_file in images_dir.glob("*.*"):
+                zipf.write(img_file, arcname=f"images/{img_file.name}")
+
+        # Clean up temp folder
+        shutil.rmtree(temp_dir)
+        print(f"Data exported to {zip_path}")
+
+    def import_from_zip(self, zip_path: str):
+        """
+        Import notes, contacts, references, and images from a ZIP export.
+        Images are copied to the local image folder.
+        """
+        import_dir = Path("sb_temp_import")
+        import_dir.mkdir(parents=True, exist_ok=True)
+
+        with ZipFile(zip_path, "r") as zipf:
+            zipf.extractall(import_dir)
+
+        # Load JSON
+        json_path = import_dir / "notes_export.json"
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Import categories
+        for category_name in data.get("categories", []):
+            self.add_category(category_name)
+
+        # Import notes
+        for note in data.get("notes", []):
+            img_path = note.get("image_path")
+            if img_path:
+                src = import_dir / img_path
+                if src.is_file():
+                    # Copies image to local folder and returns relative path
+                    new_path = save_file_drop(str(src))
+                    note["image_path"] = new_path
+
+            self.add_note(
+                category_name=note.get("category_name", "Notes"),
+                title=note["title"],
+                content=note["content"],
+                image_path=note.get("image_path")
+            )
+
+        # Import contacts
+        for contact in data.get("contacts", []):
+            self.add_contact(
+                category_name=contact.get("category_name", "Contacts"),
+                name=contact["name"],
+                phone=contact.get("phone"),
+                website=contact.get("website"),
+                email=contact.get("email")
+            )
+
+        # Import references
+        for ref in data.get("references", []):
+            self.add_reference(
+                title=ref["title"],
+                url=ref["url"]
+            )
+
+        # Clean up temp folder
+        shutil.rmtree(import_dir)
+        print(f"Data imported from {zip_path}")
+
+    # DANGER ZONE: DELETE DATABASE FROM FILE MENU
+    def delete_all_notes(self):
+        cursor = self.conn.cursor()
+        tables = ["notes", "contacts", "reference_links"]
+        for table in tables:
+            cursor.execute(f"DELETE FROM {table}")
+        self.conn.commit()
+

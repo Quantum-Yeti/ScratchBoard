@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
         self.contacts_controller = ContactsController(self.model, self.contacts_view, self.sidebar)
 
         # Menu bar
-        self.menu_bar = MainMenuBar(self)
+        self.menu_bar = MainMenuBar(self, model=self.model)
         self.menu_bar.set_sidebar(self.sidebar)
         self.setMenuBar(self.menu_bar)
 
