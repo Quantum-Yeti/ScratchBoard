@@ -1,3 +1,5 @@
+import traceback
+
 from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog
 
@@ -351,12 +353,13 @@ class MainMenuBar(QMenuBar):
             try:
                 self.note_model.import_from_zip(path)
                 QMessageBox.information(self, "Success", f"Notes imported from {path}")
+
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Import failed:\n{e}")
 
     def _delete_database(self):
         if not self.note_model:
-            QMessageBox.warning(self, "Error", "Note model is not initialized.")
+            QMessageBox.warning(self, "Error", "We're sorry - something went wrong.")
             return
 
         # Loads a skull icon
@@ -382,4 +385,5 @@ class MainMenuBar(QMenuBar):
                 self.note_model.delete_all_notes()
                 QMessageBox.information(self, "Scratch Board: Database Deleted", "All data has been deleted.")
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to delete notes:\n{e}")
+                error_message = f"Failed to delete notes:\n{e}\n\nStack Trace:\n{traceback.format_exc()}"
+                QMessageBox.critical(self, "Error", error_message)

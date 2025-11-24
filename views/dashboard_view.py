@@ -183,6 +183,8 @@ class DashboardView(QWidget):
             pixmap.scaled(200, self.height()//2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         )
 
+
+
     # Stylesheet
     def load_stylesheet(self):
         try:
