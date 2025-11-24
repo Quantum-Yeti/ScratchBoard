@@ -1,117 +1,145 @@
-from PySide6.QtCore import Qt, QUrl
+from PySide6.QtCore import Qt, QUrl, QThread
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
 
 import requests
 
+from helpers.update_helpers.update_checker import UpdateCheckWorker
 from utils.resource_path import resource_path
 
-def get_latest_release(repo_owner="Quantum-Yeti", repo_name="ScratchBoard"):
-    """Fetches the latest release tag from GitHub."""
-    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
-    try:
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        data = response.json()
-        return data.get("tag_name")  # e.g., "v1.0.1"
-    except Exception as e:
-        print("Failed to fetch latest release:", e)
-        return None
+
 
 class AboutWidget(QDialog):
     def __init__(self):
         super().__init__()
 
-        # Window setup
+        # Store the thread
+        self.thread = None
+        self.worker = None
+
+        # Reserve attribute and store
+        self.update_btn = None
+
+        # Window layout setup
         self.setWindowTitle("About Scratch Board")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
-        self.setFixedSize(400, 400)
+        self.setFixedSize(400, 420)
         self.setModal(True)
 
-        # Main vertical layout
         layout = QVBoxLayout(self)
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(15)
-        layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter | Qt.AlignVCenter)  # Top and center horizontally
+        layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
-        # App Icon
+        # Icon
         icon_label = QLabel()
-        icon = QIcon(resource_path("resources/icons/astronaut.ico"))
-        icon_label.setPixmap(icon.pixmap(64, 64))
+        icon_label.setPixmap(QIcon(resource_path("resources/icons/astronaut.ico")).pixmap(64, 64))
         icon_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(icon_label, alignment=Qt.AlignCenter)
+        layout.addWidget(icon_label)
 
-        # App Name
+        # Title
         title_label = QLabel("Scratch Board")
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet("font-size: 20px; font-weight: bold;")
         layout.addWidget(title_label)
 
         # Version label
-        current_version = "v1.1"
-        latest_version = get_latest_release()
-        if latest_version and latest_version != current_version:
-            version_text = f"Version {current_version} (Update available: {latest_version})"
-        else:
-            version_text = f"Version {current_version} (Up-to-date)"
+        self.version_label = QLabel("Checking version…")
+        self.version_label.setAlignment(Qt.AlignCenter)
+        self.version_label.setStyleSheet("font-size: 14px;")
+        layout.addWidget(self.version_label)
 
-        version_label = QLabel(version_text)
-        version_label.setAlignment(Qt.AlignCenter)
-        version_label.setStyleSheet("font-size: 14px;")
-        layout.addWidget(version_label)
+        # Placeholder for update button
+        self.update_btn_layout = QHBoxLayout()
+        self.update_btn_layout.setAlignment(Qt.AlignCenter)
+        layout.addLayout(self.update_btn_layout)
 
         # Copyright
-        copyright_label = QLabel("\u00A9 2025 Quantum Yeti")
+        copyright_label = QLabel("© 2025 Quantum Yeti")
         copyright_label.setAlignment(Qt.AlignCenter)
         copyright_label.setStyleSheet("font-size: 12px; color: gray;")
         layout.addWidget(copyright_label)
 
         # License text
-        license_label_txt = QLabel(
-            "Use of this software is an agreement to the license below:"
-        )
+        license_label_txt = QLabel("Use of this software is an agreement to the license below:")
         license_label_txt.setAlignment(Qt.AlignCenter)
-        license_label_txt.setWordWrap(True)  # wrap long text
+        license_label_txt.setWordWrap(True)
         license_label_txt.setStyleSheet("font-size: 12px;")
         layout.addWidget(license_label_txt)
 
         # License button
-        license_btn_icon = QIcon(resource_path("resources/icons/license.png"))
         license_btn = QPushButton("View License")
-        license_btn.setIcon(license_btn_icon)
+        license_btn.setIcon(QIcon(resource_path("resources/icons/license.png")))
         license_btn.setFixedWidth(120)
         license_btn.clicked.connect(lambda: QDesktopServices.openUrl(
             QUrl("https://github.com/Quantum-Yeti/ScratchBoard/blob/master/LICENSE.md")
         ))
 
-        # Close button
-        #close_btn_icon = QIcon(resource_path("resources/icons/cancel.png"))
-        #close_btn = QPushButton("Close")
-        #close_btn.setIcon(close_btn_icon)
-        #close_btn.setFixedWidth(80)
-        #close_btn.clicked.connect(self.close)
+        # Change log button
+        change_btn = QPushButton("Change Logs")
+        change_btn.setIcon(QIcon(resource_path("resources/icons/changelog.png")))
+        change_btn.setFixedWidth(120)
+        change_btn.clicked.connect(lambda: QDesktopServices.openUrl("https://github.com/Quantum-Yeti/ScratchBoard/commits/release"))
 
-        # Buttons layout (centered)
-        btn_layout = QHBoxLayout()
-        btn_layout.setAlignment(Qt.AlignCenter)  # center horizontally
-        btn_layout.setSpacing(20)  # space between buttons
+        # Add buttons to layout
+        btn_layout = QVBoxLayout()
+        btn_layout.setAlignment(Qt.AlignCenter)
         btn_layout.addWidget(license_btn)
-        #btn_layout.addWidget(close_btn)
+        btn_layout.addWidget(change_btn)
         layout.addLayout(btn_layout)
 
-    def update_version_label(self):
-        latest_version = get_latest_release()
-        if latest_version:
-            # Remove leading 'v' if present
-            latest_version_clean = latest_version.lstrip("vV")
-            current_version_clean = self.current_version.lstrip("vV")
+        # Start threaded update check
+        self.start_update_thread()
 
-            if latest_version_clean != current_version_clean:
-                self.version_label.setText(
-                    f"Version {self.current_version} (Update available: {latest_version_clean})"
-                )
-            else:
-                self.version_label.setText(f"Version {self.current_version} (Up-to-date)")
+    # Background Threading Methods for Update Detection
+    def start_update_thread(self):
+        """Starts GitHub version check in a background thread."""
+        self.thread = QThread()
+        self.worker = UpdateCheckWorker()
+        self.worker.moveToThread(self.thread)
+
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.update_version_label)
+        self.worker.finished.connect(self.thread.quit)
+
+        self.thread.start()
+
+    def update_version_label(self, current_version, latest_version):
+        """Called when the background thread returns update info."""
+
+        if latest_version is None:
+            self.version_label.setText(f"Version {current_version} (Check failed)")
+            return
+
+        cur = current_version.lstrip("vV")
+        latest = latest_version.lstrip("vV")
+
+        if cur == latest:
+            self.version_label.setText(f"Version {current_version} (Up-to-date)")
+
+            # Remove update button if it exists
+            if self.update_btn:
+                self.update_btn.setParent(None)
+                self.update_btn = None
+
         else:
-            self.version_label.setText(f"Version {self.current_version} (Check failed)")
+            self.version_label.setText(
+                f"Version {current_version} (Update available: {latest_version})"
+            )
 
+            # Create update button only once
+            if not self.update_btn:
+                self.update_btn = QPushButton("Get Update")
+                self.update_btn.setIcon(QIcon(resource_path("resources/icons/update.png")))
+                self.update_btn.setFixedWidth(130)
+
+                # Open GitHub release asset
+                self.update_btn.clicked.connect(
+                    lambda: QDesktopServices.openUrl(
+                        QUrl(
+                            f"https://github.com/Quantum-Yeti/ScratchBoard/releases/download/{latest_version}/ScratchBoard.exe"
+                        )
+                    )
+                )
+
+                self.update_btn_layout.addWidget(self.update_btn)

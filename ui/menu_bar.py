@@ -31,7 +31,6 @@ def _connect_hover_tooltips(menu):
                 lambda a=action: QToolTip.showText(QCursor.pos(), a.toolTip())
             )
 
-
 class MainMenuBar(QMenuBar):
     """
     Main application menu bar.
@@ -43,20 +42,34 @@ class MainMenuBar(QMenuBar):
         super().__init__(parent)
 
         # init actions to avoid attribute errors before menus are built
+
+        # File Menu
         self.import_action = None
         self.export_action = None
         self.exit_action = None
+
+        # Tools Menu
         self.dash_action = None
         self.scratch_action = None
+        self.notepad_action = None
         self.bat_action = None
         self.modem_action = None
+
+        # Views Menu
+        self.contact_action = None
+        self.internet_action = None
+        self.phone_action = None
+        self.video_action = None
+        self.streaming_action = None
+        self.ideas_action = None
+
+        # Charts Menu
         self.signal_action = None
         self.ethernet_action = None
         self.speeds_action = None
         self.fiber_action = None
-        self.contact_action = None
-        self.tasks_action = None
-        self.project_action = None
+
+        # Help Menu
         self.about_action = None
         self.md_action = None
 
@@ -101,11 +114,6 @@ class MainMenuBar(QMenuBar):
     def _build_tools_menu(self):
         tools_menu = self.addMenu("Tools")
 
-        self.dash_action = QAction("Dashboard", self)
-        self.dash_action.setIcon(QIcon(resource_path("resources/icons/dashboard.png")))
-        self.dash_action.setShortcut("F10")
-        tools_menu.addAction(self.dash_action)
-
         self.scratch_action = QAction("Scratch Note", self)
         self.scratch_action.setIcon(QIcon(resource_path("resources/icons/stickynote.png")))
         self.scratch_action.setShortcut("F11")
@@ -129,6 +137,57 @@ class MainMenuBar(QMenuBar):
         tools_menu.addAction(self.modem_action)
 
         _connect_hover_tooltips(tools_menu)
+
+    # Build the View Menu
+    def _build_views_menu(self):
+        view_menu = self.addMenu("Views")
+
+        self.dash_action = QAction("Dashboard", self)
+        self.dash_action.setIcon(QIcon(resource_path("resources/icons/dashboard.png")))
+        self.dash_action.setShortcut("F1")
+        view_menu.addAction(self.dash_action)
+
+        self.contact_action = QAction("Contacts", self)
+        self.contact_action.setIcon(QIcon(resource_path("resources/icons/contacts.png")))
+        self.contact_action.setShortcut("F2")
+        view_menu.addAction(self.contact_action)
+
+        self.copilot_action = QAction("CoPilot", self)
+        self.copilot_action.setIcon(QIcon(resource_path("resources/icons/owl.png")))
+        self.copilot_action.setShortcut("F3")
+        view_menu.addAction(self.copilot_action)
+
+        self.internet_action = QAction("Internet", self)
+        self.internet_action.setIcon(QIcon(resource_path("resources/icons/internet.png")))
+        self.internet_action.setShortcut("F4")
+        view_menu.addAction(self.internet_action)
+
+        self.phone_action = QAction("Phone", self)
+        self.phone_action.setIcon(QIcon(resource_path("resources/icons/phone.png")))
+        self.phone_action.setShortcut("F5")
+        view_menu.addAction(self.phone_action)
+
+        self.video_action = QAction("Video", self)
+        self.video_action.setIcon(QIcon(resource_path("resources/icons/video.png")))
+        self.video_action.setShortcut("F6")
+        view_menu.addAction(self.video_action)
+
+        self.streaming_action = QAction("Streaming", self)
+        self.streaming_action.setIcon(QIcon(resource_path("resources/icons/streaming.png")))
+        self.streaming_action.setShortcut("F7")
+        view_menu.addAction(self.streaming_action)
+
+        self.notes_action = QAction("Notes", self)
+        self.notes_action.setIcon(QIcon(resource_path("resources/icons/notes.png")))
+        self.notes_action.setShortcut("F8")
+        view_menu.addAction(self.notes_action)
+
+        self.ideas_action = QAction("Ideas", self)
+        self.ideas_action.setIcon(QIcon(resource_path("resources/icons/ideas.png")))
+        self.ideas_action.setShortcut("F9")
+        view_menu.addAction(self.ideas_action)
+
+        _connect_hover_tooltips(view_menu)
 
     def _build_charts_menu(self):
         charts_menu = self.addMenu("Charts")
@@ -160,52 +219,6 @@ class MainMenuBar(QMenuBar):
 
         _connect_hover_tooltips(charts_menu)
 
-    # Build the View Menu
-    def _build_views_menu(self):
-        view_menu = self.addMenu("Views")
-
-        self.contact_action = QAction("Contacts", self)
-        self.contact_action.setIcon(QIcon(resource_path("resources/icons/contacts.png")))
-        self.contact_action.setShortcut("F1")
-        view_menu.addAction(self.contact_action)
-
-        self.copilot_action = QAction("CoPilot", self)
-        self.copilot_action.setIcon(QIcon(resource_path("resources/icons/owl.png")))
-        self.copilot_action.setShortcut("F2")
-        view_menu.addAction(self.copilot_action)
-
-        self.tasks_action = QAction("Tasks", self)
-        self.tasks_action.setIcon(QIcon(resource_path("resources/icons/tasks.png")))
-        self.tasks_action.setShortcut("F3")
-        view_menu.addAction(self.tasks_action)
-
-        self.project_action = QAction("Projects", self)
-        self.project_action.setIcon(QIcon(resource_path("resources/icons/projects.png")))
-        self.project_action.setShortcut("F4")
-        view_menu.addAction(self.project_action)
-
-        self.notes_action = QAction("Notes", self)
-        self.notes_action.setIcon(QIcon(resource_path("resources/icons/notes.png")))
-        self.notes_action.setShortcut("F5")
-        view_menu.addAction(self.notes_action)
-
-        self.ideas_action = QAction("Ideas", self)
-        self.ideas_action.setIcon(QIcon(resource_path("resources/icons/ideas.png")))
-        self.ideas_action.setShortcut("F6")
-        view_menu.addAction(self.ideas_action)
-
-        self.journal_action = QAction("Journal", self)
-        self.journal_action.setIcon(QIcon(resource_path("resources/icons/journal.png")))
-        self.journal_action.setShortcut("F7")
-        view_menu.addAction(self.journal_action)
-
-        self.personal_action = QAction("Personal", self)
-        self.personal_action.setIcon(QIcon(resource_path("resources/icons/personal.png")))
-        self.personal_action.setShortcut("F8")
-        view_menu.addAction(self.personal_action)
-
-        _connect_hover_tooltips(view_menu)
-
     # Build the Help menu
     def _build_help_menu(self):
         help_menu = self.addMenu("Help")
@@ -214,7 +227,7 @@ class MainMenuBar(QMenuBar):
         self.md_action.setIcon(QIcon(resource_path("resources/icons/markdown.png")))
         help_menu.addAction(self.md_action)
 
-        self.about_action = QAction("About", self)
+        self.about_action = QAction("About Scratch Board", self)
         self.about_action.setIcon(QIcon(resource_path("resources/icons/about.png")))
         help_menu.addAction(self.about_action)
 
@@ -252,12 +265,12 @@ class MainMenuBar(QMenuBar):
         # Wire the view categories
         self.contact_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Contacts"))
         self.copilot_action.triggered.connect(lambda: self.sidebar.category_selected.emit("CoPilot"))
-        self.tasks_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Tasks"))
-        self.project_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Projects"))
+        self.internet_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Internet"))
+        self.phone_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Phone"))
+        self.video_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Video"))
+        self.streaming_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Streaming"))
         self.notes_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Notes"))
         self.ideas_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Ideas"))
-        self.journal_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Journal"))
-        self.personal_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Personal"))
 
         # Wire the help menu
         self.md_action.triggered.connect(self._open_md_guide)
