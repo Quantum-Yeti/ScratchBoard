@@ -2,7 +2,6 @@ from PySide6.QtCore import QObject, Signal
 import requests
 from utils.resource_path import resource_path
 
-
 def get_current_version():
     """Reads current version from version.txt."""
     try:
@@ -25,7 +24,6 @@ def get_latest_release():
 
 class UpdateCheckWorker(QObject):
     finished = Signal(str, str)  # current_version, latest_version
-
     def run(self):
         current = get_current_version()
         latest = get_latest_release()

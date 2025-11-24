@@ -31,6 +31,8 @@ class AboutWidget(QDialog):
         layout.setSpacing(15)
         layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
+        layout.addStretch()
+
         # Icon
         icon_label = QLabel()
         icon_label.setPixmap(QIcon(resource_path("resources/icons/astronaut.ico")).pixmap(64, 64))
@@ -87,6 +89,8 @@ class AboutWidget(QDialog):
         btn_layout.addWidget(license_btn)
         btn_layout.addWidget(change_btn)
         layout.addLayout(btn_layout)
+
+        layout.addStretch()
 
         # Start threaded update check
         self.start_update_thread()
