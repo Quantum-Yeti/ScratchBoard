@@ -1,60 +1,58 @@
-from PySide6.QtGui import QIcon, QPixmap, QFont
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout, QLabel, \
-    QSizePolicy, QWidget
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon, QFont, QPixmap, Qt
+from PySide6.QtWidgets import QTableWidget, QPushButton, QHBoxLayout, QSizePolicy, QLabel, QWidget, QVBoxLayout, \
+    QDialog, QTableWidgetItem
 
 from utils.resource_path import resource_path
-from views.chart_widgets.chart_dictionaries.docsis_dict import docsis_signals
+from views.chart_widgets.chart_dictionaries.voip_dict import voip_signals
 
 
-class SignalReference(QDialog):
+class VoIPReference(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # Apply the chart_theme.qss
-        with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
-            self.setStyleSheet(f.read())
+        # Apply a chart theme if available
+        try:
+            with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
+                self.setStyleSheet(f.read())
+        except Exception:
+            pass  # silently continue if theme not found
 
-        self.setWindowTitle("Scratch Board: DOCSIS Modem Signal Reference Chart")
+        self.setWindowTitle("Scratch Board: VoIP Reference Chart")
         self.setWindowModality(Qt.ApplicationModal)
-        self.resize(1200, 900)  # initial size
+        self.resize(1200, 900)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
 
-        # Top image and title of chart
+        # Top icon + title
         icon_title_widget = QWidget()
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignCenter)  # Centers everything horizontally
+        icon_title_layout.setAlignment(Qt.AlignCenter)
 
-        # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/waves_yellow.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/phone.png")))  # add your icon
         image_label.setAlignment(Qt.AlignVCenter)
 
-        # Title
-        title_label = QLabel("DOCSIS Signal Reference Chart")
+        title_label = QLabel("VoIP Troubleshooting Reference Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
         title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)  # Prevents stretching
+        title_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
 
-        # Add widgets to layout
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
-
-        # Add the container widget to the main layout
         layout.addWidget(icon_title_widget, alignment=Qt.AlignCenter)
 
         # Table
         self.table = QTableWidget()
         self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels([
-            "Signal",
+            "Metric / Signal",
             "Normal Range",
             "Symptoms / Common Issues",
             "Explanation",
@@ -70,24 +68,19 @@ class SignalReference(QDialog):
         close_btn.setIconSize(QSize(24, 24))
         close_btn.clicked.connect(self.close)
 
-        # Close button wrapped horizontal layout for alignment
         btn_layout = QHBoxLayout()
-        btn_layout.addStretch()  # left space
-        btn_layout.addWidget(close_btn)  # button
-        btn_layout.addStretch()  # right space for centering
-
-        # Add the horizontal layout to the main vertical layout
+        btn_layout.addStretch()
+        btn_layout.addWidget(close_btn)
+        btn_layout.addStretch()
         layout.addLayout(btn_layout)
 
         # Populate table
         self._populate_table()
-
-        # Resize columns and rows for readability
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(docsis_signals))
-        for row, sig in enumerate(docsis_signals):
+        self.table.setRowCount(len(voip_signals))
+        for row, sig in enumerate(voip_signals):
             for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
                 item = QTableWidgetItem(sig[key])
                 item.setFlags(item.flags() & ~Qt.ItemIsEditable)
@@ -96,16 +89,12 @@ class SignalReference(QDialog):
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        # Set initial column widths (helps with wrapping)
-        self.table.setColumnWidth(0, 180)  # Signal
-        self.table.setColumnWidth(1, 100)  # Range
-        self.table.setColumnWidth(2, 200)  # Symptoms
-        self.table.setColumnWidth(3, 300)  # Explanation
-        self.table.setColumnWidth(4, 250)  # Steps
+        self.table.setColumnWidth(0, 180)
+        self.table.setColumnWidth(1, 100)
+        self.table.setColumnWidth(2, 250)
+        self.table.setColumnWidth(3, 350)
+        self.table.setColumnWidth(4, 300)
 
-        # Resize rows to fit wrapped text
         self.table.resizeRowsToContents()
-
-        # Stretch last column to use remaining space
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)

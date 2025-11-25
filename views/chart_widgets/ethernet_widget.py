@@ -38,7 +38,7 @@ class EthernetReference(QDialog):
 
         # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/robot2.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/ethernet_purple.png")))
         image_label.setAlignment(Qt.AlignVCenter)
 
         # Title

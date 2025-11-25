@@ -36,7 +36,7 @@ class FiberReferenceDialog(QDialog):
 
         # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/robot2.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/waves.png")))
         image_label.setAlignment(Qt.AlignVCenter)
 
         # Title

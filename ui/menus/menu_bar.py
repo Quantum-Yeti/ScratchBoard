@@ -7,9 +7,11 @@ from models.note_model import NoteModel
 from ui.themes.top_menu_theme import top_menu_style
 from utils.resource_path import resource_path
 from views.chart_widgets.fiber_widget import FiberReferenceDialog
+from views.chart_widgets.gaming_widget import GamingReference
 from views.chart_widgets.signal_widget import SignalReference
 from views.chart_widgets.ethernet_widget import EthernetReference
 from views.chart_widgets.speed_widget import InternetSpeedRequirements
+from views.chart_widgets.voip_widget import VoIPReference
 from views.widgets.log_widget import ModemLogParserView
 from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
@@ -71,6 +73,8 @@ class MainMenuBar(QMenuBar):
         self.ethernet_action = None
         self.speeds_action = None
         self.fiber_action = None
+        self.voip_action = None
+        self.gaming_action = None
 
         # Help Menu
         self.about_action = None
@@ -221,10 +225,20 @@ class MainMenuBar(QMenuBar):
         self.wifi_standards_action.setShortcut("Ctrl+W")
         charts_menu.addAction(self.wifi_standards_action)
 
-        self.speeds_action = QAction("Speed Chart", self)
+        self.speeds_action = QAction("Bandwidth Requirements Chart", self)
         self.speeds_action.setIcon(QIcon(resource_path("resources/icons/speed.png")))
-        self.speeds_action.setShortcut("Ctrl+W")
+        self.speeds_action.setShortcut("Ctrl+S")
         charts_menu.addAction(self.speeds_action)
+
+        self.voip_action = QAction("VoIP Info Chart", self)
+        self.voip_action.setIcon(QIcon(resource_path("resources/icons/phone_white.png")))
+        self.voip_action.setShortcut("Ctrl+N")
+        charts_menu.addAction(self.voip_action)
+
+        self.gaming_action = QAction("Gaming Info Chart", self)
+        self.gaming_action.setIcon(QIcon(resource_path("resources/icons/gaming_white.png")))
+        self.gaming_action.setShortcut("Ctrl+G")
+        charts_menu.addAction(self.gaming_action)
 
         _connect_hover_tooltips(charts_menu)
 
@@ -275,6 +289,8 @@ class MainMenuBar(QMenuBar):
         self.wifi_standards_action.triggered.connect(self._open_wifi_chart)
         self.speeds_action.triggered.connect(self._open_speed_chart)
         self.fiber_action.triggered.connect(self._open_fiber_chart)
+        self.voip_action.triggered.connect(self._open_voip_chart)
+        self.gaming_action.triggered.connect(self._open_gaming_chart)
 
         # Wire the view categories
         self.contact_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Contacts"))
@@ -318,6 +334,14 @@ class MainMenuBar(QMenuBar):
     def _open_fiber_chart(self):
         fbr = FiberReferenceDialog(self.parent())
         fbr.exec()
+
+    def _open_voip_chart(self):
+        voip = VoIPReference(self.parent())
+        voip.exec()
+
+    def _open_gaming_chart(self):
+        gaming = GamingReference(self.parent())
+        gaming.exec()
 
     def _open_md_guide(self):
         if not hasattr(self, '_md_widget'):
@@ -367,7 +391,7 @@ class MainMenuBar(QMenuBar):
         skull_icon = QPixmap(resource_path("resources/icons/skull.png"))
         skull_icon = skull_icon.scaled(72, 72)
 
-        # Danger Popup with custom icon
+        # Danger Popup with icon
         confirm = QMessageBox(self)
         confirm.setWindowTitle("Scratch Board: Delete Database")
         confirm.setText(
