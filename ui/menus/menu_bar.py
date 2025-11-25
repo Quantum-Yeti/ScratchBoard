@@ -17,6 +17,8 @@ from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
 from views.chart_widgets.wifi_standards_widget import WifiStandardsReference
 from views.widgets.md_widget import MarkdownGuideWidget
+from views.widgets.shortcut_widget import ShortcutGuide
+
 
 # Internal tooltip hover function
 def _connect_hover_tooltips(menu):
@@ -79,6 +81,7 @@ class MainMenuBar(QMenuBar):
         # Help Menu
         self.about_action = None
         self.md_action = None
+        self.shortcut_action = None
 
         # Build menus
         self._build_file_menu()
@@ -215,6 +218,8 @@ class MainMenuBar(QMenuBar):
         self.fiber_action.setShortcut("Ctrl+Z")
         charts_menu.addAction(self.fiber_action)
 
+        charts_menu.addSeparator()
+
         self.ethernet_action = QAction("Ethernet Standards Chart", self)
         self.ethernet_action.setIcon(QIcon(resource_path("resources/icons/ethernet.png")))
         self.ethernet_action.setShortcut("Ctrl+E")
@@ -229,6 +234,8 @@ class MainMenuBar(QMenuBar):
         self.speeds_action.setIcon(QIcon(resource_path("resources/icons/speed.png")))
         self.speeds_action.setShortcut("Ctrl+S")
         charts_menu.addAction(self.speeds_action)
+
+        charts_menu.addSeparator()
 
         self.voip_action = QAction("VoIP Info Chart", self)
         self.voip_action.setIcon(QIcon(resource_path("resources/icons/phone_white.png")))
@@ -246,8 +253,14 @@ class MainMenuBar(QMenuBar):
     def _build_help_menu(self):
         help_menu = self.addMenu("Help")
 
+        self.shortcut_action = QAction("Shortcut List", self)
+        self.shortcut_action.setIcon(QIcon(resource_path("resources/icons/keyboard.png")))
+        self.shortcut_action.setShortcut("Ctrl+Shift+L")
+        help_menu.addAction(self.shortcut_action)
+
         self.md_action = QAction("Markdown Quick Guide", self)
         self.md_action.setIcon(QIcon(resource_path("resources/icons/markdown.png")))
+        self.md_action.setShortcut("Alt+M")
         help_menu.addAction(self.md_action)
 
         self.about_action = QAction("About Scratch Board", self)
@@ -303,6 +316,7 @@ class MainMenuBar(QMenuBar):
         self.ideas_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Ideas"))
 
         # Wire the help menu
+        self.shortcut_action.triggered.connect(self._open_shortcuts)
         self.md_action.triggered.connect(self._open_md_guide)
         self.about_action.triggered.connect(lambda: AboutWidget().exec())
 
@@ -342,6 +356,10 @@ class MainMenuBar(QMenuBar):
     def _open_gaming_chart(self):
         gaming = GamingReference(self.parent())
         gaming.exec()
+
+    def _open_shortcuts(self):
+        short = ShortcutGuide(self.parent())
+        short.exec()
 
     def _open_md_guide(self):
         if not hasattr(self, '_md_widget'):
