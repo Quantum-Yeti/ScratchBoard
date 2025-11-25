@@ -8,6 +8,7 @@ pyinstaller `
     --add-data "resources/icons;resources/icons" `
     --add-data "resources/ieee_oui.csv;resources" `
     --add-data "ui/themes;ui/themes" `
+    --add-data "version.txt;." `
     --hidden-import=markdown2 `
     --hidden-import=PySide6.QtCore `
     --hidden-import=PySide6.QtGui `
