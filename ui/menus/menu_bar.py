@@ -376,7 +376,7 @@ class MainMenuBar(QMenuBar):
         confirm.setIconPixmap(skull_icon)
         confirm.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirm.setDefaultButton(QMessageBox.No)
-        confirm.setDetailedText("This can not be undone. Make sure you have a backup before proceeding.")
+        confirm.setDetailedText("This action is permanent. Please back up your database before continuing.")
         confirm.setEscapeButton(QMessageBox.No)  # ESC cancels
 
         response = confirm.exec()

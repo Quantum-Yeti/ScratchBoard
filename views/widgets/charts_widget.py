@@ -46,7 +46,7 @@ def create_stacked_bar_chart(model):
     if not all_dates:
         return chart
 
-    all_dates = all_dates[-10:] # Limit to the last 10 days
+    all_dates = all_dates[-7:] # Limit to the last 7 days
 
     bar_series = QBarSeries()
     overall_max = 0
