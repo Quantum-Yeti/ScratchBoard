@@ -101,10 +101,12 @@ class MainMenuBar(QMenuBar):
         file_menu = self.addMenu("File")
 
         self.import_action = QAction("Import Notes", self)
+        self.import_action.setShortcut("Alt+I")
         self.import_action.setIcon(QIcon(resource_path("resources/icons/import.png")))
         file_menu.addAction(self.import_action)
 
         self.export_action = QAction("Export Notes", self)
+        self.export_action.setShortcut("Alt+E")
         self.export_action.setIcon(QIcon(resource_path("resources/icons/export.png")))
         file_menu.addAction(self.export_action)
 
