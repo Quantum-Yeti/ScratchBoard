@@ -10,7 +10,8 @@ from utils.resource_path import resource_path
 def get_current_version(self):
     """Reads the current version from a version.txt file."""
     try:
-        with open("version.txt", "r") as version_file:
+        version_file = resource_path('version.txt')
+        with open(version_file, "r") as version_file:
             version = version_file.read().strip()
             return version
     except FileNotFoundError:
