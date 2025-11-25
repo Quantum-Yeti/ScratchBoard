@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2025-11-24
+## [1.2] - 2025-11-25  
+### Added  
+- **Dashboard Navigation**: Automatically navigates to the dashboard after a successful note import.  
+  - Emits the `dashboard_clicked` signal after importing notes from a ZIP file.  
+
+### Fixed  
+- **Dashboard Navigation Issue**: Ensured that the correct view (dashboard) is displayed after the import process completes successfully.
+
+## [1.1] - 2025-11-24
 ### Added
 - **About dialog** now checks for updates in a background thread.
   - Introduced `UpdateCheckWorker` to fetch latest GitHub release asynchronously.

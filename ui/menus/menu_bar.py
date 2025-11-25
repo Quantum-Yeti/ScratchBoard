@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFi
 from models.note_model import NoteModel
 from ui.themes.top_menu_theme import top_menu_style
 from utils.resource_path import resource_path
-from views.chart_widgets.fiber_chart import FiberReferenceDialog
+from views.chart_widgets.fiber_widget import FiberReferenceDialog
 from views.chart_widgets.signal_widget import SignalReference
 from views.chart_widgets.ethernet_widget import EthernetReference
 from views.chart_widgets.speed_widget import InternetSpeedRequirements

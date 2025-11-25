@@ -1,13 +1,20 @@
-from PySide6.QtCore import Qt, QUrl, QThread
+from PySide6.QtCore import Qt, QUrl, QThread, QSize
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
-
+from packaging.version import Version
 from datetime import datetime
 
 from helpers.update_helpers.update_checker import UpdateCheckWorker
 from utils.resource_path import resource_path
 
-
+def get_current_version(self):
+    """Reads the current version from a version.txt file."""
+    try:
+        with open("version.txt", "r") as version_file:
+            version = version_file.read().strip()
+            return version
+    except FileNotFoundError:
+        return "Unknown version"
 
 class AboutWidget(QDialog):
     def __init__(self):
@@ -59,8 +66,9 @@ class AboutWidget(QDialog):
         # Copyright
         year = datetime.now().year
         copyright_label = QLabel(f"© {year} Quantum Yeti")
+        copyright_label.setToolTip(f"© {year} Quantum Yeti")
         copyright_label.setAlignment(Qt.AlignCenter)
-        copyright_label.setStyleSheet("font-size: 12px; color: gray;")
+        copyright_label.setStyleSheet("font-size: 12px; color: #5F8A8B;")
         layout.addWidget(copyright_label)
 
         # License text
@@ -72,29 +80,34 @@ class AboutWidget(QDialog):
 
         # License button
         license_btn = QPushButton("View License")
+        license_btn.setToolTip("View License")
         license_btn.setIcon(QIcon(resource_path("resources/icons/license.png")))
         license_btn.setFixedWidth(120)
+        self.style_centered_button(license_btn)
         license_btn.clicked.connect(lambda: QDesktopServices.openUrl(
             QUrl("https://github.com/Quantum-Yeti/ScratchBoard/blob/master/LICENSE.md")
         ))
 
-        # Change log button
-        change_btn = QPushButton("Commits")
-        change_btn.setIcon(QIcon(resource_path("resources/icons/changelog.png")))
-        change_btn.setFixedWidth(120)
-        change_btn.clicked.connect(lambda: QDesktopServices.openUrl("https://github.com/Quantum-Yeti/ScratchBoard/commits/release"))
+        # Commit log button
+        commits_btn = QPushButton("Commits")
+        commits_btn.setToolTip("Commits")
+        commits_btn.setIcon(QIcon(resource_path("resources/icons/changelog.png")))
+        commits_btn.setFixedWidth(120)
+        self.style_centered_button(commits_btn)
+        commits_btn.clicked.connect(lambda: QDesktopServices.openUrl("https://github.com/Quantum-Yeti/ScratchBoard/commits/release"))
 
         # Add buttons to layout
         btn_layout = QVBoxLayout()
         btn_layout.setAlignment(Qt.AlignCenter)
         btn_layout.addWidget(license_btn)
-        btn_layout.addWidget(change_btn)
+        btn_layout.addWidget(commits_btn)
         layout.addLayout(btn_layout)
 
         layout.addStretch()
 
         # Start threaded update check
         self.start_update_thread()
+
 
     # Background Threading Methods for Update Detection
     def start_update_thread(self):
@@ -111,40 +124,54 @@ class AboutWidget(QDialog):
 
     def update_version_label(self, current_version, latest_version):
         """Called when the background thread returns update info."""
-
         if latest_version is None:
             self.version_label.setText(f"Version {current_version} (Check failed)")
             return
 
-        cur = current_version.lstrip("vV")
-        latest = latest_version.lstrip("vV")
+        cur = Version(current_version.lstrip("vV"))
+        latest = Version(latest_version.lstrip("vV"))
 
-        if cur == latest:
+        # Up to date
+        if latest == cur:
             self.version_label.setText(f"Version {current_version} (Up-to-date)")
-
-            # Remove update button if it exists
             if self.update_btn:
                 self.update_btn.setParent(None)
                 self.update_btn = None
+            return
 
-        else:
-            self.version_label.setText(
-                f"Version {current_version} (Update available: {latest_version})"
-            )
+        # Current version is newer (rare case)
+        if cur > latest:
+            self.version_label.setText(f"Version {current_version} (Developer Build)")
+            return
 
-            # Create update button only once
-            if not self.update_btn:
-                self.update_btn = QPushButton("Get Update")
-                self.update_btn.setIcon(QIcon(resource_path("resources/icons/update.png")))
-                self.update_btn.setFixedWidth(130)
+        # Update available
+        self.version_label.setText(
+            f"Version {current_version} (Update available: {latest_version})"
+        )
 
-                # Open GitHub release asset
-                self.update_btn.clicked.connect(
-                    lambda: QDesktopServices.openUrl(
-                        QUrl(
-                            f"https://github.com/Quantum-Yeti/ScratchBoard/releases/download/{latest_version}/ScratchBoard.exe"
-                        )
+        if not self.update_btn:
+            self.update_btn = QPushButton("Get Update")
+            self.update_btn.setToolTip("Download Update")
+            self.update_btn.setIcon(QIcon(resource_path("resources/icons/update.png")))
+            self.update_btn.setFixedWidth(130)
+            self.style_centered_button(self.update_btn)
+            self.update_btn.clicked.connect(
+                lambda: QDesktopServices.openUrl(
+                    QUrl(
+                        f"https://github.com/Quantum-Yeti/ScratchBoard/releases/download/{latest_version}/ScratchBoard.exe"
                     )
                 )
+            )
+            self.update_btn_layout.addWidget(self.update_btn)
 
-                self.update_btn_layout.addWidget(self.update_btn)
+    def style_centered_button(self, btn):
+        btn.setStyleSheet("""
+            QPushButton {
+                padding: 6px;
+                qproperty-iconSize: 18px;
+            }
+        """)
+        btn.setIconSize(QSize(18, 18))
+        btn.setLayoutDirection(Qt.LeftToRight)  # icon left, text right (normal)
+        btn.setStyleSheet("text-align: center;")
+
