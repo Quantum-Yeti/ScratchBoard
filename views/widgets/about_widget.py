@@ -8,14 +8,13 @@ from helpers.update_helpers.update_checker import UpdateCheckWorker
 from utils.resource_path import resource_path
 
 def get_current_version(self):
-    """Reads the current version from a version.txt file."""
+    """Reads the current version from version.txt"""
     try:
-        version_file = resource_path('version.txt')
-        with open(version_file, "r") as version_file:
-            version = version_file.read().strip()
-            return version
-    except FileNotFoundError:
-        return "Unknown version"
+        path = resource_path("version.txt")
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except Exception as e:
+        return f"Unknown version ({e})"
 
 class AboutWidget(QDialog):
     def __init__(self):
