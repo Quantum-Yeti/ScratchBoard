@@ -1,5 +1,6 @@
 import traceback
 
+from PySide6.QtCore import QSize
 from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog
 
@@ -85,9 +86,9 @@ class MainMenuBar(QMenuBar):
 
         # Build menus
         self._build_file_menu()
-        self._build_tools_menu()
         self._build_views_menu()
         self._build_charts_menu()
+        self._build_tools_menu()
         self._build_help_menu()
 
         # Initialize the sidebar for the categories
@@ -255,12 +256,12 @@ class MainMenuBar(QMenuBar):
     def _build_help_menu(self):
         help_menu = self.addMenu("Help")
 
-        self.shortcut_action = QAction("Shortcut List", self)
+        self.shortcut_action = QAction("Keyboard Shortcuts", self)
         self.shortcut_action.setIcon(QIcon(resource_path("resources/icons/keyboard.png")))
         self.shortcut_action.setShortcut("Ctrl+Shift+L")
         help_menu.addAction(self.shortcut_action)
 
-        self.md_action = QAction("Markdown Quick Guide", self)
+        self.md_action = QAction("MarkDown Guide", self)
         self.md_action.setIcon(QIcon(resource_path("resources/icons/markdown.png")))
         self.md_action.setShortcut("Alt+M")
         help_menu.addAction(self.md_action)
@@ -292,12 +293,6 @@ class MainMenuBar(QMenuBar):
         self.export_action.triggered.connect(self._export_notes)
         self.delete_db_action.triggered.connect(self._delete_database)
 
-        # Wire the tools
-        self.scratch_action.triggered.connect(self.sidebar.open_scratch_pad) # open the scratch notes
-        self.notepad_action.triggered.connect(self._open_notepad)
-        self.bat_action.triggered.connect(self.sidebar.open_bat_file) # run a batch file
-        self.modem_action.triggered.connect(self._open_modem_parser)
-
         # Wire the charts
         self.signal_action.triggered.connect(self._open_signal_chart)
         self.ethernet_action.triggered.connect(self._open_ethernet_chart)
@@ -316,6 +311,12 @@ class MainMenuBar(QMenuBar):
         self.streaming_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Streaming"))
         self.notes_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Notes"))
         self.ideas_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Ideas"))
+
+        # Wire the tools
+        self.scratch_action.triggered.connect(self.sidebar.open_scratch_pad)  # open the scratch notes
+        self.notepad_action.triggered.connect(self._open_notepad)
+        self.bat_action.triggered.connect(self.sidebar.open_bat_file)  # run a batch file
+        self.modem_action.triggered.connect(self._open_modem_parser)
 
         # Wire the help menu
         self.shortcut_action.triggered.connect(self._open_shortcuts)
