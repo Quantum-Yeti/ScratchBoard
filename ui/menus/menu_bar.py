@@ -128,34 +128,6 @@ class MainMenuBar(QMenuBar):
         # Hover tooltips
         _connect_hover_tooltips(file_menu)
 
-    # Build the tools menu
-    def _build_tools_menu(self):
-        tools_menu = self.addMenu("Tools")
-
-        self.scratch_action = QAction("Scratch Note", self)
-        self.scratch_action.setIcon(QIcon(resource_path("resources/icons/stickynote.png")))
-        self.scratch_action.setShortcut("F11")
-        tools_menu.addAction(self.scratch_action)
-
-        self.notepad_action = QAction("Notepad", self)
-        self.notepad_action.setIcon(QIcon(resource_path("resources/icons/notepad.png")))
-        self.notepad_action.setShortcut("F12")
-        tools_menu.addAction(self.notepad_action)
-
-        self.bat_action = QAction("Run *.bat", self)
-        self.bat_action.setIcon(QIcon(resource_path("resources/icons/run.png")))
-        self.bat_action.setShortcut("Ctrl+B")
-        tools_menu.addAction(self.bat_action)
-
-        tools_menu.addSeparator()
-
-        self.modem_action = QAction("Log Parser", self)
-        self.modem_action.setIcon(QIcon(resource_path("resources/icons/network.png")))
-        self.modem_action.setShortcut("Ctrl+L")
-        tools_menu.addAction(self.modem_action)
-
-        _connect_hover_tooltips(tools_menu)
-
     # Build the View Menu
     def _build_views_menu(self):
         view_menu = self.addMenu("Views")
@@ -181,7 +153,7 @@ class MainMenuBar(QMenuBar):
         view_menu.addAction(self.internet_action)
 
         self.phone_action = QAction("Phone", self)
-        self.phone_action.setIcon(QIcon(resource_path("resources/icons/phone.png")))
+        self.phone_action.setIcon(QIcon(resource_path("resources/icons/phone_white.png")))
         self.phone_action.setShortcut("F5")
         view_menu.addAction(self.phone_action)
 
@@ -250,6 +222,34 @@ class MainMenuBar(QMenuBar):
         charts_menu.addAction(self.gaming_action)
 
         _connect_hover_tooltips(charts_menu)
+
+    # Build the tools menu
+    def _build_tools_menu(self):
+        tools_menu = self.addMenu("Tools")
+
+        self.scratch_action = QAction("Scratch Note", self)
+        self.scratch_action.setIcon(QIcon(resource_path("resources/icons/stickynote.png")))
+        self.scratch_action.setShortcut("F11")
+        tools_menu.addAction(self.scratch_action)
+
+        self.notepad_action = QAction("Notepad", self)
+        self.notepad_action.setIcon(QIcon(resource_path("resources/icons/notepad.png")))
+        self.notepad_action.setShortcut("F12")
+        tools_menu.addAction(self.notepad_action)
+
+        self.bat_action = QAction("Run *.bat", self)
+        self.bat_action.setIcon(QIcon(resource_path("resources/icons/run.png")))
+        self.bat_action.setShortcut("Ctrl+B")
+        tools_menu.addAction(self.bat_action)
+
+        tools_menu.addSeparator()
+
+        self.modem_action = QAction("Log Parser", self)
+        self.modem_action.setIcon(QIcon(resource_path("resources/icons/network.png")))
+        self.modem_action.setShortcut("Ctrl+L")
+        tools_menu.addAction(self.modem_action)
+
+        _connect_hover_tooltips(tools_menu)
 
     # Build the Help menu
     def _build_help_menu(self):
