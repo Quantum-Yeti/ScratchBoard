@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3] - 2025-11-27  
+### Fixed 
+- **Versioning**: Ensures the version within the 'About Scratch Board' view loads the proper version from release and matches against version located in the version text file.
+
 ## [1.2] - 2025-11-25  
 ### Added  
 - **Dashboard Navigation**: Automatically navigates to the dashboard after a successful note import.  
