@@ -1,4 +1,4 @@
-# helpers/markdown_to_html.py
+# helpers/md_to_html.py
 import re
 import os
 from html import escape

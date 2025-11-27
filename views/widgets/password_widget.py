@@ -24,7 +24,7 @@ class PassGenWidget(QDialog):
         layout.setContentsMargins(20, 20, 20, 20)
 
         self.select_mode = QComboBox()
-        self.select_mode.addItems(["Random Character", "Random Words"])
+        self.select_mode.addItems(["Quick", "Advanced"])
         self.select_mode.currentIndexChanged.connect(self.update_visibility)
 
         layout.addWidget(QLabel("Select Mode:"))
@@ -122,8 +122,8 @@ class PassGenWidget(QDialog):
 
     def update_visibility(self):
         mode = self.select_mode.currentText()
-        self.char_widget.setVisible(mode == "Random Characters")
-        self.words.setVisible(mode == "Random Words")
+        self.char_widget.setVisible(mode == "Quick")
+        self.words.setVisible(mode == "Advanced")
 
     def load_wordlist(self):
         path = resource_path("resources/wordlist.txt")
@@ -136,7 +136,7 @@ class PassGenWidget(QDialog):
     def generate(self):
         mode = self.select_mode.currentText()
 
-        if mode == "Random Characters":
+        if mode == "Quick":
             password = self.generate_char_password()
         else:
             password = self.generate_word_password()

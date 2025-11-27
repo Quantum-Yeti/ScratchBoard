@@ -11,8 +11,8 @@ from PySide6.QtGui import QAction
 
 from helpers.calc_helpers.count_words import count_words
 from helpers.image_helpers.drag_drop_image import save_qimage, save_file_drop
-from helpers.markdown_helpers.markdown_preview import get_markdown_guide
-from helpers.markdown_helpers.markdown_to_html import render_markdown_to_html
+from helpers.markdown_helpers.md_preview import get_markdown_guide
+from helpers.markdown_helpers.md_to_html import render_markdown_to_html
 from utils.resource_path import resource_path
 
 
