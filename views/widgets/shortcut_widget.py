@@ -12,9 +12,9 @@ class ShortcutGuide(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setWindowTitle("Scratch Board: Shortcut Menu Guide")
+        self.setWindowTitle("Scratch Board: Keyboard Shortcuts")
         self.setWindowModality(Qt.ApplicationModal)
-        self.resize(600, 450)
+        self.setFixedSize(650, 500)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 12, 12, 12)
@@ -33,7 +33,7 @@ class ShortcutGuide(QDialog):
         )
         image_label.setAlignment(Qt.AlignVCenter)
 
-        title_label = QLabel("Shortcut Menu Reference")
+        title_label = QLabel("Keyboard Shortcuts")
         font = QFont("Segoe UI", 24)
         font.setBold(True)
         title_label.setFont(font)
@@ -48,6 +48,8 @@ class ShortcutGuide(QDialog):
         self.table = QTableWidget()
         self.table.setColumnCount(2)
         self.table.setHorizontalHeaderLabels(["Shortcut", "Action"])
+        self.table.horizontalHeaderItem(0).setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.table.horizontalHeaderItem(1).setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setShowGrid(False)
@@ -61,6 +63,11 @@ class ShortcutGuide(QDialog):
                 color: white;
                 font-weight: bold;
                 padding: 6px;
+            }
+            QScrollBar::handle:vertical {
+                background: #a8b8c8;
+                min-height: 20px;
+                border-radius: 6px;
             }
         """)
 

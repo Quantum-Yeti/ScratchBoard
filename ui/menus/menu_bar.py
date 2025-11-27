@@ -277,6 +277,7 @@ class MainMenuBar(QMenuBar):
 
         self.about_action = QAction("About Scratch Board", self)
         self.about_action.setIcon(QIcon(resource_path("resources/icons/about.png")))
+        self.about_action.setShortcut("Alt+A")
         help_menu.addAction(self.about_action)
 
         _connect_hover_tooltips(help_menu)
