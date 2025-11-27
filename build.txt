@@ -7,9 +7,9 @@ pyinstaller `
     --icon "resources/icons/astronaut.ico" `
     --add-data "resources/icons;resources/icons" `
     --add-data "resources/ieee_oui.csv;resources" `
+    --add-data "resources/wordlist.txt;resources" `
     --add-data "ui/themes;ui/themes" `
-    --add-data "resources/version.txt;resources" `
-    --add-data "resources/wordlist.txt;resource" `
+    --add-data "docs/version.txt;docs" `
     --hidden-import=markdown2 `
     --hidden-import=PySide6.QtCore `
     --hidden-import=PySide6.QtGui `
