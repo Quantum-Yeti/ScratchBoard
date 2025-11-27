@@ -16,7 +16,7 @@ class PassGenWidget(QDialog):
         super().__init__(parent)
 
         self.setWindowTitle("Scratch Board: Password Generator")
-        self.setWindowIcon(QIcon(resource_path("resources/astronaut.ico")))
+        self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
         self.setMinimumWidth(420)
 
         layout = QVBoxLayout()
