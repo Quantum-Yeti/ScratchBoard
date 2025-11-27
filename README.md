@@ -14,18 +14,21 @@
 - **Execute Batch Files:** Quickly select and execute a windows batch file. 
 - **Notepad:** Notepad similar to the Windows Notepad program. Allows saving, editing, and opening of plain-text files.
 - **Mac Vendor Lookup:** Query a MAC address to find the company and country of origin from the IEEE oui database.
+- **Password Generator:** Generate a helpful password with entropy.
+- **Charts:** Informational charts on DOCSIS signals, fiber signals, bandwidth requirements, and much more.
 
 ### Views
 - **Dashboard:** Modern dashboard that includes statistics, graphs, and helpful widgets.  
 - **Sidebar Navigation:** Quickly switch between different views of the app.
 - **Contacts Rolodex:** Add, edit, and delete contacts with names, emails, phone numbers, and websites.
 - **CoPilot:** A note category to save important information from knowledge domains.
-- **Notes:** Includes categories such as Tasks, Projects, General Notes, Ideas, Journal, and Personal.
+- **Notes:** Includes categories such as Internet, Phone, Video, Streaming, Notes, and Ideas.
 
 ### Extras
 - **Basic Markdown Text Formatting:** Use Markdown formatting to jot down notes and preview the html version side by side in a preview panel.  
-
+- **Images:** All note categories can store images.
 ---
+
 ## Screenshots
 
 ### Dashboard
