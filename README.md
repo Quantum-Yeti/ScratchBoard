@@ -43,6 +43,9 @@
 ### Scratch Notes
 ![ScratchNotes](screenshots/scratchnotes.png)
 
+### Password Generator
+![PasswordGenerator](screenshots/passgen.png)
+
 
 ## Installation
 
