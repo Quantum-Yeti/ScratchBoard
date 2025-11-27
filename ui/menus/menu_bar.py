@@ -252,6 +252,8 @@ class MainMenuBar(QMenuBar):
         self.modem_action.setShortcut("Ctrl+L")
         tools_menu.addAction(self.modem_action)
 
+        tools_menu.addSeparator()
+
         self.pwd_action = QAction("Password Generator", self)
         self.pwd_action.setIcon(QIcon(resource_path("resources/icons/pw.png")))
         self.pwd_action.setShortcut("Alt+P")

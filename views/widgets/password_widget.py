@@ -120,7 +120,6 @@ class PassGenWidget(QDialog):
 
         self.update_visibility()
 
-        # --------------------------------------------------------------
     def update_visibility(self):
         mode = self.select_mode.currentText()
         self.char_widget.setVisible(mode == "Random Characters")
@@ -191,11 +190,9 @@ class PassGenWidget(QDialog):
 
         return pw
 
-# --------------------------------------------------------------
     def copy_password(self):
         QApplication.clipboard().setText(self.output.text())
 
-    # --------------------------------------------------------------
     def update_strength(self, pool_size, length):
         entropy = length * math.log2(pool_size)
         self.update_strength_from_entropy(entropy)
