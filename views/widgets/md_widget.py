@@ -15,12 +15,11 @@ def get_markdown_guide():
         ("Header H3", "### H3", "<h3>H3</h3>"),
         ("Bulleted list", "- Item", "• Item"),
         ("Numbered list", "1. Item", "1. Item"),
-        ("Link", "[Google](https://example.com)", '<a href="https://example.com">Google</a>'),
-        ("Image", "![Title of image](path/to/image/here)", '<img src="https://via.placeholder.com/50">'),
+        ("Link", "[Example Website Name](https://example.com)", '<a href="https://example.com">Example Website Name</a>'),
+        ("Image", "![Title of image](path/to/image/here)", '<img src="resources/icons/landscape.png">'),
         ("Inline code", "Inline code", '<code>Inline code</code>'),
         ("Code block", "```python\nprint('Hello World')\n```", '<pre>print("Hello World")</pre>')
     ]
-
 
 class MarkdownGuideWidget(QWidget):
     def __init__(self):
@@ -28,7 +27,7 @@ class MarkdownGuideWidget(QWidget):
         super().__init__()
         self.setWindowTitle("Scratch Board: Markdown Quick Guide")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
-        self.resize(900, 450)
+        self.setFixedSize(780, 475)
 
         layout = QVBoxLayout(self)
 
@@ -63,6 +62,9 @@ class MarkdownGuideWidget(QWidget):
             rendered_label.setOpenExternalLinks(True)
             rendered_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             rendered_label.setText(rendered)
+            rendered_label.setMinimumHeight(1)
             table.setCellWidget(row, 2, rendered_label)
+
+            table.resizeRowToContents(row)
 
         layout.addWidget(table)
