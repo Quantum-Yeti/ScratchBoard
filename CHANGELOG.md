@@ -2,7 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.3] - 2025-11-27  
+## [1.4] - 2025-11-27
+
+### Features
+- **Password Generator:** Added a password generator with entropy meter, supporting quick and advanced generation modes.
+
+### Fixed
+- **UI Improvements:** Adjusted window sizes for the MarkDown Guide and Keyboard Shortcuts dialogs.
+
+### Release
+- **Release**: Release of version 1.4.
+
+## [1.3] - 2025-11-26  
 ### Fixed 
 - **Versioning**: Ensures the version within the 'About Scratch Board' view loads the proper version from release and matches against version located in the version text file.
 
