@@ -2,7 +2,7 @@ import math
 import secrets
 import string
 
-from PySide6.QtGui import QIcon, Qt
+from PySide6.QtGui import QIcon, Qt, QFont
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QComboBox, QLabel, QWidget, QHBoxLayout, QSpinBox, QCheckBox, \
     QLineEdit, QProgressBar, QPushButton, QApplication
 
@@ -18,6 +18,7 @@ class PassGenWidget(QDialog):
         self.setWindowTitle("Scratch Board: Password Generator")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
         self.setMinimumWidth(420)
+        self.setFont(QFont("Segoe UI", 11))
 
         layout = QVBoxLayout()
         layout.setSpacing(12)
@@ -44,13 +45,13 @@ class PassGenWidget(QDialog):
         char_layout.addLayout(length_layout)
 
         self.upper_char = QCheckBox("Uppercase (A-Z")
-        self.upper_char.setChecked(True)
+        self.upper_char.setChecked(False)
 
         self.include_num = QCheckBox("Numbers (0-9)")
-        self.include_num.setChecked(True)
+        self.include_num.setChecked(False)
 
         self.include_special_char = QCheckBox("Symbols (!@#")
-        self.include_special_char.setChecked(True)
+        self.include_special_char.setChecked(False)
 
         char_layout.addWidget(self.upper_char)
         char_layout.addWidget(self.include_num)
@@ -81,6 +82,7 @@ class PassGenWidget(QDialog):
         sep_layout.addWidget(QLabel("Separator:"))
         self.separator_box = QComboBox()
         self.separator_box.addItems(["-", "_", "space", "none"])
+        self.separator_box.setCurrentText("none")
         sep_layout.addWidget(self.separator_box)
         word_layout.addLayout(sep_layout)
 
@@ -120,6 +122,28 @@ class PassGenWidget(QDialog):
 
         self.update_visibility()
 
+        # Check box styling
+        checkbox_style = """
+        QCheckBox::indicator:checked {
+            background-color: #ADD8E6;
+            border: 1px solid #5A9BD5;
+        }
+
+        QCheckBox::indicator {
+            width: 18px;
+            height: 18px;
+            border: 1px solid #fff;
+            border-radius: 3px;
+        }
+        """
+
+        self.upper_char.setStyleSheet(checkbox_style)
+        self.include_num.setStyleSheet(checkbox_style)
+        self.include_special_char.setStyleSheet(checkbox_style)
+        self.caps_words.setStyleSheet(checkbox_style)
+        self.add_nums.setStyleSheet(checkbox_style)
+
+
     def update_visibility(self):
         mode = self.select_mode.currentText()
         self.char_widget.setVisible(mode == "Quick")
@@ -155,7 +179,7 @@ class PassGenWidget(QDialog):
             charset += string.digits
             pool += 10
         if self.include_special_char.isChecked():
-            charset += "!@#$%^&*()-_=+[]{}<>/?"
+            charset += "!@#-_"
             pool += 30
 
         length = self.length_spinbox.value()
