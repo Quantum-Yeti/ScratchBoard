@@ -12,8 +12,8 @@ class PassGenWidget(QDialog):
     """
     QDialog widget for generating passwords.
     """
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
         self.setWindowTitle("Scratch Board: Password Generator")
         self.setWindowIcon(QIcon(resource_path("resources/astronaut.ico")))
@@ -113,6 +113,8 @@ class PassGenWidget(QDialog):
         btn_layout.addWidget(self.copy_btn)
 
         layout.addLayout(btn_layout)
+
+        self.setLayout(layout)
 
         self.wordlist = self.load_wordlist()
 

@@ -18,6 +18,7 @@ from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
 from views.chart_widgets.wifi_standards_widget import WifiStandardsReference
 from views.widgets.md_widget import MarkdownGuideWidget
+from views.widgets.password_widget import PassGenWidget
 from views.widgets.shortcut_widget import ShortcutGuide
 
 
@@ -62,6 +63,7 @@ class MainMenuBar(QMenuBar):
         self.notepad_action = None
         self.bat_action = None
         self.modem_action = None
+        self.pwd_action = None
 
         # Views Menu
         self.contact_action = None
@@ -250,6 +252,11 @@ class MainMenuBar(QMenuBar):
         self.modem_action.setShortcut("Ctrl+L")
         tools_menu.addAction(self.modem_action)
 
+        self.pwd_action = QAction("Password Generator", self)
+        self.pwd_action.setIcon(QIcon(resource_path("resources/icons/pw.png")))
+        self.pwd_action.setShortcut("Alt+P")
+        tools_menu.addAction(self.pwd_action)
+
         _connect_hover_tooltips(tools_menu)
 
     # Build the Help menu
@@ -317,6 +324,7 @@ class MainMenuBar(QMenuBar):
         self.notepad_action.triggered.connect(self._open_notepad)
         self.bat_action.triggered.connect(self.sidebar.open_bat_file)  # run a batch file
         self.modem_action.triggered.connect(self._open_modem_parser)
+        self.pwd_action.triggered.connect(self._open_pw_gen)
 
         # Wire the help menu
         self.shortcut_action.triggered.connect(self._open_shortcuts)
@@ -368,6 +376,10 @@ class MainMenuBar(QMenuBar):
         if not hasattr(self, '_md_widget'):
             self._md_widget = MarkdownGuideWidget()
         self._md_widget.show()
+
+    def _open_pw_gen(self):
+        pwgen = PassGenWidget(self.parent())
+        pwgen.exec()
 
     def _export_notes(self):
         if not self.note_model:
