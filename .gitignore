@@ -54,5 +54,8 @@ data
 data/notes.db
 sb_data
 
-# Resources folder cache (optional)
+# Resources
+resources/wordlist.txt
+
+# Resources folder cache
 *.cache
