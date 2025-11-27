@@ -1,0 +1,17 @@
+pyinstaller `
+    --noconfirm `
+    --clean `
+    --onefile `
+    --windowed `
+    --name "ScratchBoard" `
+    --icon "resources/icons/astronaut.ico" `
+    --add-data "resources/icons;resources/icons" `
+    --add-data "resources/ieee_oui.csv;resources" `
+    --add-data "ui/themes;ui/themes" `
+    --add-data "resources/version.txt;resources" `
+    --hidden-import=markdown2 `
+    --hidden-import=PySide6.QtCore `
+    --hidden-import=PySide6.QtGui `
+    --hidden-import=PySide6.QtWidgets `
+    --hidden-import=PySide6.QtCharts `
+    main.py
