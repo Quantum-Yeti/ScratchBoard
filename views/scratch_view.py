@@ -1,7 +1,7 @@
 import random
 
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QLabel, QColorDialog
-from PySide6.QtCore import Qt, QTimer, QPoint, QSize
+from PySide6.QtCore import Qt, QTimer, QPoint, QSize, QPropertyAnimation
 from PySide6.QtGui import QColor, QIcon, QPixmap
 from helpers.ui_helpers.text_color_switcher import get_text_color
 from utils.resource_path import resource_path
@@ -107,7 +107,7 @@ class ScratchNote(QDialog):
         # Text edit
         self.text_edit = QTextEdit()
         self.text_edit.setText(content)
-        self.text_edit.setPlaceholderText("Type note...")
+        self.text_edit.setPlaceholderText("Start typing your sticky note. Notes are auto-saved until deleted.")
         layout.addWidget(self.text_edit)
 
         # Auto-save timer
@@ -306,7 +306,6 @@ class ScratchNote(QDialog):
         self.close_btn.setIcon(QIcon(resource_path(f"resources/icons/close{icon_suffix}.png")))
         self.color_btn.setIcon(QIcon(resource_path(f"resources/icons/color_wheel{icon_suffix}.png")))
         self.delete_btn.setIcon(QIcon(resource_path(f"resources/icons/delete{icon_suffix}.png")))
-
 
     def delete_note(self):
         """Delete the note from the database"""
