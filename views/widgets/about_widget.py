@@ -10,7 +10,7 @@ from utils.resource_path import resource_path
 def get_current_version(self):
     """Reads the current version from version.txt"""
     try:
-        path = resource_path("resources/version.txt")
+        path = resource_path("docs/version.txt")
         with open(path, "r", encoding="utf-8") as f:
             return f.read().strip()
     except Exception as e:
