@@ -107,7 +107,7 @@ class ScratchNote(QDialog):
         # Text edit
         self.text_edit = QTextEdit()
         self.text_edit.setText(content)
-        self.text_edit.setPlaceholderText("Start typing your sticky note. Notes are auto-saved until deleted.")
+        self.text_edit.setPlaceholderText("Start typing your sticky note.\nNotes are auto-saved until deleted.")
         layout.addWidget(self.text_edit)
 
         # Auto-save timer
