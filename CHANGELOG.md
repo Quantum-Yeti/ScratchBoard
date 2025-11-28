@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
   - Adjusted window sizes for the MarkDown Guide and Keyboard Shortcuts dialogs.
   - Removes numbering from Scratch Notes (sticky notes).
   - Changes click and drag icon on Scratch Notes.
-  - Fixes mouse visbility based on Scratch Note background color.
+  - Fixes mouse visibility based on Scratch Note background color.
 
 ### Release
 - **Release**: Release of version 1.4.
