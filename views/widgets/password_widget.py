@@ -4,7 +4,7 @@ import string
 
 from PySide6.QtGui import QIcon, Qt, QFont
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QComboBox, QLabel, QWidget, QHBoxLayout, QSpinBox, QCheckBox, \
-    QLineEdit, QProgressBar, QPushButton, QApplication
+    QLineEdit, QProgressBar, QPushButton, QApplication, QSizePolicy, QStackedWidget
 
 from utils.resource_path import resource_path
 
@@ -15,24 +15,32 @@ class PassGenWidget(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        # Window setup
         self.setWindowTitle("Scratch Board: Password Generator")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
         self.setMinimumWidth(420)
         self.setFont(QFont("Segoe UI", 11))
 
+        # Layout of the window
         layout = QVBoxLayout()
         layout.setSpacing(12)
         layout.setContentsMargins(20, 20, 20, 20)
 
+        # Modes
         self.select_mode = QComboBox()
-        self.select_mode.addItems(["Quick", "Advanced"])
+        self.select_mode.addItems(["Quick Mode [char]", "Advanced Mode [words]"])
         self.select_mode.currentIndexChanged.connect(self.update_visibility)
 
+        # Mode selection
         layout.addWidget(QLabel("Select Mode:"))
         layout.addWidget(self.select_mode)
 
+        # Setup of random char option
         char_layout = QVBoxLayout()
         self.char_widget = QWidget()
+        self.char_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.char_widget.setContentsMargins(0, 0, 0, 0)
+        self.char_widget.setMinimumHeight(0)
         self.char_widget.setLayout(char_layout)
 
         length_layout = QHBoxLayout()
@@ -57,9 +65,13 @@ class PassGenWidget(QDialog):
         char_layout.addWidget(self.include_num)
         char_layout.addWidget(self.include_special_char)
 
-        layout.addWidget(self.char_widget)
+        #layout.addWidget(self.char_widget)
 
+        # Setup of random words option
         self.words = QWidget()
+        self.words.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.words.setMinimumHeight(0)
+        self.words.setContentsMargins(0, 0, 0, 0)
         word_layout = QVBoxLayout()
         self.words.setLayout(word_layout)
 
@@ -88,12 +100,19 @@ class PassGenWidget(QDialog):
 
         word_layout.addWidget(self.add_nums)
 
-        layout.addWidget(self.words)
+        self.stack = QStackedWidget()
+        self.stack.addWidget(self.char_widget)  # index 0 = Quick mode
+        self.stack.addWidget(self.words)  # index 1 = Advanced mode
+        layout.addWidget(self.stack)
 
+        #layout.addWidget(self.words)
+
+        # Generated password output
         self.output = QLineEdit()
         self.output.setReadOnly(True)
         layout.addWidget(self.output)
 
+        # Strength + entropy
         self.strength_label = QLabel("Strength: ---")
         self.strength_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.strength_label)
@@ -102,9 +121,12 @@ class PassGenWidget(QDialog):
         self.entropy_bar.setRange(0, 100)
         layout.addWidget(self.entropy_bar)
 
+        # Setup generate and copy buttons
         btn_layout = QHBoxLayout()
+        btn_layout.setAlignment(Qt.AlignCenter)
+
         self.generate_btn = QPushButton("Generate")
-        self.generate_btn.setIcon(QIcon(resource_path("resources/icons/refresh.png")))
+        self.generate_btn.setIcon(QIcon(resource_path("resources/icons/polybase.png")))
         self.generate_btn.clicked.connect(self.generate)
 
         self.copy_btn = QPushButton("Copy")
@@ -114,40 +136,34 @@ class PassGenWidget(QDialog):
         btn_layout.addWidget(self.generate_btn)
         btn_layout.addWidget(self.copy_btn)
 
+        # Add buttons to layout
         layout.addLayout(btn_layout)
 
+        # Add the layout initialization to layout
         self.setLayout(layout)
 
+        # Prepare wordlist
         self.wordlist = self.load_wordlist()
 
         self.update_visibility()
 
-        # Check box styling
-        checkbox_style = """
-        QCheckBox::indicator:checked {
-            background-color: #ADD8E6;
-            border: 1px solid #5A9BD5;
-        }
+        # Styling
+        style_path = resource_path("ui/themes/passgen_theme.qss")
+        with open(style_path, "r") as f:
+            self.setStyleSheet(f.read())
 
-        QCheckBox::indicator {
-            width: 18px;
-            height: 18px;
-            border: 1px solid #fff;
-            border-radius: 3px;
-        }
-        """
-
-        self.upper_char.setStyleSheet(checkbox_style)
-        self.include_num.setStyleSheet(checkbox_style)
-        self.include_special_char.setStyleSheet(checkbox_style)
-        self.caps_words.setStyleSheet(checkbox_style)
-        self.add_nums.setStyleSheet(checkbox_style)
-
+        #self.upper_char.setStyleSheet(style)
+        #self.include_num.setStyleSheet(style)
+        #self.include_special_char.setStyleSheet(style)
+        #self.caps_words.setStyleSheet(style)
+        #self.add_nums.setStyleSheet(style)
 
     def update_visibility(self):
         mode = self.select_mode.currentText()
-        self.char_widget.setVisible(mode == "Quick")
-        self.words.setVisible(mode == "Advanced")
+        if mode == "Quick Mode [char]":
+            self.stack.setCurrentIndex(0)
+        else:
+            self.stack.setCurrentIndex(1)
 
     def load_wordlist(self):
         path = resource_path("resources/wordlist.txt")
@@ -160,7 +176,7 @@ class PassGenWidget(QDialog):
     def generate(self):
         mode = self.select_mode.currentText()
 
-        if mode == "Quick":
+        if mode == "Quick Mode [char]":
             password = self.generate_char_password()
         else:
             password = self.generate_word_password()

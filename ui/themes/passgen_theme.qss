@@ -1,0 +1,96 @@
+/* Password Generator Styles */
+
+/* ComboBox Style */
+QComboBox {
+    border: none;
+    border-bottom: 2px solid #d0d0d0;
+    padding: 8px 26px 8px 4px;
+    background: transparent;
+    font-size: 14px;
+    border-radius: 2px;
+    transition: border-color 150ms ease;
+}
+
+QComboBox:hover {
+    border-bottom: 2px solid #5b8def;
+}
+
+QComboBox:focus {
+    border-bottom: 2px solid #3575e2;
+}
+
+/* Spin Box */
+
+QSpinBox::up-button,
+QSpinBox::down-button {
+    width: 18px;
+    border: none;
+    background: transparent;
+}
+
+
+
+/* Checkbox Style */
+
+QCheckBox {
+    font-size: 14px;
+    spacing: 8px;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1px solid #cccccc;
+    background: #444444;
+    transition: background 120ms ease, border-color 120ms ease;
+}
+
+QCheckBox::indicator:hover {
+    border-color: #000000;
+    background-color: #ADD8E6;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #ADD8E6;
+    border: 1px solid #000000;
+}
+
+QCheckBox::indicator:disabled {
+    background-color: #555555;
+    border-color: #b7b7b7;
+}
+
+/* Spin Box */
+QSpinBox {
+    border: 1px solid #d0d0d0;
+    padding: 4px;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 60px;
+}
+
+QSpinBox:hover {
+    border: 1px solid #5b8def;
+}
+
+QSpinBox:focus {
+    border: 1px solid #3575e2;
+}
+
+QSpinBox::up-button, QSpinBox::down-button {
+    width: 18px;
+    border: none;
+    background: transparent;
+}
+
+QSpinBox::up-button:hover, QSpinBox::down-button:hover {
+    background: rgba(90, 155, 213, 0.15);
+}
+
+/* Output Area */
+
+
+
+/* Progress Bar */
+
