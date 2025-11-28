@@ -44,8 +44,10 @@ class ScratchNote(QDialog):
         layout.setContentsMargins(6, 6, 6, 6)
 
         # Note counting
-        self.display_index = len(ScratchNote.ACTIVE_NOTES) + 1
+        #self.display_index = len(ScratchNote.ACTIVE_NOTES) + 1
         ScratchNote.ACTIVE_NOTES.append(self)
+
+        #ScratchNote.renumber_scratch_notes()
 
         # Top bar: delete button with padding
         top_bar = QHBoxLayout()
@@ -122,8 +124,9 @@ class ScratchNote(QDialog):
         bottom_bar.addStretch()
 
         self.drag_icon = QLabel()
-        self.drag_icon.setPixmap(QIcon(resource_path("resources/icons/drag_dark.png")).pixmap(20, 20))
+        self.drag_icon.setPixmap(QIcon(resource_path("resources/icons/drag_box_black.png")).pixmap(22, 22))
         self.drag_icon.setStyleSheet("background: transparent; margin: 0px; padding: 0px;")
+        self.drag_icon.setToolTip("Click and drag to resize the note.")
         bottom_bar.addWidget(self.drag_icon, alignment=Qt.AlignRight | Qt.AlignBottom)
 
         layout.addLayout(bottom_bar)
@@ -135,8 +138,8 @@ class ScratchNote(QDialog):
                 border: 2px solid #888;  /* No border-radius */
             }}
             QTextEdit {{
-                background: transparent;
-                border: none;
+                background: {self.color};
+                border: 1px solid transparent;
                 font-size: 14px;
                 color: {get_text_color(self.color)};
             }}
@@ -250,7 +253,7 @@ class ScratchNote(QDialog):
 
     def get_display_title(self):
         """Return a title with a simple note index counter."""
-        return f"Scratch Note {self.display_index}"
+        return "Scratch Note (Sticky Note)"
 
     def add_new_note(self):
         if callable(self.on_new_note):
@@ -263,6 +266,8 @@ class ScratchNote(QDialog):
 
         self.color = new_color.name()
         self.apply_style()
+        self.update()
+        self.repaint()
         self.mark_dirty()
         self.update_drag_icon()
         self.update_title_color()
@@ -272,7 +277,7 @@ class ScratchNote(QDialog):
         """Switch drag icon depending on brightness of background color."""
         c = QColor(self.color)
         brightness = (c.red() * 299 + c.green() * 587 + c.blue() * 114) / 1000
-        icon_file = "drag_dark.png" if brightness > 128 else "drag_light.png"
+        icon_file = "drag_box_black.png" if brightness > 128 else "drag_box_white.png"
         self.drag_icon.setPixmap(QPixmap(resource_path(f"resources/icons/{icon_file}")))
 
     def update_title_color(self):
@@ -311,12 +316,15 @@ class ScratchNote(QDialog):
         if self in ScratchNote.ACTIVE_NOTES:
             ScratchNote.ACTIVE_NOTES.remove(self)
 
-        for i, note in enumerate(ScratchNote.ACTIVE_NOTES, start=1):
-            note.display_index = i
-            if hasattr(note, "title_label"):
-                note.title_label.setText(note.get_display_title())
-
         self.close()
+        self.renumber_scratch_notes()
+
+    #@staticmethod
+    #def renumber_scratch_notes():
+        #for i, note in enumerate(ScratchNote.ACTIVE_NOTES, start=1):
+            #note.display_index = i
+            #if hasattr(note, "title_label"):
+                #note.title_label.setText(note.get_display_title())
 
     def closeEvent(self, event):
         self.auto_save()
