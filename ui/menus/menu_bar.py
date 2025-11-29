@@ -230,7 +230,7 @@ class MainMenuBar(QMenuBar):
     def _build_tools_menu(self):
         tools_menu = self.addMenu("Tools")
 
-        self.scratch_action = QAction("Scratch Note", self)
+        self.scratch_action = QAction("Scratch Pad", self)
         self.scratch_action.setIcon(QIcon(resource_path("resources/icons/stickynote.png")))
         self.scratch_action.setShortcut("F11")
         tools_menu.addAction(self.scratch_action)

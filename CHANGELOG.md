@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 - **Password Generator:** Added a password generator with entropy meter, supporting quick and advanced generation modes.
+
 ### Fixed
 - **UI Improvements:** 
   - Adjusted window sizes for the MarkDown Guide and Keyboard Shortcuts dialogs.
