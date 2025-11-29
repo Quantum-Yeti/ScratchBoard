@@ -1,5 +1,5 @@
 from PySide6.QtCharts import QChartView
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy, QPushButton
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
 from views.widgets.charts_widget import create_stacked_bar_chart, create_multi_line_chart
@@ -86,6 +86,7 @@ class DashboardView(QWidget):
 
             layout.addWidget(icon_label)
             layout.addWidget(text_label)
+
             return container
 
         # Reference Section
