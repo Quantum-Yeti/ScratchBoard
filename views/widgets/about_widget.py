@@ -1,14 +1,17 @@
-from PySide6.QtCore import Qt, QUrl, QThread, QSize
+from PySide6.QtCore import Qt, QUrl, QSize
 from PySide6.QtGui import QIcon, QDesktopServices
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
-from packaging.version import Version
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton
 from datetime import datetime
 
-from helpers.update_helpers.update_checker import UpdateCheckWorker
 from utils.resource_path import resource_path
 
-def get_current_version(self):
-    """Reads the current version from version.txt"""
+def get_current_version():
+    """
+    Reads the current version from of the program from 'docs/version.txt'.
+
+    Returns:
+        str: The current version of the program or 'Unknown version' if it fails.
+    """
     try:
         path = resource_path("docs/version.txt")
         with open(path, "r", encoding="utf-8") as f:
@@ -16,28 +19,49 @@ def get_current_version(self):
     except Exception as e:
         return f"Unknown version ({e})"
 
+
+def style_centered_button(btn):
+    """
+    Applies style to icon and text for QPushbutton within the AboutWidget class.
+    """
+    # Apply padding and icon size styling
+    btn.setStyleSheet("""
+        QPushButton {
+            padding: 6px;
+            qproperty-iconSize: 18px;
+        }
+    """)
+
+    # Sets icon size explicitly
+    btn.setIconSize(QSize(18, 18))
+
+    # Ensure icon is on the left, text to the right
+    btn.setLayoutDirection(Qt.LeftToRight)
+
+    # Center text inside the button
+    btn.setStyleSheet("text-align: center;")
+
 class AboutWidget(QDialog):
+    """
+    A QDialog widget class that displays information about the Scratch Board program such as
+    version, license, commits, and links to potential updates.
+    """
     def __init__(self):
         super().__init__()
 
-        # Store the thread
-        self.thread = None
-        self.worker = None
-
-        # Reserve attribute and store
-        self.update_btn = None
-
         # Window layout setup
-        self.setWindowTitle("About Scratch Board")
+        self.setWindowTitle("Scratch Board: About Scratch Board")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
         self.setFixedSize(400, 420)
         self.setModal(True)
 
+        # Main vertical layout for window
         layout = QVBoxLayout(self)
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(15)
         layout.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
 
+        # Add a stretch to the top for spacing
         layout.addStretch()
 
         # Icon
@@ -53,15 +77,22 @@ class AboutWidget(QDialog):
         layout.addWidget(title_label)
 
         # Version label
-        self.version_label = QLabel("Checking version…")
+        current_version = get_current_version()
+        self.version_label = QLabel(f"Version: {current_version}")
         self.version_label.setAlignment(Qt.AlignCenter)
         self.version_label.setStyleSheet("font-size: 14px;")
         layout.addWidget(self.version_label)
 
-        # Placeholder for update button
-        self.update_btn_layout = QHBoxLayout()
-        self.update_btn_layout.setAlignment(Qt.AlignCenter)
-        layout.addLayout(self.update_btn_layout)
+        # Check for update button
+        self.update_btn = QPushButton("Check Updates")
+        self.update_btn.setToolTip("Check for Updates")
+        self.update_btn.setIcon(QIcon(resource_path("resources/icons/update.png")))
+
+        # Connect button to Github releases
+        self.update_btn.clicked.connect(lambda: QDesktopServices.openUrl(
+            QUrl(f"https://github.com/Quantum-Yeti/ScratchBoard/releases/")
+        ))
+        layout.addWidget(self.update_btn, alignment=Qt.AlignHCenter)
 
         # Copyright
         year = datetime.now().year
@@ -83,7 +114,7 @@ class AboutWidget(QDialog):
         license_btn.setToolTip("View License")
         license_btn.setIcon(QIcon(resource_path("resources/icons/license.png")))
         license_btn.setFixedWidth(120)
-        self.style_centered_button(license_btn)
+        style_centered_button(license_btn)
         license_btn.clicked.connect(lambda: QDesktopServices.openUrl(
             QUrl("https://github.com/Quantum-Yeti/ScratchBoard/blob/master/LICENSE.md")
         ))
@@ -93,8 +124,8 @@ class AboutWidget(QDialog):
         commits_btn.setToolTip("Commits")
         commits_btn.setIcon(QIcon(resource_path("resources/icons/changelog.png")))
         commits_btn.setFixedWidth(120)
-        self.style_centered_button(commits_btn)
-        commits_btn.clicked.connect(lambda: QDesktopServices.openUrl("https://github.com/Quantum-Yeti/ScratchBoard/commits/release"))
+        style_centered_button(commits_btn)
+        commits_btn.clicked.connect(lambda: QDesktopServices.openUrl("https://github.com/Quantum-Yeti/ScratchBoard/commits/master/"))
 
         # Add buttons to layout
         btn_layout = QVBoxLayout()
@@ -103,75 +134,6 @@ class AboutWidget(QDialog):
         btn_layout.addWidget(commits_btn)
         layout.addLayout(btn_layout)
 
+        # Bottom stretch for spacing
         layout.addStretch()
-
-        # Start threaded update check
-        self.start_update_thread()
-
-
-    # Background Threading Methods for Update Detection
-    def start_update_thread(self):
-        """Starts GitHub version check in a background thread."""
-        self.thread = QThread()
-        self.worker = UpdateCheckWorker()
-        self.worker.moveToThread(self.thread)
-
-        self.thread.started.connect(self.worker.run)
-        self.worker.finished.connect(self.update_version_label)
-        self.worker.finished.connect(self.thread.quit)
-
-        self.thread.start()
-
-    def update_version_label(self, current_version, latest_version):
-        """Called when the background thread returns update info."""
-        if latest_version is None:
-            self.version_label.setText(f"Version {current_version} (Check failed)")
-            return
-
-        cur = Version(current_version.lstrip("vV"))
-        latest = Version(latest_version.lstrip("vV"))
-
-        # Up to date
-        if latest == cur:
-            self.version_label.setText(f"Version {current_version} (Up-to-date)")
-            if self.update_btn:
-                self.update_btn.setParent(None)
-                self.update_btn = None
-            return
-
-        # Current version is newer (rare case)
-        if cur > latest:
-            self.version_label.setText(f"Version {current_version} (Developer Build)")
-            return
-
-        # Update available
-        self.version_label.setText(
-            f"Version {current_version} (Update available: {latest_version})"
-        )
-
-        if not self.update_btn:
-            self.update_btn = QPushButton("Get Update")
-            self.update_btn.setToolTip("Download Update")
-            self.update_btn.setIcon(QIcon(resource_path("resources/icons/update.png")))
-            self.update_btn.setFixedWidth(130)
-            self.style_centered_button(self.update_btn)
-            self.update_btn.clicked.connect(
-                lambda: QDesktopServices.openUrl(
-                    QUrl(
-                        f"https://github.com/Quantum-Yeti/ScratchBoard/releases/download/{latest_version}/ScratchBoard.exe"
-                    )
-                )
-            )
-            self.update_btn_layout.addWidget(self.update_btn)
-
-    def style_centered_button(self, btn):
-        btn.setStyleSheet("""
-            QPushButton {
-                padding: 6px;
-                qproperty-iconSize: 18px;
-            }
-        """)
-        btn.setIconSize(QSize(18, 18))
-        btn.setLayoutDirection(Qt.LeftToRight)  # icon left, text right (normal)
-        btn.setStyleSheet("text-align: center;")
 
