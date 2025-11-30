@@ -1,19 +1,16 @@
 from PySide6.QtGui import QIcon, QPixmap, QFont
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
-    QPushButton, QHBoxLayout, QLabel, QSizePolicy, QWidget
+    QPushButton, QHBoxLayout, QSizePolicy, QLabel, QWidget
 )
 from PySide6.QtCore import Qt, QSize
 
 from utils.resource_path import resource_path
-from views.chart_widgets.chart_dictionaries.ethernet_dict import ethernet_specs
+from views.info_widgets.info_dictionaries.fiber_dict import signals
 
 
-class EthernetReference(QDialog):
-    """
-    Displays a reference table of Ethernet cable categories,
-    their capabilities, and typical use cases.
-    """
+class FiberReferenceDialog(QDialog):
+    """Fiber Modem / ONT Reference Chart Dialog"""
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -21,10 +18,11 @@ class EthernetReference(QDialog):
         with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
             self.setStyleSheet(f.read())
 
-        self.setWindowTitle("Scratch Board: Ethernet Cable Reference Chart")
+        self.setWindowTitle("Scratch Board: Fiber Modem Reference Chart")
         self.setWindowModality(Qt.ApplicationModal)
-        self.resize(1100, 900)
+        self.resize(1200, 900)
 
+        # Main layout
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
@@ -38,11 +36,11 @@ class EthernetReference(QDialog):
 
         # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/ethernet_purple.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/waves.png")))
         image_label.setAlignment(Qt.AlignVCenter)
 
         # Title
-        title_label = QLabel("Ethernet Reference Chart")
+        title_label = QLabel("Fiber Signal Reference Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
@@ -58,14 +56,13 @@ class EthernetReference(QDialog):
 
         # Table
         self.table = QTableWidget()
-        self.table.setColumnCount(6)
+        self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels([
-            "Category",
-            "Max Speed",
-            "Max Bandwidth",
-            "Max Length",
-            "PoE Support",
-            "Typical Use Cases"
+            "Signal / Metric",
+            "Normal Range",
+            "Symptoms / Common Issues",
+            "Explanation",
+            "Troubleshooting Steps"
         ])
         self.table.setWordWrap(True)
         layout.addWidget(self.table)
@@ -81,34 +78,28 @@ class EthernetReference(QDialog):
         btn_layout.addStretch()
         btn_layout.addWidget(close_btn)
         btn_layout.addStretch()
-
         layout.addLayout(btn_layout)
 
-        # Fill table & adjust size
+        # Populate table
         self._populate_table()
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(ethernet_specs))
-
-        keys = ["cat", "speed", "bandwidth", "length", "poe", "use"]
-
-        for row, entry in enumerate(ethernet_specs):
-            for col, key in enumerate(keys):
-                item = QTableWidgetItem(entry[key])
+        self.table.setRowCount(len(signals))
+        for row, sig in enumerate(signals):
+            for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
+                item = QTableWidgetItem(sig[key])
                 item.setFlags(item.flags() & ~Qt.ItemIsEditable)
                 item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                item.setToolTip(entry[key])
+                item.setToolTip(sig[key])
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        self.table.setColumnWidth(0, 110)  # Category
-        self.table.setColumnWidth(1, 140)  # Speed
-        self.table.setColumnWidth(2, 150)  # Bandwidth
-        self.table.setColumnWidth(3, 120)  # Length
-        self.table.setColumnWidth(4, 140)  # PoE
-        self.table.setColumnWidth(5, 300)  # Use cases
-
+        self.table.setColumnWidth(0, 180)
+        self.table.setColumnWidth(1, 120)
+        self.table.setColumnWidth(2, 200)
+        self.table.setColumnWidth(3, 300)
+        self.table.setColumnWidth(4, 250)
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)

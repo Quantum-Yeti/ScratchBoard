@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHBoxLayout, QPush
     QDialog, QSizePolicy
 
 from utils.resource_path import resource_path
-from views.chart_widgets.chart_dictionaries.gaming_dict import gaming_server_issues
+from views.info_widgets.info_dictionaries.gaming_dict import gaming_server_issues
 
 class GamingReference(QDialog):
     def __init__(self, parent=None):

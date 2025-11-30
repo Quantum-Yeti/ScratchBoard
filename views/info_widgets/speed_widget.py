@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QSize
 
 from utils.resource_path import resource_path
-from views.chart_widgets.chart_dictionaries.speed_dict import requirements
+from views.info_widgets.info_dictionaries.speed_dict import requirements
 
 
 class InternetSpeedRequirements(QDialog):

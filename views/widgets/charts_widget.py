@@ -199,7 +199,7 @@ def create_multi_line_chart(model, days_back=14):
 
     # Y axis
     axis_y = QValueAxis()
-    axis_y.setRange(-2, max_value)
+    axis_y.setRange(-3, max_value + 1)
     axis_y.setLabelFormat("%d")
     axis_y.setLabelsColor(QColor("white"))
     axis_y.setLineVisible(False)

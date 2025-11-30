@@ -1,13 +1,19 @@
 from PySide6.QtGui import QIcon, QPixmap, QFont
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout, QLabel, \
-    QSizePolicy, QWidget
+from PySide6.QtWidgets import (
+    QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
+    QPushButton, QHBoxLayout, QLabel, QSizePolicy, QWidget
+)
 from PySide6.QtCore import Qt, QSize
 
 from utils.resource_path import resource_path
-from views.chart_widgets.chart_dictionaries.docsis_dict import docsis_signals
+from views.info_widgets.info_dictionaries.ethernet_dict import ethernet_specs
 
 
-class SignalReference(QDialog):
+class EthernetReference(QDialog):
+    """
+    Displays a reference table of Ethernet cable categories,
+    their capabilities, and typical use cases.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -15,9 +21,9 @@ class SignalReference(QDialog):
         with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
             self.setStyleSheet(f.read())
 
-        self.setWindowTitle("Scratch Board: DOCSIS Modem Signal Reference Chart")
+        self.setWindowTitle("Scratch Board: Ethernet Cable Reference Chart")
         self.setWindowModality(Qt.ApplicationModal)
-        self.resize(1200, 900)  # initial size
+        self.resize(1100, 900)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
@@ -32,11 +38,11 @@ class SignalReference(QDialog):
 
         # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/waves_yellow.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/ethernet_purple.png")))
         image_label.setAlignment(Qt.AlignVCenter)
 
         # Title
-        title_label = QLabel("DOCSIS Signal Reference Chart")
+        title_label = QLabel("Ethernet Reference Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
@@ -52,13 +58,14 @@ class SignalReference(QDialog):
 
         # Table
         self.table = QTableWidget()
-        self.table.setColumnCount(5)
+        self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels([
-            "Signal",
-            "Normal Range",
-            "Symptoms / Common Issues",
-            "Explanation",
-            "Troubleshooting Steps"
+            "Category",
+            "Max Speed",
+            "Max Bandwidth",
+            "Max Length",
+            "PoE Support",
+            "Typical Use Cases"
         ])
         self.table.setWordWrap(True)
         layout.addWidget(self.table)
@@ -70,42 +77,38 @@ class SignalReference(QDialog):
         close_btn.setIconSize(QSize(24, 24))
         close_btn.clicked.connect(self.close)
 
-        # Close button wrapped horizontal layout for alignment
         btn_layout = QHBoxLayout()
-        btn_layout.addStretch()  # left space
-        btn_layout.addWidget(close_btn)  # button
-        btn_layout.addStretch()  # right space for centering
+        btn_layout.addStretch()
+        btn_layout.addWidget(close_btn)
+        btn_layout.addStretch()
 
-        # Add the horizontal layout to the main vertical layout
         layout.addLayout(btn_layout)
 
-        # Populate table
+        # Fill table & adjust size
         self._populate_table()
-
-        # Resize columns and rows for readability
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(docsis_signals))
-        for row, sig in enumerate(docsis_signals):
-            for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
-                item = QTableWidgetItem(sig[key])
+        self.table.setRowCount(len(ethernet_specs))
+
+        keys = ["cat", "speed", "bandwidth", "length", "poe", "use"]
+
+        for row, entry in enumerate(ethernet_specs):
+            for col, key in enumerate(keys):
+                item = QTableWidgetItem(entry[key])
                 item.setFlags(item.flags() & ~Qt.ItemIsEditable)
                 item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                item.setToolTip(sig[key])
+                item.setToolTip(entry[key])
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        # Set initial column widths (helps with wrapping)
-        self.table.setColumnWidth(0, 180)  # Signal
-        self.table.setColumnWidth(1, 100)  # Range
-        self.table.setColumnWidth(2, 200)  # Symptoms
-        self.table.setColumnWidth(3, 300)  # Explanation
-        self.table.setColumnWidth(4, 250)  # Steps
+        self.table.setColumnWidth(0, 110)  # Category
+        self.table.setColumnWidth(1, 140)  # Speed
+        self.table.setColumnWidth(2, 150)  # Bandwidth
+        self.table.setColumnWidth(3, 120)  # Length
+        self.table.setColumnWidth(4, 140)  # PoE
+        self.table.setColumnWidth(5, 300)  # Use cases
 
-        # Resize rows to fit wrapped text
         self.table.resizeRowsToContents()
-
-        # Stretch last column to use remaining space
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
