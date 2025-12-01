@@ -98,11 +98,11 @@ class SplashScreen(QWidget):
         spacer = QSpacerItem(0, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)  # 10px vertical space
         self.vbox.addItem(spacer)
 
-        # Version label
+        # Initialize Version label
         current_version = get_current_version()
         self.version_label = QLabel(f"Version: {current_version}")
         self.version_label.setAlignment(Qt.AlignCenter)
-        self.version_label.setStyleSheet("font-size: 14px;")
+        self.version_label.setStyleSheet("font-size: 14px; font-weight: bold;")
         self.vbox.addWidget(self.version_label)
 
         # Initialize copyright label with the current year
