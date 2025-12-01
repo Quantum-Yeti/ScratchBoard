@@ -2,7 +2,7 @@ import traceback
 
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap
-from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog
+from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
 from models.note_model import NoteModel
 from ui.themes.top_menu_theme import top_menu_style
@@ -38,6 +38,16 @@ def _connect_hover_tooltips(menu):
             action.hovered.connect(
                 lambda a=action: QToolTip.showText(QCursor.pos(), a.toolTip())
             )
+
+class WidenMenu(QMenu):
+    def __init__(self, title, width, parent=None):
+        super().__init__(title, parent)
+        self._min_width = width
+
+    def showEvent(self, event):
+        """Override showEvent to adjust the menu width dynamically."""
+        super().showEvent(event)
+        self.setMinimumWidth(self._min_width)
 
 class MainMenuBar(QMenuBar):
     """
@@ -102,7 +112,8 @@ class MainMenuBar(QMenuBar):
 
     # Build the File menu
     def _build_file_menu(self):
-        file_menu = self.addMenu("File")
+        file_menu = WidenMenu("File", 240, self)
+        self.addMenu(file_menu)
 
         self.import_action = QAction("Import Notes", self)
         self.import_action.setShortcut("Alt+I")
@@ -134,7 +145,8 @@ class MainMenuBar(QMenuBar):
 
     # Build the View Menu
     def _build_views_menu(self):
-        view_menu = self.addMenu("Views")
+        view_menu = WidenMenu("Views", 200, self)
+        self.addMenu(view_menu)
 
         self.dash_action = QAction("Dashboard", self)
         self.dash_action.setIcon(QIcon(resource_path("resources/icons/dashboard.png")))
@@ -189,7 +201,8 @@ class MainMenuBar(QMenuBar):
         _connect_hover_tooltips(view_menu)
 
     def _build_charts_menu(self):
-        charts_menu = self.addMenu("Charts")
+        charts_menu = WidenMenu("Charts", 260, self)
+        self.addMenu(charts_menu)
 
         self.signal_action = QAction("DOCSIS Signal Chart", self)
         self.signal_action.setIcon(QIcon(resource_path("resources/icons/signal.png")))
@@ -213,7 +226,7 @@ class MainMenuBar(QMenuBar):
         self.wifi_standards_action.setShortcut("Ctrl+W")
         charts_menu.addAction(self.wifi_standards_action)
 
-        self.speeds_action = QAction("Bandwidth Requirements Chart", self)
+        self.speeds_action = QAction("Bandwidth Req Chart", self)
         self.speeds_action.setIcon(QIcon(resource_path("resources/icons/speed.png")))
         self.speeds_action.setShortcut("Ctrl+S")
         charts_menu.addAction(self.speeds_action)
@@ -234,7 +247,8 @@ class MainMenuBar(QMenuBar):
 
     # Build the tools menu
     def _build_tools_menu(self):
-        tools_menu = self.addMenu("Tools")
+        tools_menu = WidenMenu("Tools", 240, self)
+        self.addMenu(tools_menu)
 
         self.scratch_action = QAction("Scratch Pad", self)
         self.scratch_action.setIcon(QIcon(resource_path("resources/icons/stickynote.png")))
@@ -269,11 +283,12 @@ class MainMenuBar(QMenuBar):
 
     # Build the Help menu
     def _build_help_menu(self):
-        help_menu = self.addMenu("Help")
+        help_menu = WidenMenu("Help", 260, self)
+        self.addMenu(help_menu)
 
         self.shortcut_action = QAction("Keyboard Shortcuts", self)
         self.shortcut_action.setIcon(QIcon(resource_path("resources/icons/keyboard.png")))
-        self.shortcut_action.setShortcut("Ctrl+Shift+L")
+        self.shortcut_action.setShortcut("Alt+K")
         help_menu.addAction(self.shortcut_action)
 
         self.md_action = QAction("MarkDown Guide", self)
