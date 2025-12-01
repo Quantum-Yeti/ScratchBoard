@@ -68,6 +68,7 @@ class MainMenuBar(QMenuBar):
         # Views Menu
         self.contact_action = None
         self.internet_action = None
+        self.email_action = None
         self.phone_action = None
         self.video_action = None
         self.streaming_action = None
@@ -155,29 +156,34 @@ class MainMenuBar(QMenuBar):
         self.internet_action.setShortcut("F4")
         view_menu.addAction(self.internet_action)
 
+        self.email_action = QAction("Email", self)
+        self.email_action.setIcon(QIcon(resource_path("resources/icons/email.png")))
+        self.email_action.setShortcut("F5")
+        view_menu.addAction(self.email_action)
+
         self.phone_action = QAction("Phone", self)
         self.phone_action.setIcon(QIcon(resource_path("resources/icons/phone_white.png")))
-        self.phone_action.setShortcut("F5")
+        self.phone_action.setShortcut("F6")
         view_menu.addAction(self.phone_action)
 
         self.video_action = QAction("Video", self)
         self.video_action.setIcon(QIcon(resource_path("resources/icons/video.png")))
-        self.video_action.setShortcut("F6")
+        self.video_action.setShortcut("F7")
         view_menu.addAction(self.video_action)
 
         self.streaming_action = QAction("Streaming", self)
         self.streaming_action.setIcon(QIcon(resource_path("resources/icons/streaming.png")))
-        self.streaming_action.setShortcut("F7")
+        self.streaming_action.setShortcut("F8")
         view_menu.addAction(self.streaming_action)
 
         self.notes_action = QAction("Notes", self)
         self.notes_action.setIcon(QIcon(resource_path("resources/icons/notes.png")))
-        self.notes_action.setShortcut("F8")
+        self.notes_action.setShortcut("F9")
         view_menu.addAction(self.notes_action)
 
         self.ideas_action = QAction("Ideas", self)
         self.ideas_action.setIcon(QIcon(resource_path("resources/icons/ideas.png")))
-        self.ideas_action.setShortcut("F9")
+        self.ideas_action.setShortcut("F10")
         view_menu.addAction(self.ideas_action)
 
         _connect_hover_tooltips(view_menu)
@@ -240,7 +246,7 @@ class MainMenuBar(QMenuBar):
         self.notepad_action.setShortcut("F12")
         tools_menu.addAction(self.notepad_action)
 
-        self.bat_action = QAction("Run *.bat", self)
+        self.bat_action = QAction("Execute Batch File", self)
         self.bat_action.setIcon(QIcon(resource_path("resources/icons/run.png")))
         self.bat_action.setShortcut("Ctrl+B")
         tools_menu.addAction(self.bat_action)
@@ -316,6 +322,7 @@ class MainMenuBar(QMenuBar):
         self.contact_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Contacts"))
         self.copilot_action.triggered.connect(lambda: self.sidebar.category_selected.emit("CoPilot"))
         self.internet_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Internet"))
+        self.email_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Email"))
         self.phone_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Phone"))
         self.video_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Video"))
         self.streaming_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Streaming"))
