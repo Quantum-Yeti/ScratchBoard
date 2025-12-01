@@ -1,9 +1,20 @@
+import time
 from datetime import datetime
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QSpacerItem, QSizePolicy
-from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QSpacerItem, QSizePolicy, QApplication
+from PySide6.QtGui import QPixmap, QCloseEvent
+from PySide6.QtCore import Qt, QTimer, QThread, Signal
 from utils.resource_path import resource_path
+
+class ProgressThread(QThread):
+    progress = Signal(int, str)
+
+    def run(self):
+        cur_value = 0.0
+        while cur_value <= 100:
+            cur_value += 0.2
+            self.progress.emit(int(cur_value), f"Loading... {int(cur_value)}%")
+            time.sleep(0.5)
 
 class SplashScreen(QWidget):
     def __init__(self, image_path: str):
@@ -30,10 +41,12 @@ class SplashScreen(QWidget):
 
         # Progress Bar
         self.progress = QProgressBar(self)
+        self.progress.setMaximumWidth(self.pixmap.width())
+        self.progress.setMinimumWidth(500)
         self.progress.setFixedHeight(20)
         self.progress.setRange(0, 100)
         self.progress.setTextVisible(True)
-        self.vbox.addWidget(self.progress)
+        self.vbox.addWidget(self.progress, alignment=Qt.AlignHCenter)
 
         # Message Label
         self.message_label = QLabel("", self)
@@ -41,7 +54,7 @@ class SplashScreen(QWidget):
         self.message_label.setStyleSheet("color: white;")
         self.vbox.addWidget(self.message_label)
 
-        spacer = QSpacerItem(0, 10, QSizePolicy.Minimum, QSizePolicy.Fixed)  # 10px vertical space
+        spacer = QSpacerItem(0, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)  # 10px vertical space
         self.vbox.addItem(spacer)
 
         # Copyright label
@@ -53,6 +66,10 @@ class SplashScreen(QWidget):
 
         self.setLayout(self.vbox)
         self.show()
+
+        self.worker = ProgressThread()
+        self.worker.progress.connect(self.set_progress)
+        self.worker.start()
 
     # Helper Methods
     def apply_dark_theme(self):
