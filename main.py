@@ -14,7 +14,7 @@ from helpers.ui_helpers.update_window_title import update_window_title
 from ui.menus.menu_bar import MainMenuBar
 from views.splash.splash_screen import SplashScreen
 from views.dashboard_view import DashboardView
-from views.sidebar.sidebar_view import Sidebar
+from views.sidebar.sidebar_widget import Sidebar
 from views.main_view import MainView
 from views.contacts_view import ContactsView
 from controllers.note_controller import NoteController
