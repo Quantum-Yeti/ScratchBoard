@@ -1,6 +1,5 @@
 import traceback
 
-from PySide6.QtCore import QSize
 from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
@@ -20,7 +19,6 @@ from views.info_widgets.wifi_standards_widget import WifiStandardsReference
 from views.widgets.md_widget import MarkdownGuideWidget
 from views.widgets.password_widget import PassGenWidget
 from views.widgets.shortcut_widget import ShortcutGuide
-
 
 # Internal tooltip hover function
 def _connect_hover_tooltips(menu):

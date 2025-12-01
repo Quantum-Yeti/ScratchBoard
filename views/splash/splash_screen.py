@@ -8,6 +8,20 @@ from PySide6.QtCore import Qt, QThread, Signal
 from helpers.startup.run_startup import run_startup
 from utils.resource_path import resource_path
 
+def get_current_version():
+    """
+    Reads the current version from of the program from 'docs/version.txt'.
+
+    Returns:
+        str: The current version of the program or 'Unknown version' if it fails.
+    """
+    try:
+        path = resource_path("docs/version.txt")
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except Exception as e:
+        return f"Unknown version ({e})"
+
 class ProgressThread(QThread):
     """
     QThread subclass that runs a function in a separate thread and emit the progress bar updates.
@@ -77,12 +91,19 @@ class SplashScreen(QWidget):
         # Initialize message label reserved for progress bar text
         self.message_label = QLabel("", self)
         self.message_label.setAlignment(Qt.AlignCenter)
-        self.message_label.setStyleSheet("color: white;")
+        self.message_label.setStyleSheet("color: white; font-style: italic;")
         self.vbox.addWidget(self.message_label)
 
         # Spacer to add a vertical gap
         spacer = QSpacerItem(0, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)  # 10px vertical space
         self.vbox.addItem(spacer)
+
+        # Version label
+        current_version = get_current_version()
+        self.version_label = QLabel(f"Version: {current_version}")
+        self.version_label.setAlignment(Qt.AlignCenter)
+        self.version_label.setStyleSheet("font-size: 14px;")
+        self.vbox.addWidget(self.version_label)
 
         # Initialize copyright label with the current year
         current_year = datetime.now().year
