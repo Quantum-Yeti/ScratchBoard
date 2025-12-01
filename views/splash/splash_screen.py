@@ -4,17 +4,22 @@ from datetime import datetime
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QSpacerItem, QSizePolicy, QApplication
 from PySide6.QtGui import QPixmap, QCloseEvent
 from PySide6.QtCore import Qt, QTimer, QThread, Signal
+
+from helpers.startup.run_startup import run_startup
 from utils.resource_path import resource_path
+from views.dashboard_view import DashboardView
+
 
 class ProgressThread(QThread):
     progress = Signal(int, str)
 
+    def __init__(self, func):
+        super().__init__()
+        self.func = func
+
     def run(self):
-        cur_value = 0.0
-        while cur_value <= 100:
-            cur_value += 0.2
-            self.progress.emit(int(cur_value), f"Loading... {int(cur_value)}%")
-            time.sleep(0.5)
+        # Call the function and pass a callback to emit progress
+        self.func(self.progress.emit)
 
 class SplashScreen(QWidget):
     def __init__(self, image_path: str):
@@ -43,7 +48,7 @@ class SplashScreen(QWidget):
         self.progress = QProgressBar(self)
         self.progress.setMaximumWidth(self.pixmap.width())
         self.progress.setMinimumWidth(500)
-        self.progress.setFixedHeight(20)
+        self.progress.setFixedHeight(30)
         self.progress.setRange(0, 100)
         self.progress.setTextVisible(True)
         self.vbox.addWidget(self.progress, alignment=Qt.AlignHCenter)
@@ -67,7 +72,7 @@ class SplashScreen(QWidget):
         self.setLayout(self.vbox)
         self.show()
 
-        self.worker = ProgressThread()
+        self.worker = ProgressThread(run_startup)
         self.worker.progress.connect(self.set_progress)
         self.worker.start()
 
@@ -85,5 +90,11 @@ class SplashScreen(QWidget):
         if message:
             self.message_label.setText(message)
 
+        if value >= 100:
+            self.finish()
+
         # Force UI to update immediately
         self.repaint()
+
+    def finish(self):
+        self.close()

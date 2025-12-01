@@ -180,7 +180,7 @@ def main():
 
     # Initialize and run the startup splash screen
     splash = SplashScreen(resource_path("resources/icons/astronaut_splash.png"))
-    run_startup(splash)
+    run_startup(splash.set_progress)
 
     # Initialize and display the main application window
     window = MainWindow()
