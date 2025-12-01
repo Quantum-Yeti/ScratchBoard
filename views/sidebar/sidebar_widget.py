@@ -13,8 +13,6 @@ def open_github():
     Open the ScratchBoard GitHub repository in the default web browser.
     This method uses `QDesktopServices.openUrl` to open the GitHub page for the
     ScratchBoard project. It launches the URL in the default web browser.
-    Returns:
-        None
     """
     QDesktopServices.openUrl(QUrl("https://github.com/Quantum-Yeti/ScratchBoard"))
 

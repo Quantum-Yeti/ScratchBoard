@@ -86,23 +86,33 @@ class MainView(QWidget):
         if not notes:
             empty_notes = QWidget()
             main_layout = QVBoxLayout(empty_notes)
-            main_layout.setAlignment(Qt.AlignCenter)
-            main_layout.setSpacing(12)
+
+            # Layout tuning
+            main_layout.setAlignment(Qt.AlignCenter | Qt.AlignHCenter)
+            main_layout.setContentsMargins(20, 40, 20, 40)
+            main_layout.setSpacing(16)
 
             # Astronaut icon
             icon_label = QLabel()
-            pixmap = QPixmap(resource_path("resources/icons/astronaut_splash.png"))
-
+            pixmap = QPixmap(resource_path("resources/icons/owl_empty.png"))
+            pixmap = pixmap.scaled(350, 350, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             icon_label.setPixmap(pixmap)
             icon_label.setAlignment(Qt.AlignCenter)
-            main_layout.addWidget(icon_label)
+
+            main_layout.addWidget(icon_label, alignment=Qt.AlignHCenter)
 
             # Text message
-            text_label = QLabel("No notes found.\nAdd a note using MarkDown or PlainText.")
-            text_label.setStyleSheet("color: white; font-size: 20px; font-weight: bold; font-style: italic;")
-            text_label.setAlignment(Qt.AlignCenter)
+            text_label = QLabel("This page is starless — add some light!")
+            text_label.setStyleSheet("""
+                color: white;
+                font-size: 20px;
+                font-weight: bold;
+                font-style: italic;
+            """)
+            text_label.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
             text_label.setWordWrap(True)
-            main_layout.addWidget(text_label)
+
+            main_layout.addWidget(text_label, alignment=Qt.AlignHCenter)
 
             # Make the empty_notes widget expand to fill the scroll area
             empty_notes.setSizePolicy(

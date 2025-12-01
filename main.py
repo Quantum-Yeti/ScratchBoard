@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         self.model = NoteModel()
 
         # Instantiate primary UI views
-        categories = ["Contacts", "CoPilot", "Internet", "Phone", "Video", "Streaming", "Notes", "Ideas"]
+        categories = ["Contacts", "CoPilot", "Internet", "Email", "Phone", "Video", "Streaming", "Notes", "Ideas"]
         self.main_view = MainView(categories)
         self.contacts_view = ContactsView(categories)
 
@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         self.sidebar.dashboard_clicked.connect(self.show_dashboard)
 
         # Initialize dashboard view + connect to sidebar signal and data model
-        self.dashboard_view = DashboardView(self.model, self.sidebar, image_path="resources/icons/penguin.png")
+        self.dashboard_view = DashboardView(self.model, self.sidebar, image_path="resources/icons/astronaut_banner.png")
 
         # Bind controllers to their data models and views
         self.note_controller = NoteController(self.model, self.main_view, self.sidebar)

@@ -1,6 +1,4 @@
-# views/splash_screen.py
-from PySide6 import QtGui, QtCore
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QTextBrowser
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 from utils.resource_path import resource_path
@@ -9,28 +7,24 @@ class SplashScreen(QWidget):
     def __init__(self, image_path: str):
         super().__init__()
         self.setWindowFlags(Qt.SplashScreen | Qt.WindowStaysOnTopHint)
-        self.setFixedSize(500, 300)  # Adjust to your image size
+        self.setFixedSize(780, 600)
 
         # Apply dark theme
         self.apply_dark_theme()
 
-        # Title Label
-        self.title_label = QLabel("Scratch Board", self)
-        self.title_label.setAlignment(Qt.AlignCenter)
-        self.title_label.setStyleSheet(
-            "QLabel { font-size: 20pt; font-weight: bold; color: white; }"
-        )
+        # Layout
+        self.vbox = QVBoxLayout(self)
+        self.vbox.setContentsMargins(0, 0, 0, 0)
+        self.vbox.setSpacing(0)
 
         # Image Label
         self.pixmap = QPixmap(image_path)
         self.label_image = QLabel(self)
         self.label_image.setPixmap(self.pixmap)
         self.label_image.setAlignment(Qt.AlignCenter)
-
-        # Layout
-        self.vbox = QVBoxLayout(self)
-        self.vbox.addWidget(self.title_label)
         self.vbox.addWidget(self.label_image)
+
+        self.vbox.addStretch(1)
 
         # Progress Bar
         self.progress = QProgressBar(self)
@@ -47,17 +41,11 @@ class SplashScreen(QWidget):
 
         # Developer Label (Clickable Link)
         self.dev_label = QLabel(self)
-        self.dev_label.setText(
-            '<a href="https://github.com/Quantum-Yeti/ScratchBoard"'
-            'style="text-decoration: none; color: #B8E3E9;">'
-            'Developed by Quantum-Yeti</a>'
-        )
-        self.dev_label.setTextInteractionFlags(Qt.TextBrowserInteraction)  # allow clicking
-        self.dev_label.setOpenExternalLinks(True)  # opens in default browser
+        self.dev_label.setText("")
         self.dev_label.setAlignment(Qt.AlignCenter)
         self.dev_label.setStyleSheet("""
             QLabel {
-                color: red;
+                color: #B8E3E9;
                 font-weight: bold;
                 background: transparent;
                 text-decoration: none;
@@ -66,7 +54,6 @@ class SplashScreen(QWidget):
                 color: cyan;
             }
         """)
-        self.dev_label.setOpenExternalLinks(True)
         self.vbox.addWidget(self.dev_label)
 
         self.setLayout(self.vbox)
