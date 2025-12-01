@@ -1,4 +1,6 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar
+from datetime import datetime
+
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 from utils.resource_path import resource_path
@@ -39,22 +41,15 @@ class SplashScreen(QWidget):
         self.message_label.setStyleSheet("color: white;")
         self.vbox.addWidget(self.message_label)
 
-        # Developer Label (Clickable Link)
-        self.dev_label = QLabel(self)
-        self.dev_label.setText("")
-        self.dev_label.setAlignment(Qt.AlignCenter)
-        self.dev_label.setStyleSheet("""
-            QLabel {
-                color: #B8E3E9;
-                font-weight: bold;
-                background: transparent;
-                text-decoration: none;
-            }
-            QLabel:hover {
-                color: cyan;
-            }
-        """)
-        self.vbox.addWidget(self.dev_label)
+        spacer = QSpacerItem(0, 10, QSizePolicy.Minimum, QSizePolicy.Fixed)  # 10px vertical space
+        self.vbox.addItem(spacer)
+
+        # Copyright label
+        current_year = datetime.now().year
+        self.copyright_label = QLabel(self)
+        self.copyright_label.setText(f"\u00A9 {current_year} Quantum Yeti. All rights reserved.")
+        self.copyright_label.setAlignment(Qt.AlignCenter)
+        self.vbox.addWidget(self.copyright_label)
 
         self.setLayout(self.vbox)
         self.show()
