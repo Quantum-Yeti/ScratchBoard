@@ -94,5 +94,12 @@ See the [LICENSE](LICENSE.md) file for full terms.
 This project uses the following third-party resources:
 
 - **Google Material Icons**  
-  Provided by Google under the [Apache License 2.0](https://github.com/google/material-design-icons/blob/master/LICENSE)  
-  Website: [https://fonts.google.com/icons](https://fonts.google.com/icons)
+  - Provided by Google under the [Apache License 2.0](https://github.com/google/material-design-icons/blob/master/LICENSE)  
+  - Website: [https://fonts.google.com/icons](https://fonts.google.com/icons)
+
+- **PySide6 (Qt for Python)** 
+  - Provides the application's GUI framework
+  - Licensed under the LGPL v3.  
+  - License information: https://doc.qt.io/qtforpython-6/licenses.html
+  - A copy of the LGPL-3.0 license is provided in `LICENSES/LGPL-3.0.txt`.
+  - Qt and PySide6 are developed and maintained by The Qt Company and the Qt Project.

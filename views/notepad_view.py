@@ -119,7 +119,7 @@ class NotepadDialog(QDialog):
                 font-family: Segoe UI;
             }
         """)
-        self.count_label.setAlignment(Qt.AlignBottom)
+        self.count_label.setAlignment(Qt.AlignVCenter)
         self.text_edit.textChanged.connect(self.update_count)
         bottom_layout.addWidget(self.count_label)
 
