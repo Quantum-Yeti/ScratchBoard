@@ -1,9 +1,9 @@
 import time
 from datetime import datetime
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QSpacerItem, QSizePolicy
-from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QSpacerItem, QSizePolicy, QApplication
+from PySide6.QtGui import QPixmap, QPainterPath, QRegion
+from PySide6.QtCore import Qt, QThread, Signal, QRectF
 
 from helpers.startup.run_startup import run_startup
 from utils.resource_path import resource_path
@@ -58,15 +58,22 @@ class SplashScreen(QWidget):
         Initialize the splash screen widget.
         """
         super().__init__()
-        self.setWindowFlags(Qt.SplashScreen | Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.SplashScreen | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setFixedSize(780, 600)
+        self.round_corner_window(radius=20)
+        self.setStyleSheet("""
+        QWidget {
+            border-radius: 20px;
+            background-color: #505050;
+        }    
+        """)
 
         # Apply dark theme
         self.apply_dark_theme()
 
         # Main vertical layout
         self.vbox = QVBoxLayout(self)
-        self.vbox.setContentsMargins(0, 0, 0, 0)
+        self.vbox.setContentsMargins(0, 12, 0, 0)
         self.vbox.setSpacing(0)
 
         # Load and display splash screen background image
@@ -110,6 +117,7 @@ class SplashScreen(QWidget):
         self.copyright_label = QLabel(self)
         self.copyright_label.setText(f"\u00A9 {current_year} Quantum Yeti. All rights reserved.")
         self.copyright_label.setAlignment(Qt.AlignCenter)
+        self.copyright_label.setStyleSheet("padding-bottom: 8px;")
         self.vbox.addWidget(self.copyright_label)
 
         self.setLayout(self.vbox)
@@ -132,6 +140,12 @@ class SplashScreen(QWidget):
         except Exception as e:
             print(f" Failed to load {resource_path('ui/themes/main_theme.qss')}: {e}")
 
+    def round_corner_window(self, radius=20):
+        path = QPainterPath()
+        path.addRoundedRect(self.rect(), radius, radius)
+        region = QRegion(path.toFillPolygon().toPolygon())
+        self.setMask(region)
+
     def set_progress(self, value: int, message: str = ""):
         """
         Update the progress bar value and display the step message.
@@ -140,7 +154,10 @@ class SplashScreen(QWidget):
         if message:
             self.message_label.setText(message)
 
+        QApplication.processEvents()
+
         if value >= 100:
+            QThread.msleep(300)
             self.finish()
 
         # Force UI to update immediately

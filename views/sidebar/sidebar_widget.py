@@ -88,8 +88,13 @@ class Sidebar(QWidget):
             if name == "CoPilot" or name == "Streaming":
                 separator = QFrame()
                 separator.setFrameShape(QFrame.HLine)  # Horizontal line
-                separator.setFrameShadow(QFrame.Sunken)  # Gives subtle 3D effect
-                separator.setStyleSheet("color: #1F1F1F; background-color: #1F1F1F;")  # Dark gray
+                separator.setFrameShadow(QFrame.Plain)  # Gives subtle 3D effect
+                separator.setStyleSheet("""
+                    QFrame {
+                        background-color: #2E2E2E;
+                        color: #2e2e2e;
+                    }
+                """)
                 separator.setFixedHeight(4)  # Thin line
                 layout.addWidget(separator)
 
@@ -130,7 +135,7 @@ class Sidebar(QWidget):
         bat_btn.setIconSize(QSize(32, 32))
         bat_btn.setCursor(Qt.PointingHandCursor)
         bat_btn.clicked.connect(self.open_bat_file)
-        layout.addWidget(bat_btn)
+        #layout.addWidget(bat_btn)
 
         # GitHub repository button
         logo_btn = QPushButton("Review Code")

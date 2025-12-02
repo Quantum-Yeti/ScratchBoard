@@ -37,7 +37,7 @@ def _connect_hover_tooltips(menu):
                 lambda a=action: QToolTip.showText(QCursor.pos(), a.toolTip())
             )
 
-class WidenMenu(QMenu):
+class AdjustMenu(QMenu):
     def __init__(self, title, width, parent=None):
         super().__init__(title, parent)
         self._min_width = width
@@ -110,7 +110,7 @@ class MainMenuBar(QMenuBar):
 
     # Build the File menu
     def _build_file_menu(self):
-        file_menu = WidenMenu("File", 240, self)
+        file_menu = AdjustMenu("File", 240, self)
         self.addMenu(file_menu)
 
         self.import_action = QAction("Import Notes", self)
@@ -143,7 +143,7 @@ class MainMenuBar(QMenuBar):
 
     # Build the View Menu
     def _build_views_menu(self):
-        view_menu = WidenMenu("Views", 200, self)
+        view_menu = AdjustMenu("Views", 200, self)
         self.addMenu(view_menu)
 
         self.dash_action = QAction("Dashboard", self)
@@ -199,7 +199,7 @@ class MainMenuBar(QMenuBar):
         _connect_hover_tooltips(view_menu)
 
     def _build_charts_menu(self):
-        charts_menu = WidenMenu("Charts", 260, self)
+        charts_menu = AdjustMenu("Charts", 260, self)
         self.addMenu(charts_menu)
 
         self.signal_action = QAction("DOCSIS Signal Chart", self)
@@ -245,7 +245,7 @@ class MainMenuBar(QMenuBar):
 
     # Build the tools menu
     def _build_tools_menu(self):
-        tools_menu = WidenMenu("Tools", 240, self)
+        tools_menu = AdjustMenu("Tools", 240, self)
         self.addMenu(tools_menu)
 
         self.scratch_action = QAction("Scratch Pad", self)
@@ -281,7 +281,7 @@ class MainMenuBar(QMenuBar):
 
     # Build the Help menu
     def _build_help_menu(self):
-        help_menu = WidenMenu("Help", 260, self)
+        help_menu = AdjustMenu("Help", 260, self)
         self.addMenu(help_menu)
 
         self.shortcut_action = QAction("Keyboard Shortcuts", self)
