@@ -91,3 +91,9 @@ Forking, redistribution, modification, and commercial use are strictly prohibite
 See the [LICENSE](LICENSE.md) file for full terms.
 
 ## Acknowledgements
+
+This project uses the following third-party resources:
+
+- **Google Material Icons**  
+  Provided by Google under the [Apache License 2.0](https://github.com/google/material-design-icons/blob/master/LICENSE)  
+  Website: [https://fonts.google.com/icons](https://fonts.google.com/icons)
