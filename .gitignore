@@ -57,6 +57,7 @@ sb_data
 # Resources
 resources/wordlist.txt
 docs/build.txt
+build.txt
 
 # Resources folder cache
 *.cache
