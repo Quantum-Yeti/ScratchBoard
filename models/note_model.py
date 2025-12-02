@@ -42,12 +42,21 @@ class NoteModel:
                 content TEXT NOT NULL,
                 color TEXT,
                 image_path TEXT,
+                tags TEXT,
                 created TEXT NOT NULL,
                 updated TEXT NOT NULL,
                 FOREIGN KEY(category_id) REFERENCES categories(id)
                     ON DELETE SET NULL ON UPDATE CASCADE
             );
         """)
+
+        cur = self.conn.cursor()
+        try:
+            cur.execute("ALTER TABLE notes ADD COLUMN tags TEXT;")
+        except sqlite3.OperationalError:
+            # Column already exists
+            pass
+        self.conn.commit()
 
         # Contacts
         cur.execute("""
@@ -103,16 +112,20 @@ class NoteModel:
         return [row["name"] for row in cur.fetchall()]
 
     # --- Notes methods ---
-    def add_note(self, category_name, title, content, image_path=None):
+    def add_note(self, category_name, title, content, image_path=None, tags=None):
         note_id = str(uuid.uuid4())
         color = random.choice(PASTEL_COLORS)
         now = datetime.now().isoformat()
         category_id = self.add_category(category_name)
 
+        if tags and isinstance(tags, str):
+            tags = [tags]
+        tags_json = json.dumps(tags) if tags else None
+
         self.conn.execute("""
-            INSERT INTO notes (id, category_id, title, content, color, image_path, created, updated)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (note_id, category_id, title, content, color, image_path, now, now))
+            INSERT INTO notes (id, category_id, title, content, color, image_path, tags, created, updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (note_id, category_id, title, content, color, image_path, tags_json, now, now))
         self.conn.commit()
         return note_id
 
@@ -130,8 +143,8 @@ class NoteModel:
             params.append(category_name)
         if search:
             term = f"%{search}%"
-            query += " AND (title LIKE ? OR content LIKE ?)"
-            params.extend([term, term])
+            query += " AND (title LIKE ? OR content LIKE ? OR tags LIKE ?)"
+            params.extend([term, term, term])
         query += f" ORDER BY {order_by}"
         cur.execute(query, params)
         return cur.fetchall()
@@ -146,7 +159,7 @@ class NoteModel:
         """, (note_id,))
         return cur.fetchone()
 
-    def edit_note(self, note_id, title=None, content=None, category_name=None, image_path=None):
+    def edit_note(self, note_id, title=None, content=None, category_name=None, image_path=None, tags=None):
         note = self.get_note_by_id(note_id)
         if not note:
             return False
@@ -165,6 +178,11 @@ class NoteModel:
         if image_path is not None:
             fields.append("image_path=?")
             params.append(image_path)
+        if tags is not None:
+            if isinstance(tags, str):
+                tags = [tags]
+            fields.append("tags=?")
+            params.append(json.dumps(tags))
 
         fields.append("updated=?")
         params.append(datetime.now().isoformat())
@@ -339,7 +357,7 @@ class NoteModel:
             if img_path:
                 src = Path(img_path)
                 if src.is_file():
-                    dst = images_dir / src.name
+                    dst = images_dir / f"{uuid.uuid4()}_{src.name}"
                     shutil.copy(src, dst)
                     note_dict["image_path"] = f"images/{dst.name}"  # relative path
             export_data["notes"].append(note_dict)
@@ -399,11 +417,18 @@ class NoteModel:
                     new_path = save_file_drop(str(src))
                     note["image_path"] = new_path
 
+            tags = note.get("tags")
+            if isinstance(tags, str):
+                try:
+                    tags = json.loads(tags)
+                except json.JSONDecodeError:
+                    tags = [tags]  # fallback if not valid JSON
             self.add_note(
                 category_name=note.get("category_name", "Notes"),
                 title=note["title"],
                 content=note["content"],
-                image_path=note.get("image_path")
+                image_path=note.get("image_path"),
+                tags=tags
             )
 
         # Import contacts

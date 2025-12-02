@@ -18,7 +18,7 @@ from utils.resource_path import resource_path
 
 class EditorPanel(QDialog):
 
-    def __init__(self, parent, note_id, title, content, save_callback, delete_callback=None):
+    def __init__(self, parent, note_id, title, content, save_callback, delete_callback=None, tags=None):
         super().__init__(parent)
 
         self.note_id = note_id
@@ -36,10 +36,23 @@ class EditorPanel(QDialog):
         layout.setContentsMargins(12, 6, 12, 12)
         layout.setSpacing(10)
 
+        # Horizontal layout for Title + Tags
+        top_row = QHBoxLayout()
+
         # Title
         self.title_edit = QLineEdit(title)
         self.title_edit.setPlaceholderText("Title...")
-        layout.addWidget(self.title_edit)
+        top_row.addWidget(self.title_edit, stretch=2)
+
+        # Tags
+        self.add_tag = QLineEdit()
+        self.add_tag.setPlaceholderText("Add Tags: #tag1, #tag2, #tag3...")
+        if tags:
+            self.add_tag.setText(" ".join(tags))
+        top_row.addWidget(self.add_tag, stretch=1)
+
+        # Add the horizontal layout to the main vertical layout
+        layout.addLayout(top_row)
 
         # Splitter
         splitter = QSplitter(Qt.Horizontal)
@@ -250,10 +263,13 @@ class EditorPanel(QDialog):
     # Save/Delete
     def save_note(self):
         title = self.title_edit.text().strip()
+        tag_text = self.add_tag.text().strip()
+        tags = [t.strip() for t in tag_text.split() if t.startswith("#")]
+
         if not title:
             QMessageBox.warning(self, "Missing Title", "Please enter a title before saving.")
             return
-        self.save_callback(title, self.content_edit.toPlainText())
+        self.save_callback(title, self.content_edit.toPlainText(), tags)
         self.accept()
 
     def delete_note(self):
