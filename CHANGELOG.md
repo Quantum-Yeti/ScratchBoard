@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5] - 2025-12-02
+
+### Added
+- **Tag Input for Notes:** Added tag input support in `editor_view.py`, `note_controller.py`, and `note_model.py`.  
+- **Third-Party Acknowledgments:** Updated README to include acknowledgments for PySide6 and other third-party resources.  
+- **Licensing Updates:** Improved LICENSE.md formatting and added attribution for Google Material Icons.  
+
+### Fixed
+- **Unused Code Removal:** Removed unused code from `main.py`.  
+- **Documentation Cleanup:** Removed `build.txt` from repository and refined README language for installing dependencies.  
+- **Splash Screen:** Refined progress bar behavior in `splash_screen.py`.  
+- **Sidebar UI:** Improved separator display between Copilot and streaming categories in `sidebar_widget.py`.  
+
+### Changed / Refactored
+- **Notepad Layout:** Refactored `notepad` layout and font handling for better readability and consistency.  
+- **Versioning:** Incremented version to 1.5.0 for release.  
+- **Documentation:** Removed duplicate lines in README’s main tools section.
+
 ## [1.4] - 2025-11-27
 
 ### Features
