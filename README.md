@@ -73,7 +73,7 @@ venv\Scripts\Activate.ps1
 # On Windows (Command Prompt)
 venv\Scripts\activate.bat
 ```
-Install all dependencies:
+Install all required dependencies:
 ```bash
 pip install -r requirements.txt
 ```
