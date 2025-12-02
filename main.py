@@ -191,9 +191,6 @@ def main():
     window.raise_()  # 3. Ensure the window appears above all other windows
     window.activateWindow()  # 4. Give the window keyboard focus and activates it
 
-    #update_dialog = UpdateDialog()
-    #update_dialog.exec()
-
     # Execute the Qt application loop and terminate the program when the window is closed
     sys.exit(app.exec())
 
