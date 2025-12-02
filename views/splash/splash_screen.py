@@ -93,6 +93,14 @@ class SplashScreen(QWidget):
         self.progress.setFixedHeight(30)
         self.progress.setRange(0, 100)
         self.progress.setTextVisible(True)
+        self.progress.setStyleSheet("""
+            QProgressBar {
+                font-size: 12px;
+                font-weight: bold;
+            }
+            
+        """)
+
         self.vbox.addWidget(self.progress, alignment=Qt.AlignHCenter)
 
         # Initialize message label reserved for progress bar text
