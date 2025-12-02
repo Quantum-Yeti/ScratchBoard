@@ -1,3 +1,5 @@
+import re
+
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QFileDialog,
     QLabel, QLineEdit, QComboBox, QSpinBox, QTabWidget
@@ -7,7 +9,6 @@ from PySide6.QtCore import Qt
 
 from ui.fonts.font_list import main_font_list
 from utils.resource_path import resource_path
-
 
 class NotepadDialog(QDialog):
     def __init__(self, parent=None):
@@ -27,6 +28,11 @@ class NotepadDialog(QDialog):
 
         # Text edit area
         self.text_edit = QTextEdit()
+        self.text_edit.setStyleSheet("""
+            QTextEdit {
+                font-size: 10pt;
+            }
+        """)
         self.text_edit.setPlaceholderText("Type your notes here...")
         layout.addWidget(self.text_edit)
 
@@ -34,19 +40,28 @@ class NotepadDialog(QDialog):
         toolbar_layout = QHBoxLayout()
         layout.addLayout(toolbar_layout)
 
+        # Desired uniform height for controls
+        control_height = 28  # adjust as needed
+
         # Font family selector
         self.font_combo = QComboBox()
         self.font_combo.addItems(main_font_list)
+        self.font_combo.setFixedHeight(control_height)
         self.font_combo.currentTextChanged.connect(self.update_font)
-        toolbar_layout.addWidget(QLabel("Font:"))
+        font_label = QLabel("Font:")
+        font_label.setFixedHeight(control_height)
+        toolbar_layout.addWidget(font_label)
         toolbar_layout.addWidget(self.font_combo)
 
         # Font size selector
         self.font_size_spin = QSpinBox()
         self.font_size_spin.setRange(8, 48)
         self.font_size_spin.setValue(12)
+        self.font_size_spin.setFixedHeight(control_height)
         self.font_size_spin.valueChanged.connect(self.update_font)
-        toolbar_layout.addWidget(QLabel("Size:"))
+        size_label = QLabel("Size:")
+        size_label.setFixedHeight(control_height)
+        toolbar_layout.addWidget(size_label)
         toolbar_layout.addWidget(self.font_size_spin)
 
         toolbar_layout.addStretch()
@@ -62,10 +77,12 @@ class NotepadDialog(QDialog):
         search_btn.clicked.connect(self.search_text)
         toolbar_layout.addWidget(search_btn)
 
-        # Bottom buttons
-        btn_layout = QHBoxLayout()
-        layout.addLayout(btn_layout)
 
+        # Bottom buttons
+        bottom_layout = QHBoxLayout()
+        layout.addLayout(bottom_layout)
+
+        btn_layout = QHBoxLayout()
         open_btn = QPushButton("Open")
         open_btn.setIcon(QIcon(resource_path("resources/icons/open.png")))
         open_btn.clicked.connect(self.open_file)
@@ -91,7 +108,20 @@ class NotepadDialog(QDialog):
         redo_btn.clicked.connect(self.text_edit.redo)
         btn_layout.addWidget(redo_btn)
 
+        bottom_layout.addLayout(btn_layout)
         btn_layout.addStretch()
+
+        # Word/char count
+        self.count_label = QLabel("Words: 0 - Chars: 0")
+        self.count_label.setStyleSheet("""
+            QLabel {
+                font-size: 10pt;
+                font-family: Segoe UI;
+            }
+        """)
+        self.count_label.setAlignment(Qt.AlignBottom)
+        self.text_edit.textChanged.connect(self.update_count)
+        bottom_layout.addWidget(self.count_label)
 
     # Helper methods
     def update_font(self):
@@ -136,3 +166,14 @@ class NotepadDialog(QDialog):
         if path:
             with open(path, "w", encoding="utf-8") as f:
                 f.write(self.text_edit.toPlainText())
+
+    def update_count(self):
+        text = self.text_edit.toPlainText()
+
+        # Count words: split by any whitespace sequence
+        words = len([w for w in re.split(r'\s+', text.strip()) if w])
+
+        # Count characters excluding whitespace
+        chars = len(text.replace(" ", "").replace("\n", ""))
+
+        self.count_label.setText(f"Words: {words} - Chars: {chars}")
