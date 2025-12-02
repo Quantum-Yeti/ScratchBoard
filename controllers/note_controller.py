@@ -3,6 +3,7 @@ import json
 from PySide6.QtCore import QTimer, Signal, QObject
 from PySide6.QtWidgets import QMessageBox
 from views.editor_view import EditorPanel
+from views.widgets.charts_widget import create_stacked_bar_chart, create_multi_line_chart
 
 
 class NoteController(QObject):
@@ -70,7 +71,12 @@ class NoteController(QObject):
         self._notify_change()
 
     def delete_note(self, note_id):
+        note_to_delete = self.model.get_note_by_id(note_id)
+        if not note_to_delete:
+            return
+
         self.model.delete_note(note_id)
+
         self._notify_change()
 
     def refresh_notes(self):
