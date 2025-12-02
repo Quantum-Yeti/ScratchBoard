@@ -10,7 +10,6 @@
 - **Scratch Notes:** Create colorful, draggable, and resizable sticky notes that auto-save.
 - **Quick Links/References:** Add and delete quick links to helpful online resources.
 - **Modem Log Parser:** Parse DOCSIS modem logs to troubleshoot connection issues.
-- **Info Charts:** Reference charts for DOCSIS modem signals, fiber signals, bandwidth, ethernet, and much more.
 - **Execute Batch Files:** Quickly select and execute a windows batch file. 
 - **Notepad:** Fully integrated Notepad program similar to the Windows Notepad program. Allows saving, editing, and opening of plain-text files.
 - **Mac Vendor Lookup:** Query a MAC address to find the company and country of origin from the IEEE oui database.
