@@ -1,25 +1,41 @@
-from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QTextEdit
 
-from utils.resource_path import resource_path
+from utils.menu_hover_tip import HoverToolTip
 
 
 class ModifyContextMenu(QTextEdit):
     def contextMenuEvent(self, event):
         menu = self.createStandardContextMenu()
 
-        icon_map = {
-            "cut": "cut_small.png",
-            "copy": "copy_small.png",
-            "paste": "paste_small.png",
-            "undo": "undo_small.png",
-            "redo": "redo_small.png",
-        }
+        # Apply a stylesheet to the menu
+        menu.setStyleSheet("""
+            QMenu {
+                background-color: #1f1f1f;
+                color: #f0f0f0;
+                border: 1px solid #3c3c3c;
+                border-radius: 8px;
+                padding: 4px;
+            }
+            QMenu::item {
+                padding: 6px 24px 6px 24px;
+            }
+            QMenu::item:selected {
+                background-color: #505050;
+                color: #ffffff;
+            }
+            QMenu::separator {
+                height: 1px;
+                background: #3c3c3c;
+                margin: 4px 0px 4px 0px;
+            }
+        """)
 
         for action in menu.actions():
-            text = action.text().lower()
-            for key, icon in icon_map.items():
-                if text.startswith(key):
-                    action.setIcon(QIcon(resource_path(f"resources/icons/{icon}")))
+            if not action.isEnabled():
+                menu.removeAction(action)
+            else:
+                action.setToolTip(action.text())
+
+        menu.installEventFilter(HoverToolTip(menu))
 
         menu.exec_(event.globalPos())

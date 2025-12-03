@@ -68,7 +68,7 @@ class EditorPanel(QDialog):
         self._add_toolbar_actions()
         left_l.addWidget(self.toolbar)
 
-        self.content_edit = QTextEdit()
+        self.content_edit = ModifyContextMenu()
         self.content_edit.setPlainText(content or "")
         self.content_edit.setPlaceholderText(get_markdown_guide())
         self.content_edit.textChanged.connect(self._schedule_preview)

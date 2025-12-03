@@ -112,6 +112,16 @@ class ReferenceWidget(QWidget):
         item = self.list_widget.itemAt(pos)
         if item:
             menu = QMenu()
+            menu.setStyleSheet("""
+                QMenu {
+                    background-color: #1f1f1f;
+                    color: #f0f0f0;
+                }
+                QMenu::item:selected {
+                    background-color: #505050;
+                    color: #ffffff;
+                }
+            """)
             delete_action = QAction("Delete", self)
             delete_action.setToolTip("Delete")
             delete_action.setIcon(QIcon(resource_path("resources/icons/delete.png")))
