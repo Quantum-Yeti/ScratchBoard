@@ -46,9 +46,9 @@ class EditorPanel(QDialog):
 
         # Tags
         self.add_tag = QLineEdit()
-        self.add_tag.setPlaceholderText("Add Tags: #tag1, #tag2, #tag3...")
+        self.add_tag.setPlaceholderText("Add Tags: #tag1, #tag2...")
         if tags:
-            self.add_tag.setText(" ".join(tags))
+            self.add_tag.setText(", ".join(tags))
         top_row.addWidget(self.add_tag, stretch=1)
 
         # Add the horizontal layout to the main vertical layout
@@ -264,7 +264,19 @@ class EditorPanel(QDialog):
     def save_note(self):
         title = self.title_edit.text().strip()
         tag_text = self.add_tag.text().strip()
-        tags = [t.strip() for t in tag_text.split() if t.startswith("#")]
+
+        multi_tags = re.split(r"[,\s]+", tag_text)
+
+        tags = []
+        for t in multi_tags:
+            t = t.strip()
+            if not t:
+                continue
+            if not t.startswith("#"):
+                t = "#" + t
+            tags.append(t)
+
+        tags = list(dict.fromkeys(tags))
 
         if not title:
             QMessageBox.warning(self, "Missing Title", "Please enter a title before saving.")

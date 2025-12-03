@@ -1,0 +1,21 @@
+QTableWidget {
+    border: none;
+    color: #f0f0f0;
+    font-size: 14px;
+}
+QHeaderView::section {
+    background-color: #2e2e2e;
+    color: #ffffff;
+    border: none;
+    margin-top: 4px;
+    padding: 8px;
+    font-weight: bold;
+}
+QTableWidget::item {
+    border: none;
+    padding: 6px;
+}
+QTableWidget::item:selected {
+    background-color: #3498db;
+    color: white;
+}

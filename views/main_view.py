@@ -1,6 +1,10 @@
+import random
+
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel
 from PySide6.QtCore import Qt
+
+from helpers.ui_helpers.empty_messages import empty_messages
 from helpers.ui_helpers.floating_action import FloatingButton
 from utils.resource_path import resource_path
 from views.note_card_view import NoteCard
@@ -95,22 +99,24 @@ class MainView(QWidget):
             # Astronaut icon
             icon_label = QLabel()
             pixmap = QPixmap(resource_path("resources/icons/owl_empty.png"))
-            pixmap = pixmap.scaled(350, 350, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pixmap = pixmap.scaled(250, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             icon_label.setPixmap(pixmap)
             icon_label.setAlignment(Qt.AlignCenter)
 
             main_layout.addWidget(icon_label, alignment=Qt.AlignHCenter)
 
             # Text message
-            text_label = QLabel("This page is starless — add some light!")
+            text_label = QLabel(random.choice(empty_messages))
             text_label.setStyleSheet("""
                 color: white;
                 font-size: 20px;
                 font-weight: bold;
                 font-style: italic;
             """)
-            text_label.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+            text_label.setAlignment(Qt.AlignCenter)
             text_label.setWordWrap(True)
+            text_label.setSizePolicy(text_label.sizePolicy().horizontalPolicy(),
+                                     text_label.sizePolicy().verticalPolicy())
 
             main_layout.addWidget(text_label, alignment=Qt.AlignHCenter)
 
@@ -123,9 +129,9 @@ class MainView(QWidget):
             # Wrap in a container to center inside scroll area
             container = QWidget()
             container_layout = QVBoxLayout(container)
-            container_layout.addStretch()  # top spacer
+            container_layout.addStretch(1)  # top spacer
             container_layout.addWidget(empty_notes, alignment=Qt.AlignCenter)
-            container_layout.addStretch()  # bottom spacer
+            container_layout.addStretch(1)  # bottom spacer
 
             self.grid_layout.addWidget(container, 0, 0, 1, -1)
             return
