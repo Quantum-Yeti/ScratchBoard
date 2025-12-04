@@ -1,4 +1,3 @@
-from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QWidget, QScrollArea, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QSizePolicy
 )
@@ -10,18 +9,32 @@ from helpers.ui_helpers.floating_action import FloatingButton
 
 
 class ContactsView(QWidget):
+    """
+    The contacts widget displays a searchable, scrollable list of contacts with clickable rows. Includes a floating "Add"
+    button and double-click handlers to open the add/edit dialog.
+
+    Signals:
+        contact_selected (dict): emitted when a contact is selected (not currently used).
+    """
     contact_selected = Signal(dict)  # signal to call elsewhere, maybe but thinking unnecessary
 
     def __init__(self, categories):
+        """
+        Initializes the ContactsView.
+
+        Args:
+            categories (list): A list of dictionaries, each dictionary representing a contact.
+        """
         super().__init__()
         self.categories = categories
         self.all_contacts = []  # store all contacts for filtering
 
+        # Main vertical layout
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(8, 8, 8, 8)
         main_layout.setSpacing(8)
 
-        # Search bar
+        # Search bar setup
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText("Search contacts...")
         self.search_bar.textChanged.connect(self.filter_contacts)
@@ -42,12 +55,12 @@ class ContactsView(QWidget):
         """)
         main_layout.addWidget(self.search_bar)
 
-        self.contact_click_handler = None
+        self.contact_click_handler = None # Store the external click callback
 
         # Header labels
         header_layout = QHBoxLayout()
         header_layout.setSpacing(12)
-        self.column_stretch = [2, 1, 3, 3]
+        self.column_stretch = [2, 1, 3, 3] # Relative width for columns
 
         header_labels = ["Name", "Phone", "Email", "Website"]
         for text, stretch in zip(header_labels, self.column_stretch):
@@ -56,7 +69,7 @@ class ContactsView(QWidget):
             #lbl.setFixedWidth(width)
             lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
             #header_layout.addWidget(lbl)
-
+            # Add labels to layout with stretch
             if text == "Name":
                 header_layout.addWidget(lbl, 2)
             elif text == "Phone":
@@ -69,7 +82,7 @@ class ContactsView(QWidget):
         #header_layout.addStretch()
         main_layout.addLayout(header_layout)
 
-        # Scrollable area for contact rows
+        # Scrollable area to hold contact rows
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
         self.list_widget = QWidget()
@@ -89,11 +102,21 @@ class ContactsView(QWidget):
         )
 
     def resizeEvent(self, event):
+        """
+        Reposition the floating add button on widget resize.
+        """
         self.add_btn.reposition()
         super().resizeEvent(event)
 
     def populate_contacts(self, contacts, on_click=None, store_all=True):
-        """Fill the contact list with rows."""
+        """
+        Populates the contacts widget with a list of contacts within a scroll area.
+
+        Args:
+            contacts (list[dict[str, str]]): A list of dictionaries, each dictionary representing a contact.
+            on_click (function): A function that will be called when the user clicks on the contact.
+            store_all (bool): If True, stores all contacts within a scroll area and used for filtering.
+        """
         if store_all:
             self.all_contacts = contacts  # store ONCE when loading full list
 
@@ -109,6 +132,7 @@ class ContactsView(QWidget):
                 w.deleteLater()
 
         if not contacts:
+            # Display empty message iuf no contacts
             empty_contacts = QWidget()
             empty_layout = QVBoxLayout(empty_contacts)
             empty_layout.addStretch()  # top stretch
@@ -122,11 +146,12 @@ class ContactsView(QWidget):
             return
 
         for contact in contacts:
+            # Create a horizontal row for each contact
             row = QHBoxLayout()
             row.setSpacing(12)
             row.setContentsMargins(0, 0, 0, 0)  # remove default margins
 
-            # Create labels for each column
+            # Name column
             name_label = QLabel(contact["name"] if contact["name"] else "N/A")
             #name_label.setFixedWidth(150)
             name_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
@@ -135,6 +160,7 @@ class ContactsView(QWidget):
             name_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(name_label, 2)
 
+            # Phone column
             phone_label = CopyableLabel(contact["phone"] if contact["phone"] else "N/A")
             #phone_label.setFixedWidth(120)
             phone_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
@@ -143,6 +169,7 @@ class ContactsView(QWidget):
             #phone_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(phone_label, 1)
 
+            # Email column
             email_label = QLabel(contact["email"] if contact["email"] else "N/A")
             #email_label.setFixedWidth(180)
             email_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
@@ -151,6 +178,7 @@ class ContactsView(QWidget):
             email_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(email_label, 3)
 
+            # Website column
             website_label = CopyableLabel()
             website_label.setTextFormat(Qt.RichText)
             website_label.setStyleSheet("color: #B0E0E6;")
@@ -165,7 +193,7 @@ class ContactsView(QWidget):
 
             #row.addStretch()
 
-            # Row widget
+            # Wraps the row in a QWidget
             row_widget = QWidget()
             row_widget.setObjectName("row")
             row_widget.setLayout(row)
@@ -193,7 +221,7 @@ class ContactsView(QWidget):
                 }
             """)
 
-            # Double click to open
+            # Attach double-click handler
             if on_click:
                 def make_handler(c):
                     def handler(event):
@@ -205,14 +233,20 @@ class ContactsView(QWidget):
             self.list_layout.addWidget(row_widget)
 
     def filter_contacts(self, text):
-        """Filter contacts based on search text."""
+        """
+        Filter contacts based on search text.
+
+        Args:
+            text (str): The text to search for in name, phone, email, or website.
+        """
         query = text.strip().lower()
 
         if not query:
-            # Show full list again
+            # Show full list again if search is empty
             self.populate_contacts(self.all_contacts, self.contact_click_handler, store_all=False)
             return
 
+        # Filter contacts that match query
         filtered = [
             c for c in self.all_contacts
             if text.lower() in (c["name"] or "").lower()
