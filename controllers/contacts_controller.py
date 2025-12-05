@@ -88,7 +88,7 @@ class ContactsController(QObject):
                 return
 
             # Default to the main contacts category for all contacts if no category selected
-            self.model.add_contact(self.current_category or "Contacts", name, phone, website, email)
+            self.model.add_contact(self.current_category or "Contacts", name, phone, email, website)
             self._notify_change()
 
         # None + empty strings -> new contact
@@ -109,8 +109,18 @@ class ContactsController(QObject):
 
         :param contact_id: ID of the contact to delete.
         """
-        self.model.delete_contact(contact_id)
-        self._notify_change()
+        warning = QMessageBox.question(
+            self.view,
+            "Delete Contact",
+            "Are you sure you want to delete this contact?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        # Only delete on confirmation
+        if warning == QMessageBox.Yes:
+            self.model.delete_contact(contact_id)
+            self._notify_change()
 
     def refresh_contacts(self):
         """
