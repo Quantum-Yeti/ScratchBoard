@@ -23,9 +23,16 @@
 - **CoPilot:** A note category to save important information from knowledge domains.
 - **Notes:** Includes categories such as Internet, Email, Phone, Video, Streaming, Notes, and Ideas.
 
+### Local Database Storage
+- Scratch Board uses a lightweight local SQLite database to securely store user-generated information such as scratch notes, contacts, categorized notes, and more.
+- Database files are created automatically and can be exported or imported.
+- The database file 'notes.db' is stored in the 'sb_data' folder within the program directory.
+- Exported database files are automatically converted into a human-readable '.json' file, which allows for portability and use outside the program.
+
 ### Extras
 - **Basic Markdown Text Formatting:** All notes can be formatted using MarkDown syntax, or by using toolbar buttons.
 - **Image Embedding:** All notes can store images using MarkDown syntax or the button in the toolbar.
+- **Keyboard Shortcuts:** All views and tools have keyboard shortcuts for quick, easy navigation.
 ---
 
 ## Screenshots
