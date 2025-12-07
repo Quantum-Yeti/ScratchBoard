@@ -1,13 +1,14 @@
 import random
 
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel
-from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap, QIcon
+from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout, \
+    QPushButton, QSizePolicy
+from PySide6.QtCore import Qt, QSize
 
 from helpers.ui_helpers.empty_messages import empty_messages
 from helpers.ui_helpers.floating_action import FloatingButton
 from utils.resource_path import resource_path
-from views.note_card_view import NoteCard
+from views.notes.single_card_view import NoteCard
 
 
 class MainView(QWidget):
@@ -28,14 +29,26 @@ class MainView(QWidget):
         layout.setSpacing(10)
         layout.setContentsMargins(8, 8, 8, 8)
 
-        # Search + Category filter
-        controls_layout = QVBoxLayout()
+        # Top control bar (Search + View Toggle)
+        controls_layout = QHBoxLayout()
+
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("Search notes...")
+        self.search_input.setPlaceholderText("Search notes…")
         controls_layout.addWidget(self.search_input)
+
+        # Toggle button
+        self.toggle_view_btn = QPushButton()
+        self.toggle_view_btn.setIcon(QIcon(resource_path("resources/icons/list.png")))
+        self.toggle_view_btn.setIconSize(QSize(24, 24))
+        #self.toggle_view_btn.setFixedWidth(40)
+        self.toggle_view_btn.setToolTip("Toggle list / grid view")
+        self.toggle_view_btn.clicked.connect(self.toggle_view_mode)
+        controls_layout.addWidget(self.toggle_view_btn)
+
         layout.addLayout(controls_layout)
 
         # Scrollable notes grid
+        self.view_mode = "grid"
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.grid_widget = QWidget()
@@ -76,6 +89,9 @@ class MainView(QWidget):
         Populate the notes grid with note cards. If note card category
         is empty, an empty-state message is displayed.
         """
+        self._last_notes = notes
+        self._last_click = on_click
+
         if not hasattr(self, "grid_layout") or self.grid_layout is None:
             return  # layout destroyed
 
@@ -136,9 +152,55 @@ class MainView(QWidget):
             self.grid_layout.addWidget(container, 0, 0, 1, -1)
             return
 
-        cols = 3
-        for idx, note in enumerate(notes):
-            r, c = divmod(idx, cols)
-            card = NoteCard(note, on_click)
-            self.grid_layout.addWidget(card, r, c)
+        if self.view_mode == "grid":
+            cols = 3
 
+            # This will stretch columns equally when toggling grid -> list; list -> grid
+            for i in range(cols):
+                self.grid_layout.setColumnStretch(i, 1)
+            self.grid_layout.setColumnStretch(cols, 0)
+
+            for idx, note in enumerate(notes):
+                r, c = divmod(idx, cols)
+                card = NoteCard(note, on_click)
+
+                # Resets styles for grid when toggling
+                card.setMinimumHeight(0)
+                card.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+
+                self.grid_layout.addWidget(card, r, c)
+            self.grid_layout.setContentsMargins(8,8,8,8)
+
+        else:  # LIST VIEW
+            # Force single column stretching
+            for i in range(self.grid_layout.columnCount()):
+                self.grid_layout.setColumnStretch(i, 0)
+            self.grid_layout.setColumnStretch(0, 1)
+
+            for row, note in enumerate(notes):
+                card = NoteCard(note, on_click)
+
+                # Forcing card to list row
+                card.setMinimumHeight(0)
+                card.setMaximumWidth(16777215)
+                card.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+
+                self.grid_layout.addWidget(card, row, 0, 1, -1)
+
+        # Force UI refresh
+        self.grid_widget.adjustSize()
+        self.scroll.updateGeometry()
+
+    def toggle_view_mode(self):
+        if self.view_mode == "grid":
+            self.view_mode = "list"
+            self.toggle_view_btn.setIcon(QIcon(resource_path("resources/icons/grid.png")))
+            self.toggle_view_btn.setIconSize(QSize(24, 24))
+        else:
+            self.view_mode = "grid"
+            self.toggle_view_btn.setIcon(QIcon(resource_path("resources/icons/list.png")))
+            self.toggle_view_btn.setIconSize(QSize(24, 24))
+
+        # Re-populate if notes loaded
+        if hasattr(self, "_last_notes") and hasattr(self, "_last_click"):
+            self.populate_notes(self._last_notes, self._last_click)

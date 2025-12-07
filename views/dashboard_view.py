@@ -1,5 +1,5 @@
 from PySide6.QtCharts import QChartView
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
 from views.widgets.charts_widget import create_stacked_bar_chart, create_multi_line_chart
@@ -7,7 +7,7 @@ from views.widgets.stats_widget import StatsWidget
 from views.widgets.mac_widget import MacVendorView
 from views.widgets.reference_widget import ReferenceWidget
 from views.widgets.task_widget import TaskWidget
-from views.main_view import MainView
+from views.notes.grid_note_view import MainView
 from views.contacts_view import ContactsView
 from utils.resource_path import resource_path
 

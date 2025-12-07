@@ -15,7 +15,7 @@ from ui.menus.menu_bar import MainMenuBar
 from views.splash.splash_screen import SplashScreen
 from views.dashboard_view import DashboardView
 from views.sidebar.sidebar_widget import Sidebar
-from views.main_view import MainView
+from views.notes.grid_note_view import MainView
 from views.contacts_view import ContactsView
 from controllers.note_controller import NoteController
 from controllers.contacts_controller import ContactsController

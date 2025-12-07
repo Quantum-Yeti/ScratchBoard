@@ -229,5 +229,3 @@ def create_multi_line_chart(model, days_back=14):
         marker.setBrush(brush)
 
     return chart
-
-
