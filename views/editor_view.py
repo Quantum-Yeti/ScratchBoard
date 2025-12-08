@@ -45,7 +45,31 @@ def _convert_image_paths(html):
     return html
 
 class EditorPanel(QDialog):
+    """
+    A rich text editor dialog for creating and editing notes with Markdown support,
+    live HTML preview, image insertion, and tagging.
 
+    Features:
+        - Title and tag input fields.
+        - Markdown editor with toolbar for formatting (bold, italic, headers, links, code blocks, lists).
+        - Drag-and-drop image support and image insertion dialog.
+        - Live HTML preview with clickable images.
+        - Word and character count display.
+        - Keyboard shortcuts for common actions (save, bold, italic, link insertion, fullscreen toggle).
+        - Fullscreen toggle with F11.
+        - Save and optional delete functionality via callbacks.
+
+    Args:
+        parent (QWidget): The parent widget for this dialog.
+        note_id (Any): Unique identifier for the note being edited.
+        title (str): Initial title of the note.
+        content (str): Initial content of the note (plain text or Markdown).
+        save_callback (Callable): Function to call when the note is saved.
+            Should accept parameters: title, content, tags.
+        delete_callback (Optional[Callable]): Function to call when the note is deleted.
+            Should accept the note_id as a parameter. Defaults to None.
+        tags (Optional[List[str]]): Initial tags for the note. Defaults to None.
+    """
     def __init__(self, parent, note_id, title, content, save_callback, delete_callback=None, tags=None):
         super().__init__(parent)
 
