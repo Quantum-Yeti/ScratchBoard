@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (QApplication,
                                QWidget,
                                QStackedLayout,
                                QMessageBox)
-from helpers.startup.run_startup import run_startup
+from helpers.start_helpers.run_startup import run_startup
 from helpers.ui_helpers.update_window_title import update_window_title
 from ui.menus.menu_bar import MainMenuBar
 from views.splash.splash_screen import SplashScreen
@@ -158,7 +158,7 @@ def main():
         1. Create the QApplication instance.
         2. Apply global QSS styles.
         3. Prevent multiple concurrent instances of the program using QSharedMemory.
-        4. Display the splash screen and run startup initialization.
+        4. Display the splash screen and run start_helpers initialization.
         5. Initialize and display the main application window when the splash screen is finished.
         6. Start the Qt event loop.
 
@@ -177,7 +177,7 @@ def main():
         QMessageBox.warning(None, "Already Running", "Scratch Board is already running.")
         sys.exit(0)
 
-    # Initialize and run the startup splash screen
+    # Initialize and run the start_helpers splash screen
     splash = SplashScreen(resource_path("resources/icons/astronaut_splash.png"))
     run_startup(splash.set_progress)
 

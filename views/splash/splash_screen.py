@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QSpace
 from PySide6.QtGui import QPixmap, QPainterPath, QRegion
 from PySide6.QtCore import Qt, QThread, Signal, QRectF
 
-from helpers.startup.run_startup import run_startup
+from helpers.start_helpers.run_startup import run_startup
 from utils.resource_path import resource_path
 
 def get_current_version():
@@ -48,10 +48,10 @@ class SplashScreen(QWidget):
     Attributes:
         vbox (QVBoxLayout): Main layout container.
         label_image (QLabel): Displays the splash image.
-        progress (QProgressBar): Shows progress of startup tasks.
+        progress (QProgressBar): Shows progress of start_helpers tasks.
         message_label (QLabel): Displays optional progress messages.
         copyright_label (QLabel): Displays copyright information.
-        worker (ProgressThread): Thread running startup tasks.
+        worker (ProgressThread): Thread running start_helpers tasks.
     """
     def __init__(self, image_path: str):
         """
@@ -131,7 +131,7 @@ class SplashScreen(QWidget):
         self.setLayout(self.vbox)
         self.show()
 
-        # Start the asynchronous worker thread to run startup tasks
+        # Start the asynchronous worker thread to run start_helpers tasks
         self.worker = ProgressThread(run_startup)
         self.worker.progress.connect(self.set_progress)
         self.worker.start()

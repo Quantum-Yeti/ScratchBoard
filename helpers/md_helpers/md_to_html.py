@@ -124,7 +124,7 @@ def _highlight_code_blocks(html: str) -> str:
 
 def render_markdown_to_html(md_text: str) -> str:
     """
-    Render markdown_helpers -> full HTML snippet styled for QTextBrowser.
+    Render md_helpers -> full HTML snippet styled for QTextBrowser.
     Uses markdown2 extras and applies Pygments to code blocks.
     """
     # extras: fenced code blocks, tables, autolink, strike, task lists (checkboxes supported by markdown2 via 'extras' isn't native,
@@ -169,6 +169,6 @@ def save_dropped_image(bytes_data: bytes, filename_hint: str = "pasted") -> str:
         i += 1
     with open(candidate, "wb") as f:
         f.write(bytes_data)
-    # return relative path for markdown_helpers link
+    # return relative path for md_helpers link
     rel = os.path.relpath(candidate, os.getcwd()).replace("\\", "/")
     return rel
