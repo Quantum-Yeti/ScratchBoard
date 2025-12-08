@@ -70,7 +70,7 @@ class EditorPanel(QDialog):
 
         self.content_edit = ModifyContextMenu()
         self.content_edit.setPlainText(content or "")
-        self.content_edit.setPlaceholderText(get_markdown_guide())
+        self.content_edit.setPlaceholderText("Use Plaintext, Markdown syntax, or the buttons to write and format.")
         self.content_edit.textChanged.connect(self._schedule_preview)
         self.content_edit.textChanged.connect(self._update_word_stats)
         left_l.addWidget(self.content_edit, stretch=1)
@@ -80,7 +80,7 @@ class EditorPanel(QDialog):
         # Right side (Preview)
         self.preview = QTextBrowser()
         self.preview.setObjectName("PreviewPanel")
-        self.preview.setPlaceholderText("Markdown -> Html Preview")
+        self.preview.setPlaceholderText("Markdown \u2192 Html Preview")
         self.preview.setAutoFillBackground(True)
         self.preview.setContentsMargins(0,0,6,0)
         self.preview.setOpenLinks(False)

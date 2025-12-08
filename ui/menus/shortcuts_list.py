@@ -70,11 +70,11 @@ shortcut_list = [
                 "action": "Open NotePad"
             },
             {
-                "shortcut": "Ctrl+B",
+                "shortcut": "Alt+B",
                 "action": "Run a *.bat file"
             },
             {
-                "shortcut": "Ctrl+L",
+                "shortcut": "Alt+L",
                 "action": "Open Modem Log Parser"
             },
             {

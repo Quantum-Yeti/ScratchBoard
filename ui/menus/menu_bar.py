@@ -260,14 +260,14 @@ class MainMenuBar(QMenuBar):
 
         self.bat_action = QAction("Execute Batch File", self)
         self.bat_action.setIcon(QIcon(resource_path("resources/icons/run.png")))
-        self.bat_action.setShortcut("Ctrl+B")
+        self.bat_action.setShortcut("Alt+B")
         tools_menu.addAction(self.bat_action)
 
         tools_menu.addSeparator()
 
         self.modem_action = QAction("Log Parser", self)
         self.modem_action.setIcon(QIcon(resource_path("resources/icons/network.png")))
-        self.modem_action.setShortcut("Ctrl+L")
+        self.modem_action.setShortcut("Alt+L")
         tools_menu.addAction(self.modem_action)
 
         tools_menu.addSeparator()
