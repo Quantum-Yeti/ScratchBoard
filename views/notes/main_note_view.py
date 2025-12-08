@@ -8,7 +8,7 @@ from PySide6.QtCore import Qt, QSize
 from helpers.ui_helpers.empty_messages import empty_messages
 from helpers.ui_helpers.floating_action import FloatingButton
 from utils.resource_path import resource_path
-from views.notes.single_card_view import NoteCard
+from views.notes.single_note_view import NoteCard
 
 
 class MainView(QWidget):

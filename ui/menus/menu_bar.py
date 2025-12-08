@@ -4,7 +4,7 @@ from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
 from models.note_model import NoteModel
-from ui.themes.top_menu_theme import menu_style
+from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path
 from views.info_widgets.fiber_widget import FiberReferenceDialog
 from views.info_widgets.gaming_widget import GamingReference
