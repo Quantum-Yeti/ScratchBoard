@@ -1,6 +1,8 @@
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser
 from PySide6.QtCore import Qt, QEvent
 import markdown
+
+from ui.menus.context_menu import ModifyContextMenu
 from utils.resource_path import resource_path
 
 class NoteCard(QFrame):
@@ -36,6 +38,14 @@ class NoteCard(QFrame):
         content_view.setOpenExternalLinks(True)
         content_view.setStyleSheet(
             "background: transparent; border: none; a { color: #5DADE2; text-decoration: none;}"
+        )
+
+        # Apply the menu_style for context menus
+        self.context_menu = ModifyContextMenu()
+        # Override context menu events
+        content_view.setContextMenuPolicy(Qt.CustomContextMenu)
+        content_view.customContextMenuRequested.connect(
+            lambda pos: self.context_menu.contextMenuEvent(content_view)
         )
 
         html = markdown.markdown(self.note["content"])

@@ -4,7 +4,7 @@ from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
 from models.note_model import NoteModel
-from ui.themes.top_menu_theme import top_menu_style
+from ui.themes.top_menu_theme import menu_style
 from utils.resource_path import resource_path
 from views.info_widgets.fiber_widget import FiberReferenceDialog
 from views.info_widgets.gaming_widget import GamingReference
@@ -106,7 +106,7 @@ class MainMenuBar(QMenuBar):
         self.sidebar = None
 
         # Override the dark_theme.qss and apply a hover color to menus via QSS
-        self.setStyleSheet(top_menu_style)
+        self.setStyleSheet(menu_style)
 
     # Build the File menu
     def _build_file_menu(self):

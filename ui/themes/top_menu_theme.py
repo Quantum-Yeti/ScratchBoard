@@ -1,4 +1,4 @@
-top_menu_style = """
+menu_style = """
 QMenuBar::item:selected {
     background-color: #000000;
 }

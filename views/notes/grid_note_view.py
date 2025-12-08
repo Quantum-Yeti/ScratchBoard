@@ -25,6 +25,8 @@ class MainView(QWidget):
         super().__init__()
         self.categories = categories
 
+
+
         layout = QVBoxLayout(self)
         layout.setSpacing(10)
         layout.setContentsMargins(8, 8, 8, 8)
