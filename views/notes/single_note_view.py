@@ -1,3 +1,6 @@
+import base64
+from io import BytesIO
+
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser, QMenu
 from PySide6.QtCore import Qt, QEvent
 import markdown
@@ -60,7 +63,20 @@ class NoteCard(QFrame):
         )
 
         # Render Markdown content to HTML
-        html = markdown.markdown(self.note["content"])
+        # Render markdown to HTML
+        rendered_markdown = markdown.markdown(self.note["content"])
+
+        # Optional cached image appended below text
+        img_html = ""
+        cached = getattr(self.note, "_cached_pix", None)
+        if cached:
+            # inline encode ONCE
+            buffer = BytesIO()
+            cached.save(buffer, "PNG")
+            encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
+            img_html = f'<br><img src="data:image/png;base64,{encoded}" />'
+
+        # Combine everything with your styling
         html = f"""
             <style>
                 a {{
@@ -71,10 +87,11 @@ class NoteCard(QFrame):
                     max-width: 180px;
                     height: auto;
                     border-radius: 6px;
-                    cursor: pointer; 
+                    cursor: pointer;
                 }}
             </style>
-        {html}
+            {rendered_markdown}
+            {img_html}
         """
         content_view.setHtml(html)
 

@@ -1,9 +1,12 @@
+import base64
+import os
 import random
+from io import BytesIO
 
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout, \
     QPushButton, QSizePolicy
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, QThread, Signal, QByteArray, QBuffer
 
 from helpers.ui_helpers.empty_messages import empty_messages
 from helpers.ui_helpers.floating_action import FloatingButton
@@ -12,6 +15,43 @@ from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
 from views.notes.single_note_view import NoteCard
 
+class PopulateNotesThread(QThread):
+    thread_loaded = Signal(list, object) # notes + click handler
+
+    def __init__(self, notes, on_click, max_size=250):
+        super().__init__()
+        self.notes = notes
+        self.on_click = on_click
+        self.max_size = max_size
+
+    def run(self):
+        # Image cache once
+        for note in self.notes:
+            # If we already processed this note before, skip work entirely
+            if hasattr(note, "_cached_pix"):
+                continue
+
+            img_path = getattr(note, "image_path", None)
+            if img_path and os.path.exists(img_path):
+                pix = QPixmap(img_path)
+
+                if pix.width() > self.max_size or pix.height() > self.max_size:
+                    pix = pix.scaled(
+                        self.max_size,
+                        self.max_size,
+                        Qt.KeepAspectRatio,
+                        Qt.SmoothTransformation
+                    )
+
+                #ba = QByteArray()
+                #buffer = QBuffer(ba)
+                #buffer.open(QBuffer.WriteOnly)
+                #pix.save(buffer, "PNG")
+                #encoded = base64.b64encode(ba.data()).decode("utf-8")
+                #buffer.close()
+
+                note._cached_pix = pix
+        self.thread_loaded.emit(self.notes, self.on_click)
 
 class MainView(QWidget):
     """
@@ -25,9 +65,11 @@ class MainView(QWidget):
 
     def __init__(self, categories):
         super().__init__()
+        self._thread = None
         self._last_click = None
         self._last_notes = None
         self.categories = categories
+
 
         # Main vertical layout
         layout = QVBoxLayout(self)
@@ -79,6 +121,31 @@ class MainView(QWidget):
         """
         self.add_btn.reposition()
         super().resizeEvent(event)
+
+    def populate_notes_async(self, notes, on_click):
+        """
+        Populate notes in a background thread safely.
+        
+        If a previous populate thread is still running, it will be
+        terminated cleanly before starting a new one.
+        """
+        self._last_notes = notes
+        self._last_click = on_click
+    
+        # Stop any running thread
+        if hasattr(self, "_thread") and self._thread is not None:
+            if self._thread.isRunning():
+                self._thread.quit()
+                self._thread.wait()
+    
+        # Create a new thread and keep a reference
+        self._thread = PopulateNotesThread(notes, on_click)
+        self._thread.thread_loaded.connect(self._populate_notes_from_thread)
+        self._thread.start()
+
+    def _populate_notes_from_thread(self, notes, on_click):
+        """ Called in main thread to safely populate the grid."""
+        self.populate_notes(notes, on_click)
 
     def populate_notes(self, notes, on_click):
         """
@@ -160,6 +227,8 @@ class MainView(QWidget):
                 r, c = divmod(idx, cols)
                 card = NoteCard(note, on_click)
 
+
+
                 # Resets styles for grid when toggling
                 card.setMinimumHeight(0)
                 card.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
@@ -175,6 +244,8 @@ class MainView(QWidget):
 
             for row, note in enumerate(notes):
                 card = NoteCard(note, on_click)
+
+
 
                 # Forcing card to list row
                 card.setMinimumHeight(0)
