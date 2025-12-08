@@ -17,7 +17,6 @@ from helpers.md_helpers.md_to_html import render_markdown_to_html
 from ui.menus.context_menu import ModifyContextMenu
 from utils.resource_path import resource_path
 
-
 def _convert_image_paths(html):
     """
     Convert all <img> tags in the provided HTML to use absolute file URLs
@@ -44,7 +43,6 @@ def _convert_image_paths(html):
     # Match all <img src="...">
     html = re.sub(r'<img\s+[^>]*src="([^"]+)"[^>]*>', repl, html)
     return html
-
 
 class EditorPanel(QDialog):
 
@@ -305,9 +303,24 @@ class EditorPanel(QDialog):
 
     #### --- INTERNAL HELPERS --- ####
     def _schedule_preview(self):
+        """
+        Start or restart the preview update timer.
+
+        This method triggers a short-delay timer that will eventually
+        call the preview update function. It is used to debounce
+        rapid text changes for efficient Markdown rendering.
+        """
         self._preview_timer.start()
 
     def _update_preview_no_animation(self):
+        """
+        Render the current Markdown content to HTML and update the preview panel.
+
+        This method converts the editor's Markdown text into HTML, processes
+        image paths to be absolute and clickable, and injects inline CSS for
+        consistent styling. Images are constrained to a max width of 250px,
+        maintain aspect ratio, and are centered with a pointer cursor.
+        """
         md = self.content_edit.toPlainText()
         html = render_markdown_to_html(md)
         html = _convert_image_paths(html)
@@ -333,11 +346,29 @@ class EditorPanel(QDialog):
         self.preview.setHtml(style + html)
 
     def _update_word_stats(self):
+        """
+        Update the word and character count label based on the editor content.
+
+        Retrieves the current text from the editor, calculates the number of
+        words and characters using the `count_words` helper, and updates
+        `self.word_label` to display the counts in the format:
+        "Words: X — Chars: Y".
+        """
         text = self.content_edit.toPlainText()
         words, chars = count_words(text)
         self.word_label.setText(f"Words: {words} — Chars: {chars}")
 
     def _insert_image_dialog(self):
+        """
+        Open a file dialog to select an image, copy it to the local images directory,
+        and insert a Markdown image reference into the editor.
+
+        - Opens a QFileDialog to let the user select an image file.
+        - Copies the selected file to 'sb_data/images', creating the directory if needed.
+        - Inserts a Markdown image tag referencing the copied image at the current
+          cursor position in the editor.
+        - Triggers a preview update to render the inserted image.
+        """
         path, _ = QFileDialog.getOpenFileName(self, "Insert Image", "", "Images (*.png *.jpg *.jpeg *.gif *.webp)")
         if path:
             dst_dir = Path("sb_data/images")
@@ -351,6 +382,19 @@ class EditorPanel(QDialog):
             self._schedule_preview()
 
     def _bind_shortcuts(self):
+        """
+        Bind keyboard shortcuts to editor actions for convenience.
+
+        Shortcuts:
+        - Ctrl+S: Save the current note.
+        - Ctrl+B: Apply bold Markdown formatting to the selected text.
+        - Ctrl+I: Apply italic Markdown formatting to the selected text.
+        - Ctrl+K: Insert a Markdown link template.
+        - F11: Toggle fullscreen mode for the editor.
+
+        Internally, a helper `ks` function is used to create a QAction, set its
+        shortcut, connect it to the handler, and add it to the dialog.
+        """
         def ks(key, handler):
             act = QAction(self)
             act.setShortcut(QKeySequence(key))
@@ -364,6 +408,19 @@ class EditorPanel(QDialog):
         ks("F11", self._toggle_fullscreen)
 
     def _add_toolbar_actions(self):
+        """
+        Initialize and add actions to the editor's toolbar.
+
+        Each action corresponds to a Markdown formatting feature or editor utility:
+        - Bold, Italic, Headers (H1-H3)
+        - Link insertion, Code Block, Quote, Bullet List
+        - Image insertion via file dialog
+        - Fullscreen toggle
+
+        Uses a helper function `add` to create text-formatting actions with icons
+        and tooltips, connecting them to `insert_md`. Other actions are connected
+        to their respective handlers like `_insert_image_dialog` and `_toggle_fullscreen`.
+        """
         def add(icon, start, end, tip):
             act = self.toolbar.addAction(QIcon(resource_path(f"resources/icons/{icon}")), "")
             act.setToolTip(tip)
@@ -388,6 +445,13 @@ class EditorPanel(QDialog):
         fs.triggered.connect(self._toggle_fullscreen)
 
     def _toggle_fullscreen(self):
+        """
+        Toggle the editor window between fullscreen and normal windowed mode.
+
+        Updates the internal `_is_fullscreen` flag to keep track of the current state.
+        If the editor is currently fullscreen, it will return to normal size.
+        If the editor is in normal mode, it will switch to fullscreen.
+        """
         if self._is_fullscreen:
             self.showNormal()
         else:
@@ -400,7 +464,7 @@ class EditorPanel(QDialog):
             return
 
         dlg = QDialog(self)
-        dlg.setWindowTitle("Image Viewer")
+        dlg.setWindowTitle("Scratch Board: Image Viewer")
         dlg.resize(900, 700)
 
         layout = QVBoxLayout(dlg)
