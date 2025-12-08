@@ -8,6 +8,11 @@ from ui.themes.context_menu_theme import menu_style
 from ui.themes.reference_list_style import ref_list_style
 from utils.resource_path import resource_path
 
+
+def open_reference(item):
+    QDesktopServices.openUrl(QUrl(item.data(Qt.UserRole)))
+
+
 class ReferenceWidget(QWidget):
     def __init__(self, model):
         super().__init__()
@@ -51,7 +56,7 @@ class ReferenceWidget(QWidget):
         # Initialize the loading of references
         self.load_references()
         # Allow reference to open on click
-        self.list_widget.itemClicked.connect(self.open_reference)
+        self.list_widget.itemClicked.connect(open_reference)
 
     def load_references(self):
         self.list_widget.clear()
@@ -92,9 +97,6 @@ class ReferenceWidget(QWidget):
         self.load_references()
         self.title_input.clear()
         self.url_input.clear()
-
-    def open_reference(self, item):
-        QDesktopServices.openUrl(QUrl(item.data(Qt.UserRole)))
 
     def show_context_menu(self, pos):
         item = self.list_widget.itemAt(pos)

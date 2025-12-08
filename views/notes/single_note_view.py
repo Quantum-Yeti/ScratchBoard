@@ -1,9 +1,21 @@
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser, QMenu
 from PySide6.QtCore import Qt, QEvent
 import markdown
 
 from ui.menus.context_menu import ModifyContextMenu
+from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path
+
+
+def show_context_menu(widget, pos):
+    """Show a dark-themed context menu with hover color."""
+    menu = QMenu(widget)
+    menu.setStyleSheet(menu_style)  # your dark + hover blue style
+
+    # Convert local pos to global coordinates
+    global_pos = widget.mapToGlobal(pos)
+    menu.exec_(global_pos)
+
 
 class NoteCard(QFrame):
     """
@@ -41,13 +53,10 @@ class NoteCard(QFrame):
             "background: transparent; border: none; a { color: #5DADE2; text-decoration: none;}"
         )
 
-        # Apply the menu_style for context menus
-        self.context_menu = ModifyContextMenu()
-
         # Override context menu events on right click
         content_view.setContextMenuPolicy(Qt.CustomContextMenu)
         content_view.customContextMenuRequested.connect(
-            lambda pos: self.context_menu.contextMenuEvent(content_view)
+            lambda pos: show_context_menu(content_view, pos)
         )
 
         # Render Markdown content to HTML
@@ -113,3 +122,4 @@ class NoteCard(QFrame):
                 self.on_double_click(self.note)
             return True  # stop further handling
         return super().eventFilter(obj, event)
+
