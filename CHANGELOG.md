@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2025-12-08
+
+### Added / Improved
+- **Image caching for notes:** Introduced `PopulateNotesThread` to preload and cache scaled pixmaps, reducing UI freezes and improving scroll responsiveness.
+- **Performance optimizations:** Faster note loading and smoother toggling between grid and list views, particularly with high-resolution or many images.
+
+### Fixed / Refactored
+- **Memory and scaling improvements:** Large images are resized once and stored as pixmaps, preventing repeated disk reads and redundant scaling.
+- **Code cleanup:** Minor refactors and removal of legacy blocking image loads for a cleaner codebase.
+
+
 ## [1.5] - 2025-12-02
 
 ### Added
