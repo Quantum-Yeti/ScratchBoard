@@ -23,17 +23,18 @@ class NoteCard(QFrame):
         self.on_double_click = on_double_click
         self.setObjectName("NoteCard")
 
+        # Main vertical layout for title and content
         layout = QVBoxLayout(self)
         layout.setSpacing(6)
         layout.setContentsMargins(12, 12, 12, 12)
 
-        # Title
+        # Title label
         title_label = QLabel(note["title"])
         title_label.setObjectName("NoteTitle")
         title_label.setStyleSheet("background: transparent; border: none;")
         layout.addWidget(title_label)
 
-        # Content (rendered Markdown)
+        # Content area (rendered Markdown)
         content_view = QTextBrowser()
         content_view.setOpenExternalLinks(True)
         content_view.setStyleSheet(
@@ -42,12 +43,14 @@ class NoteCard(QFrame):
 
         # Apply the menu_style for context menus
         self.context_menu = ModifyContextMenu()
-        # Override context menu events
+
+        # Override context menu events on right click
         content_view.setContextMenuPolicy(Qt.CustomContextMenu)
         content_view.customContextMenuRequested.connect(
             lambda pos: self.context_menu.contextMenuEvent(content_view)
         )
 
+        # Render Markdown content to HTML
         html = markdown.markdown(self.note["content"])
         html = f"""
         <style>
@@ -58,7 +61,6 @@ class NoteCard(QFrame):
         </style>
         {html}
         """
-
         content_view.setHtml(html)
 
         # Hide scrollbars but keep original size
@@ -73,7 +75,7 @@ class NoteCard(QFrame):
         for child in self.findChildren(QTextBrowser) + self.findChildren(QLabel):
             child.installEventFilter(self)
 
-        # Content
+        # Add content view to layout
         layout.addWidget(content_view)
 
         # Apply stylesheet
