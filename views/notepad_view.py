@@ -8,6 +8,7 @@ from PySide6.QtGui import QFont, QIcon, QTextCursor, QTextCharFormat
 from PySide6.QtCore import Qt
 
 from ui.fonts.font_list import main_font_list
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
 
 class NotepadDialog(QDialog):
@@ -28,6 +29,7 @@ class NotepadDialog(QDialog):
 
         # Text edit area
         self.text_edit = QTextEdit()
+        self.text_edit.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         self.text_edit.setStyleSheet("""
             QTextEdit {
                 font-size: 10pt;
