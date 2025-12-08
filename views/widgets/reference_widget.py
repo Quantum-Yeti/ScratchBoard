@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLa
 
 from ui.themes.context_menu_theme import menu_style
 from ui.themes.reference_list_style import ref_list_style
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
 
 
@@ -25,6 +26,7 @@ class ReferenceWidget(QWidget):
         layout.setSpacing(6)
 
         self.list_widget = QListWidget()
+        self.list_widget.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         self.list_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.list_widget.setStyleSheet(ref_list_style)
         self.list_widget.setViewportMargins(0, 0, 0, 0)
