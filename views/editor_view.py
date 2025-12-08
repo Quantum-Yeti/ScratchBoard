@@ -499,7 +499,16 @@ class EditorPanel(QDialog):
 
         lbl = QLabel()
         lbl.setAlignment(Qt.AlignCenter)
-        lbl.setPixmap(QPixmap(path))
+
+        pix = QPixmap(path)
+        # Scale pixmap to fit dialog window
+        max_width = int(dlg.width() * 0.9)
+        max_height = int(dlg.height() * 0.9)
+
+        if pix.width() > max_width or pix.height() > max_height:
+            pix = pix.scaled(max_width, max_height, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        lbl.setPixmap(pix)
         scroll.setWidget(lbl)
 
         dlg.exec()
