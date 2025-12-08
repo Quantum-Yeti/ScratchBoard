@@ -5,9 +5,11 @@ from PySide6.QtCore import Qt, QTimer, QEvent
 from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit, QPushButton, QLabel,
-    QSplitter, QTextBrowser, QMessageBox, QWidget, QToolBar, QGraphicsOpacityEffect
+    QSplitter, QTextBrowser, QMessageBox, QWidget, QToolBar, QGraphicsOpacityEffect, QFileDialog
 )
 from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QDialog, QLabel, QVBoxLayout, QScrollArea
+from PySide6.QtGui import QPixmap
 
 from helpers.calc_helpers.count_words import count_words
 from helpers.image_helpers.drag_drop_image import save_qimage, save_file_drop
@@ -15,6 +17,19 @@ from helpers.md_helpers.md_preview import get_markdown_guide
 from helpers.md_helpers.md_to_html import render_markdown_to_html
 from ui.menus.context_menu import ModifyContextMenu
 from utils.resource_path import resource_path
+
+
+def _convert_image_paths(html):
+
+    def repl(m):
+        src = m.group(1)
+        abs_path = os.path.abspath(src).replace("\\", "/")
+        # Wrap in <a> with clickable link
+        return f'<a href="file:///{abs_path}"><img src="file:///{abs_path}"></a>'
+
+    # Match all <img src="...">
+    html = re.sub(r'<img\s+[^>]*src="([^"]+)"[^>]*>', repl, html)
+    return html
 
 
 class EditorPanel(QDialog):
@@ -92,7 +107,6 @@ class EditorPanel(QDialog):
         self._opacity.setOpacity(1)
 
         splitter.addWidget(self.preview)
-
 
         # initial sizes for left and right panels
         splitter.setStretchFactor(0, 1)
@@ -172,15 +186,15 @@ class EditorPanel(QDialog):
         self._schedule_preview()
 
     def eventFilter(self, obj, event):
-        if obj is self.preview and event.type() == QEvent.MouseButtonDblClick:
+        if obj is self.preview and event.type() == QEvent.MouseButtonRelease:
             cursor = self.preview.cursorForPosition(event.pos())
             anchor = cursor.charFormat().anchorHref()
-
-            if anchor:
-                # Trigger the full-view popup
-                from PySide6.QtCore import QUrl
-                self._on_preview_link_clicked(QUrl(anchor))
-                return True
+            if anchor.startswith("file:///"):
+                # strip the 'file:///' prefix to get the OS path
+                path = anchor[8:] if anchor.startswith("file:///") else anchor
+                if os.path.exists(path):
+                    self._on_preview_link_clicked(path)
+                    return True
 
         return super().eventFilter(obj, event)
 
@@ -191,16 +205,25 @@ class EditorPanel(QDialog):
     def _update_preview_no_animation(self):
         md = self.content_edit.toPlainText()
         html = render_markdown_to_html(md)
-        html = self._convert_image_paths(html)
+        html = _convert_image_paths(html)
 
         # Force background from HTML so QTextBrowser obeys it
         style = """
             <style>
-            body {
-                background-color: #333;
-            }
+                body {
+                    background-color: #333;
+                    color: #fff;
+                    font-family: sans-serif;
+                }
+                img { 
+                    max-width: 250px; 
+                    height: auto; 
+                    display:block; 
+                    margin:5px auto; 
+                    cursor:pointer; 
+                }
             </style>
-            """
+        """
 
         self.preview.setHtml(style + html)
 
@@ -230,25 +253,7 @@ class EditorPanel(QDialog):
             self._schedule_preview()
             event.acceptProposedAction()
 
-    def _convert_image_paths(self, html):
-        def replace(match):
-            path = match.group(1)
-            abs_path = os.path.abspath(path).replace("\\", "/")
-            return f'src="file:///{abs_path}"'
-
-        html = re.sub(r'src="([^"]+)"', replace, html)
-
-        # Wrap IMG in clickable <a>
-        html = re.sub(
-            r'<img([^>]+)src="([^"]+)"([^>]*)>',
-            r'<a href="\2"><img\1src="\2"\3></a>',
-            html
-        )
-
-        return html
-
     def _insert_image_dialog(self):
-        from PySide6.QtWidgets import QFileDialog
         path, _ = QFileDialog.getOpenFileName(self, "Insert Image", "", "Images (*.png *.jpg *.jpeg *.gif *.webp)")
         if path:
             dst_dir = Path("sb_data/images")
@@ -291,7 +296,6 @@ class EditorPanel(QDialog):
             self.delete_callback(self.note_id)
             self.accept()
 
-
     # Shortcuts / Fullscreen
     def _bind_shortcuts(self):
         def ks(key, handler):
@@ -313,15 +317,10 @@ class EditorPanel(QDialog):
             self.showFullScreen()
         self._is_fullscreen = not self._is_fullscreen
 
-    def _on_preview_link_clicked(self, url):
-        """Opens image_helpers in a full-window dialog."""
-        path = url.toLocalFile()
-
+    def _on_preview_link_clicked(self, path):
+        """Opens the image in a full-window dialog."""
         if not os.path.exists(path):
             return
-
-        from PySide6.QtWidgets import QDialog, QLabel, QVBoxLayout, QScrollArea
-        from PySide6.QtGui import QPixmap
 
         dlg = QDialog(self)
         dlg.setWindowTitle("Image Viewer")
@@ -335,9 +334,7 @@ class EditorPanel(QDialog):
 
         lbl = QLabel()
         lbl.setAlignment(Qt.AlignCenter)
-
-        pix = QPixmap(path)
-        lbl.setPixmap(pix)
+        lbl.setPixmap(QPixmap(path))
         scroll.setWidget(lbl)
 
         dlg.exec()
