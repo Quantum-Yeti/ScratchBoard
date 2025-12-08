@@ -6,7 +6,7 @@ vertical_scrollbar_style = """
         border-radius: 4px;
     }
     QScrollBar::handle:vertical {
-        background: #3E8CA3;
+        background: #2E6F82;
         min-height: 20px;
         border-radius: 4px;
     }

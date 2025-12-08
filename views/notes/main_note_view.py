@@ -55,6 +55,7 @@ class MainView(QWidget):
         # Scrollable notes grid
         self.view_mode = "grid"
         self.scroll = QScrollArea()
+        self.scroll.setStyleSheet("border: none;")
         self.scroll.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         self.scroll.setWidgetResizable(True)
         self.grid_widget = QWidget()

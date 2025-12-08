@@ -62,12 +62,18 @@ class NoteCard(QFrame):
         # Render Markdown content to HTML
         html = markdown.markdown(self.note["content"])
         html = f"""
-        <style>
-        a {{
-            color: #5dade2;
-            text-decoration: none;
-        }}
-        </style>
+            <style>
+                a {{
+                    color: #5dade2;
+                    text-decoration: none;
+                }}
+                img {{
+                    max-width: 180px;
+                    height: auto;
+                    border-radius: 6px;
+                    cursor: pointer; 
+                }}
+            </style>
         {html}
         """
         content_view.setHtml(html)
