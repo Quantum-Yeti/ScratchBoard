@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QEvent, Signal
 
 from helpers.modules.contacts_copy_menu import CopyableLabel
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
 from helpers.ui_helpers.floating_action import FloatingButton
 
@@ -84,6 +85,7 @@ class ContactsView(QWidget):
 
         # Scrollable area to hold contact rows
         self.scroll_area = QScrollArea()
+        self.scroll_area.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setFrameShape(QFrame.NoFrame)
         self.list_widget = QWidget()
