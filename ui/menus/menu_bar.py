@@ -14,6 +14,7 @@ from views.info_widgets.signal_widget import SignalReference
 from views.info_widgets.ethernet_widget import EthernetReference
 from views.info_widgets.speed_widget import InternetSpeedRequirements
 from views.info_widgets.voip_widget import VoIPReference
+from views.widgets.SimpleCalc import SimpleCalcView
 from views.widgets.log_widget import ModemLogParserView
 from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
@@ -75,6 +76,7 @@ class MainMenuBar(QMenuBar):
         self.bat_action = None
         self.modem_action = None
         self.pwd_action = None
+        self.calc_action = None
 
         # Views Menu
         self.contact_action = None
@@ -281,6 +283,11 @@ class MainMenuBar(QMenuBar):
         self.pwd_action.setShortcut("Alt+P")
         tools_menu.addAction(self.pwd_action)
 
+        self.calc_action = QAction("Calculator", self)
+        self.calc_action.setIcon(QIcon(resource_path("resources/icons/calculator.png")))
+        self.calc_action.setShortcut("Alt+C")
+        tools_menu.addAction(self.calc_action)
+
         _connect_hover_tooltips(tools_menu)
 
     # Build the Help menu
@@ -353,6 +360,7 @@ class MainMenuBar(QMenuBar):
         self.bat_action.triggered.connect(self.sidebar.open_bat_file)  # run a batch file
         self.modem_action.triggered.connect(self._open_modem_parser)
         self.pwd_action.triggered.connect(self._open_pw_gen)
+        self.calc_action.triggered.connect(self._open_calc)
 
         # Wire the help menu
         self.shortcut_action.triggered.connect(self._open_shortcuts)
@@ -408,6 +416,10 @@ class MainMenuBar(QMenuBar):
     def _open_pw_gen(self):
         pwgen = PassGenWidget(self.parent())
         pwgen.exec()
+
+    def _open_calc(self):
+        calc = SimpleCalcView(self.parent())
+        calc.exec()
 
     def _export_notes(self):
         if not self.note_model:
