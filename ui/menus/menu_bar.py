@@ -411,7 +411,7 @@ class MainMenuBar(QMenuBar):
 
     def _export_notes(self):
         if not self.note_model:
-            QMessageBox.warning(self, "Error", "Note model is not initialized.")
+            QMessageBox.warning(self, "Error", "Database export failed..")
             return
 
         path, _ = QFileDialog.getSaveFileName(
@@ -477,7 +477,7 @@ class MainMenuBar(QMenuBar):
     def _sync_db(self):
         # Dialog window to select zipped database export
         db_path, _ = QFileDialog.getOpenFileName(
-            self, "Select Database", "", "Zipped Files (*.zip)"
+            self, "Select Database (Export to ZIP first)", "", "Zipped Files (*.zip)"
         )
         if not db_path:
             return
