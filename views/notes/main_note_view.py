@@ -8,6 +8,7 @@ from PySide6.QtCore import Qt, QSize
 from helpers.ui_helpers.empty_messages import empty_messages
 from helpers.ui_helpers.floating_action import FloatingButton
 from ui.themes.floating_action_style import floating_btn_style
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
 from views.notes.single_note_view import NoteCard
 
@@ -54,6 +55,7 @@ class MainView(QWidget):
         # Scrollable notes grid
         self.view_mode = "grid"
         self.scroll = QScrollArea()
+        self.scroll.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         self.scroll.setWidgetResizable(True)
         self.grid_widget = QWidget()
         self.grid_layout = QGridLayout(self.grid_widget)
