@@ -3,6 +3,9 @@ from PySide6.QtCore import QUrl, QSize
 from PySide6.QtGui import QDesktopServices, Qt, QAction, QIcon
 from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLayout, QLineEdit, QPushButton, QWidget, \
     QMenu, QMessageBox, QLabel, QSizePolicy
+
+from ui.themes.context_menu_theme import menu_style
+from ui.themes.reference_list_style import ref_list_style
 from utils.resource_path import resource_path
 
 class ReferenceWidget(QWidget):
@@ -18,22 +21,7 @@ class ReferenceWidget(QWidget):
 
         self.list_widget = QListWidget()
         self.list_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.list_widget.setStyleSheet("""
-            QListWidget {
-                background-color: #2E2E2E;
-                color: #9ACEEB;               
-                border: 1px solid #444;       
-                border-radius: 8px;           
-                padding: 2px;                 
-            }
-            QListWidget::item {
-                /* vertical | horizontal */
-                padding: 2px 4px;             
-            }
-            QListWidget::item:selected {
-                background-color: #333;       /* highlight color when selected */
-            }
-        """)
+        self.list_widget.setStyleSheet(ref_list_style)
         self.list_widget.setViewportMargins(0, 0, 0, 0)
         self.list_widget.viewport().setAutoFillBackground(False)
         self.list_widget.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -112,16 +100,7 @@ class ReferenceWidget(QWidget):
         item = self.list_widget.itemAt(pos)
         if item:
             menu = QMenu()
-            menu.setStyleSheet("""
-                QMenu {
-                    background-color: #1f1f1f;
-                    color: #f0f0f0;
-                }
-                QMenu::item:selected {
-                    background-color: #505050;
-                    color: #ffffff;
-                }
-            """)
+            menu.setStyleSheet(menu_style)
             delete_action = QAction("Delete", self)
             delete_action.setToolTip("Delete")
             delete_action.setIcon(QIcon(resource_path("resources/icons/delete.png")))
