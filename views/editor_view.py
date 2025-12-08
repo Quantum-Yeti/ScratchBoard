@@ -4,7 +4,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QTimer, QEvent
 from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLineEdit, QTextEdit, QPushButton, QLabel,
+    QHBoxLayout, QLineEdit, QPushButton,
     QSplitter, QTextBrowser, QMessageBox, QWidget, QToolBar, QGraphicsOpacityEffect, QFileDialog
 )
 from PySide6.QtGui import QAction
@@ -13,7 +13,6 @@ from PySide6.QtGui import QPixmap
 
 from helpers.calc_helpers.count_words import count_words
 from helpers.image_helpers.drag_drop_image import save_qimage, save_file_drop
-from helpers.md_helpers.md_preview import get_markdown_guide
 from helpers.md_helpers.md_to_html import render_markdown_to_html
 from ui.menus.context_menu import ModifyContextMenu
 from utils.resource_path import resource_path
