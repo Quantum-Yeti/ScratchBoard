@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QWidget, QScrollArea, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QSizePolicy
+    QWidget, QScrollArea, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QSizePolicy, QFrame
 )
 from PySide6.QtCore import Qt, QEvent, Signal
 
@@ -85,6 +85,7 @@ class ContactsView(QWidget):
         # Scrollable area to hold contact rows
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QFrame.NoFrame)
         self.list_widget = QWidget()
         self.list_layout = QVBoxLayout(self.list_widget)
         self.list_layout.setSpacing(8)
@@ -122,6 +123,8 @@ class ContactsView(QWidget):
 
         self.contact_click_handler = on_click
         self.list_layout.setSpacing(4)
+
+        contacts = sorted(contacts, key=lambda c: (c["Name"] or "").lower())
 
         # Clear existing rows
         while self.list_layout.count():
@@ -254,4 +257,7 @@ class ContactsView(QWidget):
                or text.lower() in (c["email"] or "").lower()
                or text.lower() in (c["website"] or "").lower()
         ]
+
+        filtered = sorted(filtered, key=lambda c: (c["name"] or "").lower())
+
         self.populate_contacts(filtered, self.contact_click_handler, store_all=False)
