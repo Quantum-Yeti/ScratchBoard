@@ -8,7 +8,6 @@ from PySide6.QtWidgets import (QApplication,
                                QWidget,
                                QStackedLayout,
                                QMessageBox)
-
 from helpers.startup.run_startup import run_startup
 from helpers.ui_helpers.update_window_title import update_window_title
 from ui.menus.menu_bar import MainMenuBar

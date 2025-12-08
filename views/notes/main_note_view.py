@@ -7,6 +7,7 @@ from PySide6.QtCore import Qt, QSize
 
 from helpers.ui_helpers.empty_messages import empty_messages
 from helpers.ui_helpers.floating_action import FloatingButton
+from ui.themes.floating_action_style import floating_btn_style
 from utils.resource_path import resource_path
 from views.notes.single_note_view import NoteCard
 
@@ -23,10 +24,11 @@ class MainView(QWidget):
 
     def __init__(self, categories):
         super().__init__()
+        self._last_click = None
+        self._last_notes = None
         self.categories = categories
 
-
-
+        # Main vertical layout
         layout = QVBoxLayout(self)
         layout.setSpacing(10)
         layout.setContentsMargins(8, 8, 8, 8)
@@ -63,18 +65,7 @@ class MainView(QWidget):
         # Floating add button
         self.add_btn = FloatingButton(self, icon_path="resources/icons/add.png", tooltip="Add note", shortcut="Ctrl+N")
         self.add_btn.setIconSize(self.size() * 0.6)  # 60% of button size
-        self.setStyleSheet("""
-            QPushButton#FloatingButton {
-                border: none;
-                border-radius: 30px;
-            }
-            QPushButton#FloatingButton:hover {
-                background-color: #3498eb;
-            }
-            QPushButton#FloatingButton::icon {
-                padding-left: 10px;
-            }
-        """)
+        self.setStyleSheet(floating_btn_style)
 
     def resizeEvent(self, event):
         """
