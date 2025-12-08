@@ -1,8 +1,10 @@
+import os
 import traceback
 
 from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
+from helpers.modules.sync_helper import sync_db
 from models.note_model import NoteModel
 from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path
@@ -63,6 +65,7 @@ class MainMenuBar(QMenuBar):
         # File Menu
         self.import_action = None
         self.export_action = None
+        self.sync_action = None
         self.exit_action = None
 
         # Tools Menu
@@ -122,6 +125,11 @@ class MainMenuBar(QMenuBar):
         self.export_action.setShortcut("Alt+E")
         self.export_action.setIcon(QIcon(resource_path("resources/icons/export.png")))
         file_menu.addAction(self.export_action)
+
+        self.sync_action = QAction("Sync Notes", self)
+        self.sync_action.setShortcut("Alt+S")
+        self.sync_action.setIcon(QIcon(resource_path("resources/icons/sync.png")))
+        file_menu.addAction(self.sync_action)
 
         file_menu.addSeparator()
 
@@ -316,6 +324,7 @@ class MainMenuBar(QMenuBar):
         # Wire the file menu
         self.import_action.triggered.connect(self._import_notes)
         self.export_action.triggered.connect(self._export_notes)
+        self.sync_action.triggered.connect(self._sync_db)
         self.delete_db_action.triggered.connect(self._delete_database)
 
         # Wire the charts
@@ -464,3 +473,20 @@ class MainMenuBar(QMenuBar):
             except Exception as e:
                 error_message = f"Failed to delete notes:\n{e}\n\nStack Trace:\n{traceback.format_exc()}"
                 QMessageBox.critical(self, "Error", error_message)
+
+    def _sync_db(self):
+        # Dialog window to select zipped database export
+        db_path, _ = QFileDialog.getOpenFileName(
+            self, "Select Database", "", "Zipped Files (*.zip)"
+        )
+        if not db_path:
+            return
+
+        # Default OneDrive folder
+        default_onedrive = os.path.join(os.path.expanduser("~"), "OneDrive", "Scratch Board")
+
+        # Calls sync_helper.py
+        sync_db(db_path, default_onedrive)
+
+        # Notify user on success
+        QMessageBox.information(self, "Success", f"Database synced to OneDrive:\n{default_onedrive}")
