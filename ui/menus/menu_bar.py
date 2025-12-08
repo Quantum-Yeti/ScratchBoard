@@ -14,7 +14,7 @@ from views.info_widgets.signal_widget import SignalReference
 from views.info_widgets.ethernet_widget import EthernetReference
 from views.info_widgets.speed_widget import InternetSpeedRequirements
 from views.info_widgets.voip_widget import VoIPReference
-from views.widgets.SimpleCalc import SimpleCalcView
+from views.widgets.calc_widget import SimpleCalcView
 from views.widgets.log_widget import ModemLogParserView
 from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
