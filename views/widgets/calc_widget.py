@@ -1,9 +1,20 @@
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QGridLayout, QPushButton, QLabel, QSizePolicy
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QGridLayout, QPushButton, QLabel, QSizePolicy, QComboBox
 
 from utils.resource_path import resource_path
 
+storage_units = {
+    "Byte": 1,
+    "KB": 1024,
+    "MB": 1024**2,
+    "GB": 1024**3,
+    "TB": 1024**4
+}
+
+def convert(value, from_unit, to_unit):
+    bytes_value = value * storage_units[from_unit]
+    return bytes_value / storage_units[to_unit]
 
 class SimpleCalcView(QDialog):
     """
@@ -16,7 +27,7 @@ class SimpleCalcView(QDialog):
         self.setFixedSize(400, 500)
 
         self.current_expression = ""
-        self.outage_mode = False
+        self.converter_mode = False
 
         self._create_calc_ui()
 
@@ -51,7 +62,7 @@ class SimpleCalcView(QDialog):
         self.mode_button.setCheckable(True)
         self.mode_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.mode_button.setFixedHeight(50)
-        self.mode_button.toggled.connect(self._toggle_outage_mode)
+        self.mode_button.toggled.connect(self._toggle_converter_mode)
         grid.addWidget(self.mode_button, 0, 0, 1, 4)
 
         # Button definitions
@@ -86,12 +97,23 @@ class SimpleCalcView(QDialog):
 
         main_layout.addLayout(grid)
 
-    def _toggle_outage_mode(self, checked):
-        self.outage_mode = checked
-        self.display.setText("")
+    def _toggle_converter_mode(self, checked):
+        self.converter_mode = checked
         self.current_expression = ""
-        self.mode_button.setText("Outage Mode" if checked else "Normal Mode")
-        self.display.setPlaceholderText("Monthly fee / hours offline" if checked else "")
+        self.display.setText("")
+
+        if checked:
+            self.from_unit = QComboBox()
+            self.from_unit.addItems(list(storage_units.keys()))
+            self.to_unit = QComboBox()
+            self.to_unit.addItems(list(storage_units.keys()))
+            self.layout().insertWidget(1, self.from_unit)
+            self.layout().insertWidget(2, self.to_unit)
+        else:
+            self.layout().removeWidget(self.from_unit)
+            self.layout().removeWidget(self.to_unit)
+            self.from_unit.deleteLater()
+            self.to_unit.deleteLater()
 
     def _on_btn_clicked(self, text):
         if text == "C":
@@ -105,18 +127,15 @@ class SimpleCalcView(QDialog):
 
     def _evaluate_expression(self):
         try:
-            if self.outage_mode:
-                parts = self.current_expression.split('/')
-                if len(parts) != 2:
-                    self.display.setText("Error")
-                    return
-                monthly_charge = float(parts[0].strip())
-                hours_offline = float(parts[1].strip())
-                result = monthly_charge * (hours_offline / (30*24))  # proportional cost
+            if getattr(self, "converter_mode", False):
+                value = float(self.current_expression)
+                from_u = self.from_unit.currentText()
+                to_u = self.to_unit.currentText()
+                result = convert(value, from_u, to_u)
             else:
                 result = eval(self.current_expression, {"__builtins__": None}, {})
 
-            self.current_expression = str(round(result, 2))
+            self.current_expression = str(round(result, 4))
             self.display.setText(self.current_expression)
         except Exception:
             self.display.setText("Error")
