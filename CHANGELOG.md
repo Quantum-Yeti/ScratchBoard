@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2025-12-09
+
+### Added / Improved
+- **Storage Unit Converter:** Replaced outage mode in `SimpleCalcView` with a storage unit converter (Bytes ↔ KB/MB/GB/TB). Supports dynamic "From" and "To" units selection via dropdowns.
+- **Multi-Line Chart Enhancements:** Refined Y-axis range calculation for `create_multi_line_chart` to better fit all stat lines and avoid unnecessary padding.
+- **Dashboard Chart Improvements:** General improvements to stacked bar and multi-line charts for better readability and tighter layouts.
+- **Info Charts:** Added an internet protocol info chart and storage info chart.
+
+### Fixed / Refactored
+- **Calculator Refactor:** Removed outage mode from `SimpleCalcView` and cleaned up legacy UI elements.
+- **Chart Axis Handling:** Ensured proper axis attachment and scaling for charts with dynamic data ranges.
+
+
 ## [1.5.1] - 2025-12-08
 
 ### Added / Improved
