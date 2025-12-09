@@ -199,7 +199,16 @@ def create_multi_line_chart(model, days_back=14):
 
     # Y axis
     axis_y = QValueAxis()
-    axis_y.setRange(-3, max_value + 1)
+
+    # Compute min and max of all stats
+    all_values = [stats.get(key, 0) for stats in daily_stats for key, _ in stat_keys]
+    min_val = min(all_values, default=0)
+    max_val = max(all_values, default=1)
+    # Add padding to axis y
+    padding = (max_val - min_val) * 0.3 # maximum - minimum * percent to padd
+    axis_y.setRange(min_val - padding, max_val + padding)
+
+    #axis_y.setRange(-3, max_value + 1) # Will leave for now
     axis_y.setLabelFormat("%d")
     axis_y.setLabelsColor(QColor("white"))
     axis_y.setLineVisible(False)
@@ -208,7 +217,7 @@ def create_multi_line_chart(model, days_back=14):
     chart.addAxis(axis_y, Qt.AlignLeft)
 
     # Starts the y-axis at a minimum of -1 to prevent lines visually dipping below 0
-    axis_y.setMin(-1)
+    #axis_y.setMin(-1) # Will leave for now
 
     # Attach axes
     for s in chart.series():
