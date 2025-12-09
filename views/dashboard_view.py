@@ -1,4 +1,4 @@
-from PySide6.QtCharts import QChartView
+from PySide6.QtCharts import QChartView, QChart
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
@@ -165,11 +165,29 @@ class DashboardView(QWidget):
         self.stats_widget.refresh(animated=animated)
 
     def update_graphs(self):
-        self.stacked_bar_chart = create_stacked_bar_chart(self.model)
-        self.stacked_bar_view.setChart(self.stacked_bar_chart)
+        """
+        Refreshes both stacked bar and multi-line charts.
+        Old charts are removed, new charts are created, and legends update automatically.
+        """
+        # --- Remove old series from stacked bar chart ---
+        if self.stacked_bar_view.chart():
+            self.stacked_bar_view.chart().removeAllSeries()
 
+        # --- Remove old series from multi-line chart ---
+        if self.multi_line_view.chart():
+            self.multi_line_view.chart().removeAllSeries()
+
+        # --- Create new charts ---
+        self.stacked_bar_chart = create_stacked_bar_chart(self.model)
         self.multi_line_chart = create_multi_line_chart(self.model)
+
+        # --- Replace charts in QChartView ---
+        self.stacked_bar_view.setChart(self.stacked_bar_chart)
         self.multi_line_view.setChart(self.multi_line_chart)
+
+        # --- Force redraw to ensure view updates ---
+        self.stacked_bar_view.repaint()
+        self.multi_line_view.repaint()
 
     def refresh_dashboard(self):
         self.update_stats(animated=True)
