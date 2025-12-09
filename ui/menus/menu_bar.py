@@ -14,7 +14,7 @@ from views.info_widgets.protocol_widget import InternetProtocolsTimeline
 from views.info_widgets.signal_widget import SignalReference
 from views.info_widgets.ethernet_widget import EthernetReference
 from views.info_widgets.speed_widget import InternetSpeedRequirements
-from views.info_widgets.storage_widdget import DiskStorageChart
+from views.info_widgets.storage_widget import DiskStorageChart
 from views.info_widgets.voip_widget import VoIPReference
 from views.widgets.calc_widget import SimpleCalcView
 from views.widgets.log_widget import ModemLogParserView
