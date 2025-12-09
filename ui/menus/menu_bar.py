@@ -10,9 +10,11 @@ from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path
 from views.info_widgets.fiber_widget import FiberReferenceDialog
 from views.info_widgets.gaming_widget import GamingReference
+from views.info_widgets.protocol_widget import InternetProtocolsTimeline
 from views.info_widgets.signal_widget import SignalReference
 from views.info_widgets.ethernet_widget import EthernetReference
 from views.info_widgets.speed_widget import InternetSpeedRequirements
+from views.info_widgets.storage_widdget import DiskStorageChart
 from views.info_widgets.voip_widget import VoIPReference
 from views.widgets.calc_widget import SimpleCalcView
 from views.widgets.log_widget import ModemLogParserView
@@ -94,6 +96,8 @@ class MainMenuBar(QMenuBar):
         self.fiber_action = None
         self.voip_action = None
         self.gaming_action = None
+        self.storage_action = None
+        self.protocol_action = None
 
         # Help Menu
         self.about_action = None
@@ -222,8 +226,6 @@ class MainMenuBar(QMenuBar):
         self.fiber_action.setShortcut("Ctrl+Z")
         charts_menu.addAction(self.fiber_action)
 
-        charts_menu.addSeparator()
-
         self.ethernet_action = QAction("Ethernet Standards Chart", self)
         self.ethernet_action.setIcon(QIcon(resource_path("resources/icons/ethernet.png")))
         self.ethernet_action.setShortcut("Ctrl+E")
@@ -239,7 +241,10 @@ class MainMenuBar(QMenuBar):
         self.speeds_action.setShortcut("Ctrl+S")
         charts_menu.addAction(self.speeds_action)
 
-        charts_menu.addSeparator()
+        self.protocol_action = QAction("Protocol Chart", self)
+        self.protocol_action.setIcon(QIcon(resource_path("resources/icons/server.png")))
+        self.protocol_action.setShortcut("Alt+P")
+        charts_menu.addAction(self.protocol_action)
 
         self.voip_action = QAction("VoIP Info Chart", self)
         self.voip_action.setIcon(QIcon(resource_path("resources/icons/phone_white.png")))
@@ -250,6 +255,11 @@ class MainMenuBar(QMenuBar):
         self.gaming_action.setIcon(QIcon(resource_path("resources/icons/gaming_white.png")))
         self.gaming_action.setShortcut("Ctrl+G")
         charts_menu.addAction(self.gaming_action)
+
+        self.storage_action = QAction("Storage Info Chart", self)
+        self.storage_action.setIcon(QIcon(resource_path("resources/icons/storage_white.png")))
+        self.storage_action.setShortcut("Alt+D")
+        charts_menu.addAction(self.storage_action)
 
         _connect_hover_tooltips(charts_menu)
 
@@ -340,8 +350,10 @@ class MainMenuBar(QMenuBar):
         self.wifi_standards_action.triggered.connect(self._open_wifi_chart)
         self.speeds_action.triggered.connect(self._open_speed_chart)
         self.fiber_action.triggered.connect(self._open_fiber_chart)
+        self.protocol_action.triggered.connect(self._open_protocol_chart)
         self.voip_action.triggered.connect(self._open_voip_chart)
         self.gaming_action.triggered.connect(self._open_gaming_chart)
+        self.storage_action.triggered.connect(self._open_storage_chart)
 
         # Wire the view categories
         self.contact_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Contacts"))
@@ -396,6 +408,10 @@ class MainMenuBar(QMenuBar):
         fbr = FiberReferenceDialog(self.parent())
         fbr.exec()
 
+    def _open_protocol_chart(self):
+        prot = InternetProtocolsTimeline(self.parent())
+        prot.exec()
+
     def _open_voip_chart(self):
         voip = VoIPReference(self.parent())
         voip.exec()
@@ -403,6 +419,10 @@ class MainMenuBar(QMenuBar):
     def _open_gaming_chart(self):
         gaming = GamingReference(self.parent())
         gaming.exec()
+
+    def _open_storage_chart(self):
+        storage = DiskStorageChart(self.parent())
+        storage.exec()
 
     def _open_shortcuts(self):
         short = ShortcutGuide(self.parent())
