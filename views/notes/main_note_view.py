@@ -5,7 +5,7 @@ from io import BytesIO
 
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout, \
-    QPushButton, QSizePolicy
+    QPushButton, QSizePolicy, QDialog, QMenu
 from PySide6.QtCore import Qt, QSize, QThread, Signal, QByteArray, QBuffer
 
 from helpers.ui_helpers.empty_messages import empty_messages
@@ -125,19 +125,19 @@ class MainView(QWidget):
     def populate_notes_async(self, notes, on_click):
         """
         Populate notes in a background thread safely.
-        
+
         If a previous populate thread is still running, it will be
         terminated cleanly before starting a new one.
         """
         self._last_notes = notes
         self._last_click = on_click
-    
+
         # Stop any running thread
         if hasattr(self, "_thread") and self._thread is not None:
             if self._thread.isRunning():
                 self._thread.quit()
                 self._thread.wait()
-    
+
         # Create a new thread and keep a reference
         self._thread = PopulateNotesThread(notes, on_click)
         self._thread.thread_loaded.connect(self._populate_notes_from_thread)
@@ -227,7 +227,7 @@ class MainView(QWidget):
                 r, c = divmod(idx, cols)
                 card = NoteCard(note, on_click)
 
-
+                card.imgRightClicked.connect(self._open_image_popup)
 
                 # Resets styles for grid when toggling
                 card.setMinimumHeight(0)
@@ -244,8 +244,6 @@ class MainView(QWidget):
 
             for row, note in enumerate(notes):
                 card = NoteCard(note, on_click)
-
-
 
                 # Forcing card to list row
                 card.setMinimumHeight(0)
@@ -271,3 +269,29 @@ class MainView(QWidget):
         # Re-populate if notes loaded
         if hasattr(self, "_last_notes") and hasattr(self, "_last_click"):
             self.populate_notes(self._last_notes, self._last_click)
+
+    def _open_image_popup(self, path):
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Image Viewer")
+        dlg.resize(900, 700)
+
+        layout = QVBoxLayout(dlg)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        layout.addWidget(scroll)
+
+        lbl = QLabel()
+        lbl.setAlignment(Qt.AlignCenter)
+
+        pix = QPixmap(path)
+        max_width = int(dlg.width() * 0.9)
+        max_height = int(dlg.height() * 0.9)
+
+        if pix.width() > max_width or pix.height() > max_height:
+            pix = pix.scaled(max_width, max_height, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        lbl.setPixmap(pix)
+        scroll.setWidget(lbl)
+        dlg.exec()
+

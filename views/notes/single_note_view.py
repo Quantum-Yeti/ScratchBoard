@@ -2,7 +2,7 @@ import base64
 from io import BytesIO
 
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser, QMenu
-from PySide6.QtCore import Qt, QEvent
+from PySide6.QtCore import Qt, QEvent, Signal
 import markdown
 
 from ui.menus.context_menu import ModifyContextMenu
@@ -25,6 +25,9 @@ class NoteCard(QFrame):
     A visual card representing a single note with title and rendered Markdown content.
     Supports double-clicking anywhere on the card (*not the content) to trigger a callback.
     """
+
+    # Emit signal for image right click
+    imgRightClicked = Signal(str)
 
     def __init__(self, note, on_double_click):
         """
@@ -50,16 +53,20 @@ class NoteCard(QFrame):
         layout.addWidget(title_label)
 
         # Content area (rendered Markdown)
-        content_view = QTextBrowser()
-        content_view.setOpenExternalLinks(True)
-        content_view.setStyleSheet(
+        self.content_view = QTextBrowser()
+        self.content_view.setOpenExternalLinks(True)
+        self.content_view.setStyleSheet(
             "background: transparent; border: none; a { color: #5DADE2; text-decoration: none;}"
         )
 
+        self.content_view.setMouseTracking(True)
+        self.content_view.viewport().setMouseTracking(True)
+        self.content_view.viewport().installEventFilter(self)
+
         # Override context menu events on right click
-        content_view.setContextMenuPolicy(Qt.CustomContextMenu)
-        content_view.customContextMenuRequested.connect(
-            lambda pos: show_context_menu(content_view, pos)
+        self.content_view.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.content_view.customContextMenuRequested.connect(
+            lambda pos: show_context_menu(self.content_view, pos)
         )
 
         # Render Markdown content to HTML
@@ -69,12 +76,13 @@ class NoteCard(QFrame):
         # Optional cached image appended below text
         img_html = ""
         cached = getattr(self.note, "_cached_pix", None)
+        img_path = getattr(self.note, "image_path", None)
         if cached:
             # inline encode ONCE
             buffer = BytesIO()
             cached.save(buffer, "PNG")
             encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
-            img_html = f'<br><img src="data:image/png;base64,{encoded}" />'
+            img_html = f'<br><img src="data:image/png;base64,{encoded}" data-path="{img_path}" />'
 
         # Combine everything with your styling
         html = f"""
@@ -93,14 +101,14 @@ class NoteCard(QFrame):
             {rendered_markdown}
             {img_html}
         """
-        content_view.setHtml(html)
+        self.content_view.setHtml(html)
 
         # Hide scrollbars but keep original size
-        content_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        content_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        content_view.setSizePolicy(
-            content_view.sizePolicy().horizontalPolicy(),
-            content_view.sizePolicy().verticalPolicy()
+        self.content_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.content_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.content_view.setSizePolicy(
+            self.content_view.sizePolicy().horizontalPolicy(),
+            self.content_view.sizePolicy().verticalPolicy()
         )
 
         # Make sure double-click anywhere works within the box, does not work on text, links, or image_helpers
@@ -108,7 +116,7 @@ class NoteCard(QFrame):
             child.installEventFilter(self)
 
         # Add content view to layout
-        layout.addWidget(content_view)
+        layout.addWidget(self.content_view)
 
         # Apply stylesheet
         self.load_stylesheet()
@@ -143,6 +151,17 @@ class NoteCard(QFrame):
         if event.type() == QEvent.MouseButtonDblClick:
             if callable(self.on_double_click):
                 self.on_double_click(self.note)
-            return True  # stop further handling
+            return True
+
+        if obj == self.content_view.viewport():
+            if event.type() == QEvent.MouseButtonRelease and event.button() == Qt.RightButton:
+                cursor = self.content_view.cursorForPosition(event.pos())
+                fmt = cursor.charFormat()
+                if fmt.isImageFormat():
+                    # Try to get image path from HTML attribute
+                    img_path = fmt.toImageFormat().name()
+                    self.imgRightClicked.emit(img_path)
+                    return True
+
         return super().eventFilter(obj, event)
 
