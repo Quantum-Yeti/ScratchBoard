@@ -1,4 +1,4 @@
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QCursor
 from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QStyle, \
     QApplication, QFrame
 from helpers.modules.modem_log_parser import ModemLogParser
@@ -94,15 +94,31 @@ class ModemLogParserView(QDialog):
         self.setMinimumSize(QSize(900, 700))
         self.setMaximumSize(QSize(1400, 1200))
 
+        self.center_on_screen(parent)
+
         # Center the dialog on screen
-        self.setGeometry(
-            QStyle.alignedRect (
-                Qt.LeftToRight,
-                Qt.AlignCenter,
-                self.size(),
-                QApplication.primaryScreen().availableGeometry()
-            )
-        )
+        #self.setGeometry(
+            #QStyle.alignedRect (
+                #Qt.LeftToRight,
+                #Qt.AlignCenter,
+                #self.size(),
+                #QApplication.primaryScreen().availableGeometry()
+            #)
+        #)
+
+    def center_on_screen(self, parent=None):
+        if parent:
+            parent_geometry = parent.frameGeometry()
+            parent_center = parent_geometry.center()
+            self.move(parent_center - self.rect().center())
+        else:
+            cursor_position = QCursor.pos()
+            screen = QApplication.screenAt(cursor_position)
+            if not screen:
+                screen = QApplication.primaryScreen()
+            screen_geometry = screen.availableGeometry()
+            self.move(screen_geometry.center() - self.rect().center())
+
 
     def parse_logs(self):
         """

@@ -2,9 +2,9 @@ import re
 
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QFileDialog,
-    QLabel, QLineEdit, QComboBox, QSpinBox, QTabWidget
+    QLabel, QLineEdit, QComboBox, QSpinBox, QTabWidget, QApplication
 )
-from PySide6.QtGui import QFont, QIcon, QTextCursor, QTextCharFormat
+from PySide6.QtGui import QFont, QIcon, QTextCursor, QTextCharFormat, QCursor
 from PySide6.QtCore import Qt
 
 from ui.fonts.font_list import main_font_list
@@ -20,9 +20,11 @@ class NotepadDialog(QDialog):
 
         # Allow to minimize and close
         self.setWindowFlags(
-            Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
+            Qt.Window | Qt.WindowTitleHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
         )
         self.setWindowModality(Qt.NonModal)
+
+        self.center_on_screen(parent)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
@@ -126,6 +128,20 @@ class NotepadDialog(QDialog):
         bottom_layout.addWidget(self.count_label)
 
     # Helper methods
+    def center_on_screen(self, parent=None):
+        """Centers the dialog on the parent window if available, else on the current screen."""
+        self.show()  # must show to get correct size
+        if parent:
+            parent_geom = parent.frameGeometry()
+            parent_center = parent_geom.center()
+            self.move(parent_center - self.rect().center())
+        else:
+            screen = QApplication.screenAt(QCursor.pos())
+            if not screen:
+                screen = QApplication.primaryScreen()
+            screen_geom = screen.availableGeometry()
+            self.move(screen_geom.center() - self.rect().center())
+
     def update_font(self):
         font = QFont(self.font_combo.currentText(), self.font_size_spin.value())
         cursor = self.text_edit.textCursor()

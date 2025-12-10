@@ -1,7 +1,7 @@
 import random
 
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QLabel, QColorDialog
-from PySide6.QtCore import Qt, QTimer, QPoint, QSize, QPropertyAnimation
+from PySide6.QtCore import Qt, QTimer, QPoint, QSize
 from PySide6.QtGui import QColor, QIcon, QPixmap
 from helpers.ui_helpers.text_color_switcher import get_text_color
 from utils.resource_path import resource_path
@@ -135,7 +135,7 @@ class ScratchNote(QDialog):
         self.setStyleSheet(f"""
             QDialog {{
                 background-color: {self.color};
-                border: 2px solid #888;  /* No border-radius */
+                border: 2px solid #000;  /* No border-radius */
             }}
             QTextEdit {{
                 background: {self.color};
@@ -316,7 +316,7 @@ class ScratchNote(QDialog):
             ScratchNote.ACTIVE_NOTES.remove(self)
 
         self.close()
-        self.renumber_scratch_notes()
+        #self.renumber_scratch_notes()
 
     #@staticmethod
     #def renumber_scratch_notes():
