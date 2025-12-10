@@ -13,19 +13,40 @@ from helpers.image_helpers.drag_drop_image import save_file_drop
 PASTEL_COLORS = ["#FFEBEE", "#FFF3E0", "#E8F5E9", "#E3F2FD", "#F3E5F5"]
 
 class NoteModel:
+    """
+    A class to manage notes, contacts, reference links, and categories.
+    Provides CRUD operations, search, and import/export functionality.
+    Uses SQLite as the backend database.
+    """
     def __init__(self, db_path=None):
+        """
+        Initialize the NoteModel instance.
+        Creates the database and tables if they do not exist.
+
+        Args:
+            db_path (str):
+                        Path to SQLite database file.
+                        Defaults to "sb_data/db/notes.db".
+        """
         if db_path is None:
             os.makedirs("sb_data/db", exist_ok=True)
             db_path = os.path.join("sb_data/db", "notes.db")
 
         self.conn = sqlite3.connect(db_path)
+
+        # Enable dictionary access to rows
         self.conn.row_factory = sqlite3.Row
         self._setup_db()
 
     def _setup_db(self):
+        """
+        Create tables and default categories if they don't exist.
+        Handles notes, contacts, reference_links, and categories.
+        Adds necessary indexes for performance.
+        """
         cur = self.conn.cursor()
 
-        # --- Categories ---
+        # Categories table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,7 +54,7 @@ class NoteModel:
             );
         """)
 
-        # Notes
+        # Notes table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS notes (
                 id TEXT PRIMARY KEY,
@@ -58,7 +79,7 @@ class NoteModel:
             pass
         self.conn.commit()
 
-        # Contacts
+        # Contacts table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS contacts (
                 id TEXT PRIMARY KEY,
@@ -74,7 +95,7 @@ class NoteModel:
             );
         """)
 
-        # Quick Links/References
+        # Quick Links/References table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS "reference_links" (
                 id TEXT PRIMARY KEY,
@@ -86,7 +107,7 @@ class NoteModel:
         """)
         cur.execute('CREATE INDEX IF NOT EXISTS idx_reference_links_title ON reference_links(title)')
 
-        # --- Default categories ---
+        # --- Default categories
         cur.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Notes')")
         cur.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Contacts')")
 
@@ -98,7 +119,7 @@ class NoteModel:
 
         self.conn.commit()
 
-    # --- Category methods ---
+    ### CATEGORY METHODS ###
     def add_category(self, name):
         cur = self.conn.cursor()
         cur.execute("INSERT OR IGNORE INTO categories (name) VALUES (?)", (name,))
@@ -111,7 +132,7 @@ class NoteModel:
         cur.execute("SELECT name FROM categories ORDER BY name ASC")
         return [row["name"] for row in cur.fetchall()]
 
-    # --- Notes methods ---
+    ### NOTES METHODS ###
     def add_note(self, category_name, title, content, image_path=None, tags=None):
         note_id = str(uuid.uuid4())
         color = random.choice(PASTEL_COLORS)
@@ -198,7 +219,7 @@ class NoteModel:
         self.conn.commit()
         return True
 
-    # --- Contacts methods ---
+    ### CONTACTS METHODS ###
     def add_contact(self, category_name, name, phone=None, website=None, email=None):
         contact_id = str(uuid.uuid4())
         now = datetime.now().isoformat()
@@ -268,7 +289,7 @@ class NoteModel:
         self.conn.commit()
         return True
 
-    # --- References methods ---
+    ### REFERENCE WIDGET METHODS ###
     def add_reference(self, title, url):
         ref_id = str(uuid.uuid4())
         now = datetime.now().isoformat()
@@ -313,7 +334,7 @@ class NoteModel:
         cur.execute("SELECT * FROM reference_links WHERE id=?", (ref_id,))
         return cur.fetchone()
 
-    # --- Misc / Utilities ---
+    ### MISCELLANEOUS METHODS ###
     def search_notes(self, term):
         return self.get_notes(search=term)
 
