@@ -374,14 +374,48 @@ class NoteModel:
         # Export notes
         for note in self.get_notes():
             note_dict = dict(note)
+
+            # Always resolve through real image directory
             img_path = note_dict.get("image_path")
-            if img_path:
-                src = Path(img_path)
-                if src.is_file():
-                    dst = images_dir / f"{uuid.uuid4()}_{src.name}"
-                    shutil.copy(src, dst)
-                    note_dict["image_path"] = f"images/{dst.name}"  # relative path
+
+            if not img_path:
+                # No image → just add note and continue
+                export_data["notes"].append(note_dict)
+                continue
+
+            # Normalize path
+            src = Path(img_path)
+
+            # If broken/relative path → try sb_data/images
+            if not src.is_file():
+                candidate = Path("sb_data/images") / src.name
+                if candidate.is_file():
+                    src = candidate
+                else:
+                    print(f"[EXPORT WARNING] Image not found: {img_path}")
+                    # keep note but remove image reference
+                    note_dict.pop("image_path", None)
+                    export_data["notes"].append(note_dict)
+                    continue
+
+            # Copy file to temp/images
+            dst_name = f"{uuid.uuid4()}_{src.name}"
+            dst = images_dir / dst_name
+            shutil.copy(src, dst)
+
+            # Update note's path relative to ZIP
+            note_dict["image_path"] = f"images/{dst_name}"
+
             export_data["notes"].append(note_dict)
+
+        # Copy image folder
+        sb_images = Path("sb_data/images")
+        if sb_images.is_dir():
+            for file in sb_images.glob("*.*"):
+                # Avoid name collisions: only copy if filename not already used
+                dst = images_dir / file.name
+                if not dst.exists():
+                    shutil.copy(file, dst)
 
         # Export contacts
         for contact in self.get_contacts():
@@ -400,6 +434,7 @@ class NoteModel:
         with ZipFile(zip_path, "w", ZIP_DEFLATED) as zipf:
             # Add JSON file
             zipf.write(json_path, arcname="notes_export.json")
+
             # Add images
             for img_file in images_dir.glob("*.*"):
                 zipf.write(img_file, arcname=f"images/{img_file.name}")
@@ -419,6 +454,17 @@ class NoteModel:
         with ZipFile(zip_path, "r") as zipf:
             zipf.extractall(import_dir)
 
+        src_images = import_dir / "images"
+        dst_images = Path("sb_data/images")
+        dst_images.mkdir(parents=True, exist_ok=True)
+
+        if src_images.exists():
+            for file in src_images.glob("*.*"):
+                try:
+                    shutil.copy(file, dst_images / file.name)
+                except Exception as e:
+                    print("Failed copying image:", file, e)
+
         # Load JSON
         json_path = import_dir / "notes_export.json"
         with open(json_path, "r", encoding="utf-8") as f:
@@ -430,6 +476,7 @@ class NoteModel:
 
         # Import notes
         for note in data.get("notes", []):
+
             img_path = note.get("image_path")
             if img_path:
                 src = import_dir / img_path
@@ -464,10 +511,17 @@ class NoteModel:
 
         # Import references
         for ref in data.get("references", []):
-            self.add_reference(
-                title=ref["title"],
-                url=ref["url"]
-            )
+            title = ref.get("title")
+            url = ref.get("url")
+
+            if not title or not url:
+                print("Skipping reference: missing title or url →", ref)
+                continue
+
+            try:
+                self.add_reference(title, url)
+            except Exception as e:
+                print("Reference import error:", e)
 
         # Clean up temp folder
         shutil.rmtree(import_dir)
@@ -476,8 +530,9 @@ class NoteModel:
     # DANGER ZONE: DELETE DATABASE FROM FILE MENU
     def delete_all_notes(self):
         cursor = self.conn.cursor()
-        tables = ["notes", "contacts", "reference_links"]
-        for table in tables:
-            cursor.execute(f"DELETE FROM {table}")
+        cursor.execute("DELETE FROM notes")
+        cursor.execute("DELETE FROM contacts")
+        cursor.execute("DELETE FROM reference_links")
+
         self.conn.commit()
 

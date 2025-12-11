@@ -190,6 +190,7 @@ class DashboardView(QWidget):
         self.multi_line_view.repaint()
 
     def refresh_dashboard(self):
+        self.reference_widget.refresh_references()
         self.update_stats(animated=True)
         self.update_graphs()
 

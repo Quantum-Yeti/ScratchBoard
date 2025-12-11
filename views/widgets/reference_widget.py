@@ -56,6 +56,7 @@ class ReferenceWidget(QWidget):
         layout.addLayout(input_layout)
 
         # Initialize the loading of references
+        self.refresh_references()
         self.load_references()
         # Allow reference to open on click
         self.list_widget.itemClicked.connect(open_reference)
@@ -124,3 +125,9 @@ class ReferenceWidget(QWidget):
         if reply == QMessageBox.Yes:
             self.model.delete_reference(ref_id)
             self.load_references()
+
+    def refresh_references(self):
+        self.list_widget.blockSignals(True)
+        self.load_references()
+        self.list_widget.blockSignals(False)
+

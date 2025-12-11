@@ -59,11 +59,14 @@ class MainMenuBar(QMenuBar):
     Initializes the menu bar, applies custom styling, defines all action
     placeholders, and constructs the menus.
     """
-    def __init__(self, parent=None, model: NoteModel | None = None):
+    def __init__(self, parent=None, model: NoteModel | None = None, dashboard=None):
         super().__init__(parent)
 
         # Calls the note model to allow import/export
         self.note_model = model
+
+        # Store the dashboard view for _delete_all_notes
+        self.dashboard = dashboard
 
         # File Menu
         self.import_action = None
@@ -502,6 +505,12 @@ class MainMenuBar(QMenuBar):
             try:
                 self.note_model.delete_all_notes()
                 QMessageBox.information(self, "Scratch Board: Database Deleted", "All data has been deleted.")
+
+                # Forces dashboard refresh
+                if self.dashboard:
+                    self.dashboard.go_to_dashboard()
+                    self.dashboard.refresh_dashboard()
+
             except Exception as e:
                 error_message = f"Failed to delete notes:\n{e}\n\nStack Trace:\n{traceback.format_exc()}"
                 QMessageBox.critical(self, "Error", error_message)

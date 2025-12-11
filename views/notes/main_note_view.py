@@ -178,7 +178,7 @@ class MainView(QWidget):
             # Astronaut icon
             icon_label = QLabel()
             pixmap = QPixmap(resource_path("resources/icons/owl_empty.png"))
-            pixmap = pixmap.scaled(250, 250, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pixmap = pixmap.scaled(240, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             icon_label.setPixmap(pixmap)
             icon_label.setAlignment(Qt.AlignCenter)
 
