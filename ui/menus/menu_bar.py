@@ -506,10 +506,14 @@ class MainMenuBar(QMenuBar):
                 self.note_model.delete_all_notes()
                 QMessageBox.information(self, "Scratch Board: Database Deleted", "All data has been deleted.")
 
-                # Forces dashboard refresh
+                # Forces refresh
                 if self.dashboard:
                     self.dashboard.go_to_dashboard()
-                    self.dashboard.refresh_dashboard()
+                    self.dashboard.refresh_dashboard()  # refresh dashboard, if needed
+
+                # Directly refresh the ReferenceWidget without waiting for dashboard button click
+                if self.dashboard and hasattr(self.dashboard, 'reference_widget'):
+                    self.dashboard.reference_widget.refresh_references()  # Refresh reference widget immediately
 
             except Exception as e:
                 error_message = f"Failed to delete notes:\n{e}\n\nStack Trace:\n{traceback.format_exc()}"
