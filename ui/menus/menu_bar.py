@@ -246,7 +246,7 @@ class MainMenuBar(QMenuBar):
 
         self.protocol_action = QAction("Protocol Chart", self)
         self.protocol_action.setIcon(QIcon(resource_path("resources/icons/server.png")))
-        self.protocol_action.setShortcut("Alt+P")
+        self.protocol_action.setShortcut("Alt+R")
         charts_menu.addAction(self.protocol_action)
 
         self.voip_action = QAction("VoIP Info Chart", self)

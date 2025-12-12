@@ -37,23 +37,67 @@ shortcut_list = [
             },
             {
                 "shortcut": "F5",
-                "action": "Phone"
+                "action": "Email"
             },
             {
                 "shortcut": "F6",
-                "action": "Video"
+                "action": "Phone"
             },
             {
                 "shortcut": "F7",
-                "action": "Streaming"
+                "action": "Video"
             },
             {
                 "shortcut": "F8",
-                "action": "Notes"
+                "action": "Streaming"
             },
             {
                 "shortcut": "F9",
+                "action": "Notes"
+            },
+            {
+                "shortcut": "F10",
                 "action": "Ideas"
+            }
+        ]
+    },
+    {
+        "category": "Charts Menu",
+        "shortcuts":
+        [
+            {   "shortcut": "Ctrl+P",
+                "action": "DOCSIS Signal Chart"
+            },
+            {   "shortcut": "Ctrl+Z",
+                "action": "Fiber Signal Chart"
+            },
+            {
+                "shortcut": "Ctrl+E",
+                "action": "Ethernet Standards Chart"
+            },
+            {
+                "shortcut": "Ctrl+W",
+                "action": "WiFi Standards Chart"
+            },
+            {
+                "shortcut": "Ctrl+S",
+                "action": "Bandwidth Requirements Chart"
+            },
+            {
+                "shortcut": "Alt+R",
+                "action": "Internet Protocol Chart"
+            },
+            {
+                "shortcut": "Ctrl+N",
+                "action": "VoIP Info Chart"
+            },
+            {
+                "shortcut": "Ctrl+G",
+                "action": "Gaming Info Chart"
+            },
+            {
+                "shortcut": "Alt+D",
+                "action": "Storage Info Chart"
             }
         ]
     },
@@ -63,11 +107,11 @@ shortcut_list = [
         [
             {
                 "shortcut": "F11",
-                "action": "Open Scratch Notes"
+                "action": "Open Scratch Pad (sticky notes)"
             },
             {
                 "shortcut": "F12",
-                "action": "Open NotePad"
+                "action": "Open Notepad"
             },
             {
                 "shortcut": "Alt+B",
@@ -80,7 +124,11 @@ shortcut_list = [
             {
                 "shortcut": "Alt+P",
                 "action": "Opens Password Generator"
-            }
+            },
+            {
+                "shortcut": "Alt+C",
+                "action": "Open Calculator"
+            },
         ]
     },
     {
