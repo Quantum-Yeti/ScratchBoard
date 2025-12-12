@@ -6,7 +6,7 @@ from views.widgets.charts_widget import create_stacked_bar_chart, create_multi_l
 from views.widgets.stats_widget import StatsWidget
 from views.widgets.mac_widget import MacVendorView
 from views.widgets.reference_widget import ReferenceWidget
-from views.widgets.task_widget import TaskWidget
+from views.widgets.cal_widget import CalendarDashboardWidget
 from views.notes.main_note_view import MainView
 from views.contacts_view import ContactsView
 from utils.resource_path import resource_path
@@ -107,14 +107,14 @@ class DashboardView(QWidget):
         mac_layout.addWidget(self.mac_vendor_view)
         bottom_layout.addLayout(mac_layout, stretch=1)
 
-        # Task Widget Section
-        self.task_widget = TaskWidget()
-        self.task_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        task_layout = QVBoxLayout()
-        task_layout.setAlignment(Qt.AlignTop)
-        task_layout.addWidget(create_section_title("Daily Tasks", "task_widget"))
-        task_layout.addWidget(self.task_widget)
-        bottom_layout.addLayout(task_layout, stretch=1)
+        # Calendar Widget Section
+        self.cal_widget = CalendarDashboardWidget()
+        self.cal_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        cal_layout = QVBoxLayout()
+        cal_layout.setAlignment(Qt.AlignTop)
+        cal_layout.addWidget(create_section_title("Calendar", "calendar"))
+        cal_layout.addWidget(self.cal_widget)
+        bottom_layout.addLayout(cal_layout, stretch=1)
 
         # Bottom spacing
         bottom_spacing = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
