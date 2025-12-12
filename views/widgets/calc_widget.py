@@ -12,6 +12,14 @@ storage_units = {
     "TB": 1024**4
 }
 
+speed_units = {
+    "bps": 1 / 8,
+    "kbps": 1024 / 8,
+    "mbps": 1024**2 / 8,
+    "gbps": 1024**3 / 8,
+    "tbps": 1024**4 / 8
+}
+
 def convert(value, from_unit, to_unit):
     bytes_value = value * storage_units[from_unit]
     return bytes_value / storage_units[to_unit]
