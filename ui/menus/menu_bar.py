@@ -509,11 +509,15 @@ class MainMenuBar(QMenuBar):
                 # Forces refresh
                 if self.dashboard:
                     self.dashboard.go_to_dashboard()
-                    self.dashboard.refresh_dashboard()  # refresh dashboard, if needed
+                    self.dashboard.refresh_dashboard()  # refresh dashboard
 
                 # Directly refresh the ReferenceWidget without waiting for dashboard button click
                 if self.dashboard and hasattr(self.dashboard, 'reference_widget'):
                     self.dashboard.reference_widget.refresh_references()  # Refresh reference widget immediately
+
+                # Trigger calendar update
+                if hasattr(self.dashboard, 'calendar_widget'):
+                    self.dashboard.calendar_widget.refresh_calendar()
 
             except Exception as e:
                 error_message = f"Failed to delete notes:\n{e}\n\nStack Trace:\n{traceback.format_exc()}"
