@@ -18,12 +18,13 @@ class CalendarDashboardWidget(QWidget):
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 8)
-        layout.setSpacing(12)
+        layout.setSpacing(10)
 
         # Time Label
         self.time_label = QLabel()
         self.time_label.setObjectName("time_label")
         self.time_label.setAlignment(Qt.AlignCenter)
+        self.time_label.setContentsMargins(0, -5, 0, 0)
         layout.addWidget(self.time_label)
 
         # Date Label
