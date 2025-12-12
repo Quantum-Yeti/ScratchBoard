@@ -23,7 +23,7 @@ class SimpleCalcView(QDialog):
     """
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Scratch Board: Simple Calculator/Outage Calculator")
+        self.setWindowTitle("Scratch Board: Simple Calculator/Storage Calculator")
         self.setFixedSize(400, 500)
 
         self.current_expression = ""
