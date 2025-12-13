@@ -6,7 +6,7 @@ from views.widgets.charts_widget import create_stacked_bar_chart, create_multi_l
 from views.widgets.stats_widget import StatsWidget
 from views.widgets.mac_widget import MacVendorView
 from views.widgets.reference_widget import ReferenceWidget
-from views.widgets.cal_widget import CalendarDashboardWidget
+from views.widgets.cal_stat_widget import CalStatWidget
 from views.notes.main_note_view import MainView
 from views.contacts_view import ContactsView
 from utils.resource_path import resource_path
@@ -94,7 +94,7 @@ class DashboardView(QWidget):
         ref_layout = QVBoxLayout()
         self.reference_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         ref_layout.setAlignment(Qt.AlignTop)
-        ref_layout.addWidget(create_section_title("Quick Links/Reference", "reference"))
+        ref_layout.addWidget(create_section_title("Custom Links", "reference"))
         ref_layout.addWidget(self.reference_widget)
         bottom_layout.addLayout(ref_layout, stretch=1)
 
@@ -108,11 +108,11 @@ class DashboardView(QWidget):
         bottom_layout.addLayout(mac_layout, stretch=1)
 
         # Calendar Widget Section
-        self.cal_widget = CalendarDashboardWidget()
+        self.cal_widget = CalStatWidget()
         self.cal_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         cal_layout = QVBoxLayout()
         cal_layout.setAlignment(Qt.AlignTop)
-        cal_layout.addWidget(create_section_title("Calendar", "calendar"))
+        cal_layout.addWidget(create_section_title("Cal + CPU Stats", "calendar"))
         cal_layout.addWidget(self.cal_widget)
         bottom_layout.addLayout(cal_layout, stretch=1)
 
