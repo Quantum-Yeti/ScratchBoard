@@ -67,7 +67,7 @@ class ReferenceWidget(QWidget):
 
         if not references:
             # Add a dummy, disabled item as placeholder
-            placeholder_item = QListWidgetItem("Add a reference/quick link...")
+            placeholder_item = QListWidgetItem("Add a custom link for quick access.\nRight-click to delete a link.")
             placeholder_item.setFlags(Qt.NoItemFlags)  # makes it unselectable
             placeholder_item.setForeground(QtCore.Qt.gray)
             self.list_widget.addItem(placeholder_item)

@@ -103,7 +103,7 @@ class DashboardView(QWidget):
         self.mac_vendor_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         mac_layout = QVBoxLayout()
         mac_layout.setAlignment(Qt.AlignTop)
-        mac_layout.addWidget(create_section_title("MAC Lookup", "robot"))
+        mac_layout.addWidget(create_section_title("MAC Vendor Query", "robot"))
         mac_layout.addWidget(self.mac_vendor_view)
         bottom_layout.addLayout(mac_layout, stretch=1)
 

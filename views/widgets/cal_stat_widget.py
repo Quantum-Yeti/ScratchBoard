@@ -49,6 +49,7 @@ class CalStatWidget(QWidget):
         # CPU Bar
         cpu_frame = QVBoxLayout()
         cpu_label = QLabel("CPU", self)
+        cpu_label.setStyleSheet("font-weight: bold; color: #B8F1B0;")
         cpu_label.setAlignment(Qt.AlignCenter)
         self.cpu_bar = QProgressBar(self)
         self.cpu_bar.setFormat("%p%")
@@ -59,6 +60,7 @@ class CalStatWidget(QWidget):
         # RAM Bar
         ram_frame = QVBoxLayout()
         ram_label = QLabel("RAM", self)
+        ram_label.setStyleSheet("font-weight: bold; color: #B8F1B0;")
         ram_label.setAlignment(Qt.AlignCenter)
         self.ram_bar = QProgressBar(self)
         self.ram_bar.setFormat("%p%")
@@ -114,7 +116,7 @@ class CalStatWidget(QWidget):
         # Timers
         self.timer_processes = QTimer(self)
         self.timer_processes.timeout.connect(self.update_processes)
-        self.timer_processes.start(3000)
+        self.timer_processes.start(6000)
 
         self.timer_clock = QTimer(self)
         self.timer_clock.timeout.connect(self.update_time_and_stats)
