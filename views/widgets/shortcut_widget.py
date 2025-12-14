@@ -38,7 +38,7 @@ class ShortcutGuide(QDialog):
         font.setBold(True)
         title_label.setFont(font)
         title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        title_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
@@ -100,7 +100,7 @@ class ShortcutGuide(QDialog):
             category_item = QTableWidgetItem(cat["category"])
             category_item.setFlags(Qt.ItemIsEnabled)
             category_item.setTextAlignment(Qt.AlignCenter)
-            category_item.setFont(QFont("Segoe UI", 12, QFont.Bold))
+            category_item.setFont(QFont("Segoe UI", 12, QFont.Weight.Bold))
 
             # Span across both columns
             self.table.setItem(row, 0, category_item)

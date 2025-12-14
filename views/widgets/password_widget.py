@@ -38,7 +38,7 @@ class PassGenWidget(QDialog):
         # Setup of random char option
         char_layout = QVBoxLayout()
         self.char_widget = QWidget()
-        self.char_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.char_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.char_widget.setContentsMargins(0, 0, 0, 0)
         self.char_widget.setMinimumHeight(0)
         self.char_widget.setLayout(char_layout)
@@ -69,7 +69,7 @@ class PassGenWidget(QDialog):
 
         # Setup of random words option
         self.words = QWidget()
-        self.words.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.words.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.words.setMinimumHeight(0)
         self.words.setContentsMargins(0, 0, 0, 0)
         word_layout = QVBoxLayout()
@@ -114,7 +114,7 @@ class PassGenWidget(QDialog):
 
         # Strength + entropy
         self.strength_label = QLabel("Strength: ---")
-        self.strength_label.setAlignment(Qt.AlignCenter)
+        self.strength_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.strength_label)
 
         self.entropy_bar = QProgressBar()
@@ -123,7 +123,7 @@ class PassGenWidget(QDialog):
 
         # Setup generate and copy buttons
         btn_layout = QHBoxLayout()
-        btn_layout.setAlignment(Qt.AlignCenter)
+        btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.generate_btn = QPushButton("Generate")
         self.generate_btn.setIcon(QIcon(resource_path("resources/icons/polybase.png")))

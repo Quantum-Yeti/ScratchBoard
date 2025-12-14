@@ -68,7 +68,7 @@ class StatsWidget(QWidget):
                 anim.setDuration(700)
                 anim.setStartValue(card.value)
                 anim.setEndValue(val)
-                anim.setEasingCurve(QEasingCurve.OutCubic)
+                anim.setEasingCurve(QEasingCurve.Type.OutCubic)
                 anim.start()
                 card._anim = anim
             else:

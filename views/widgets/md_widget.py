@@ -63,7 +63,7 @@ class MarkdownGuideWidget(QWidget):
         table.setColumnCount(3)
         table.setHorizontalHeaderLabels(["Feature", "Markdown Syntax", "Rendered"])
         table.verticalHeader().setVisible(False)
-        table.setEditTriggers(QTableWidget.NoEditTriggers)
+        table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         table.setWordWrap(True)
         table.setColumnWidth(0, 150)
         table.setColumnWidth(1, 300)

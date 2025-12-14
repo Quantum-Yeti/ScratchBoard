@@ -2,7 +2,7 @@ from PySide6 import QtCore
 from PySide6.QtCore import QUrl, QSize
 from PySide6.QtGui import QDesktopServices, Qt, QAction, QIcon
 from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLayout, QLineEdit, QPushButton, QWidget, \
-    QMenu, QMessageBox, QLabel, QSizePolicy
+    QMenu, QMessageBox, QSizePolicy
 
 from ui.themes.context_menu_theme import menu_style
 from ui.themes.reference_list_style import ref_list_style
@@ -11,7 +11,7 @@ from utils.resource_path import resource_path
 
 
 def open_reference(item):
-    QDesktopServices.openUrl(QUrl(item.data(Qt.UserRole)))
+    QDesktopServices.openUrl(QUrl(item.data(Qt.ItemDataRole.UserRole)))
 
 
 class ReferenceWidget(QWidget):
@@ -27,11 +27,11 @@ class ReferenceWidget(QWidget):
 
         self.list_widget = QListWidget()
         self.list_widget.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
-        self.list_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.list_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.list_widget.setStyleSheet(ref_list_style)
         self.list_widget.setViewportMargins(0, 0, 0, 0)
         self.list_widget.viewport().setAutoFillBackground(False)
-        self.list_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.list_widget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_widget.customContextMenuRequested.connect(self.show_context_menu)
 
         layout.addWidget(self.list_widget)
@@ -68,15 +68,15 @@ class ReferenceWidget(QWidget):
         if not references:
             # Add a dummy, disabled item as placeholder
             placeholder_item = QListWidgetItem("Add a custom link for quick access.\nRight-click to delete a link.")
-            placeholder_item.setFlags(Qt.NoItemFlags)  # makes it unselectable
+            placeholder_item.setFlags(Qt.ItemFlag.NoItemFlags)  # makes it unselectable
             placeholder_item.setForeground(QtCore.Qt.gray)
             self.list_widget.addItem(placeholder_item)
             return
 
         for ref in references:
             item = QListWidgetItem(f"> {ref['title']}")
-            item.setData(Qt.UserRole, ref["url"])
-            item.setData(Qt.UserRole + 1, ref["id"])  # store the database ID for deletion
+            item.setData(Qt.ItemDataRole.UserRole, ref["url"])
+            item.setData(Qt.ItemDataRole.UserRole + 1, ref["id"])  # store the database ID for deletion
 
             # Adds extra vertical spacing
             item.setSizeHint(item.sizeHint() + QtCore.QSize(0, 3))
@@ -89,10 +89,10 @@ class ReferenceWidget(QWidget):
 
         if not title or not url:
             error = QMessageBox(self)
-            error.setIcon(QMessageBox.Warning)
+            error.setIcon(QMessageBox.Icon.Warning)
             error.setWindowTitle("Error")
             error.setText("Title and URL are required.")
-            error.setStandardButtons(QMessageBox.Ok)
+            error.setStandardButtons(QMessageBox.StandardButton.Ok)
             error.exec()
             return
 
@@ -115,14 +115,14 @@ class ReferenceWidget(QWidget):
             menu.exec(self.list_widget.mapToGlobal(pos))
 
     def delete_reference(self, item):
-        ref_id = item.data(Qt.UserRole + 1)  # store the ref_id separately when loading
+        ref_id = item.data(Qt.ItemDataRole.UserRole + 1)  # store the ref_id separately when loading
         reply = QMessageBox.question(
             self,
             "Delete Reference",
             f"Delete '{item.text()}'?",
-            QMessageBox.Yes | QMessageBox.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
-        if reply == QMessageBox.Yes:
+        if reply == QMessageBox.StandardButton.Yes:
             self.model.delete_reference(ref_id)
             self.load_references()
 
