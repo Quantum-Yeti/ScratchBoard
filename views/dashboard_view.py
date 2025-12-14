@@ -1,4 +1,4 @@
-from PySide6.QtCharts import QChartView, QChart
+from PySide6.QtCharts import QChartView
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
@@ -52,16 +52,16 @@ class DashboardView(QWidget):
 
         self.stacked_bar_chart = create_stacked_bar_chart(self.model)
         self.stacked_bar_view = QChartView(self.stacked_bar_chart)
-        self.stacked_bar_view.setRenderHint(QPainter.Antialiasing)
+        self.stacked_bar_view.setRenderHint(QPainter.RenderHint.Antialiasing)
         charts_layout.addWidget(self.stacked_bar_view, stretch=1)
 
         self.multi_line_chart = create_multi_line_chart(self.model)
         self.multi_line_view = QChartView(self.multi_line_chart)
-        self.multi_line_view.setRenderHint(QPainter.Antialiasing)
+        self.multi_line_view.setRenderHint(QPainter.RenderHint.Antialiasing)
         charts_layout.addWidget(self.multi_line_view, stretch=1)
 
-        self.stacked_bar_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.multi_line_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.stacked_bar_view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.multi_line_view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Bottom Widgets
         bottom_layout = QHBoxLayout()
@@ -92,7 +92,7 @@ class DashboardView(QWidget):
         # Reference Section
         self.reference_widget = ReferenceWidget(model)
         ref_layout = QVBoxLayout()
-        self.reference_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.reference_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         ref_layout.setAlignment(Qt.AlignTop)
         ref_layout.addWidget(create_section_title("Custom Links", "reference"))
         ref_layout.addWidget(self.reference_widget)
@@ -100,7 +100,7 @@ class DashboardView(QWidget):
 
         # MAC Vendor Section
         self.mac_vendor_view = MacVendorView()
-        self.mac_vendor_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.mac_vendor_view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         mac_layout = QVBoxLayout()
         mac_layout.setAlignment(Qt.AlignTop)
         mac_layout.addWidget(create_section_title("MAC Vendor Query", "robot"))
@@ -109,7 +109,7 @@ class DashboardView(QWidget):
 
         # Calendar Widget Section
         self.cal_widget = CalStatWidget()
-        self.cal_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.cal_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         cal_layout = QVBoxLayout()
         cal_layout.setAlignment(Qt.AlignTop)
         cal_layout.addWidget(create_section_title("Cal + CPU Stats", "calendar"))
@@ -117,7 +117,7 @@ class DashboardView(QWidget):
         bottom_layout.addLayout(cal_layout, stretch=1)
 
         # Bottom spacing
-        bottom_spacing = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        bottom_spacing = QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         content_layout.addLayout(bottom_layout)
         content_layout.addItem(bottom_spacing)
 

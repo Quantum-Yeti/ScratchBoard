@@ -1,10 +1,9 @@
 import datetime
-import calendar
 import psutil
 
 from PySide6.QtCore import QTimer, Qt, QObject, Slot, Signal, QThread
 from PySide6.QtWidgets import (
-    QWidget, QLabel, QVBoxLayout, QProgressBar, QFrame, QGridLayout, QHBoxLayout
+    QWidget, QLabel, QVBoxLayout, QProgressBar, QFrame, QHBoxLayout, QDialog, QTextEdit
 )
 
 from ui.themes.cal_stat_theme import cal_stat_style
@@ -13,6 +12,9 @@ from ui.themes.cal_stat_theme import cal_stat_style
 class ProcessWorker(QObject):
     stats_arm = Signal(int, int)
     process_arm = Signal(list)
+    disk_arm = Signal(str)
+    net_arm = Signal(str)
+    users_arm = Signal(str)
 
     @Slot()
     def get_stats(self):
@@ -47,6 +49,22 @@ class ProcessWorker(QObject):
         processes.sort(key=lambda p: p[1], reverse=True)
         self.process_arm.emit(processes[:5])
 
+
+# --- Dialog for Live Stats ---
+class StatsDialog(QDialog):
+    def __init__(self, title, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.resize(400, 300)
+        layout = QVBoxLayout(self)
+        self.text = QTextEdit(self)
+        self.text.setReadOnly(True)
+        layout.addWidget(self.text)
+
+    @Slot(str)
+    def update_text(self, content):
+        self.text.setPlainText(content)
+
 class CalStatWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -74,13 +92,13 @@ class CalStatWidget(QWidget):
 
         # CPU + RAM Section
         stats_frame = QFrame(self)
-        stats_frame.setFrameShape(QFrame.NoFrame)
+        stats_frame.setFrameShape(QFrame.Shape.NoFrame)
 
         stats_layout = QVBoxLayout(stats_frame)
         stats_layout.setContentsMargins(0, 0, 0, 0)
         stats_layout.setSpacing(6)
 
-        # -------- CPU Row --------
+        # CPU Row
         cpu_row = QHBoxLayout()
         cpu_row.setContentsMargins(0, 0, 0, 0)
         cpu_row.setSpacing(8)
@@ -96,7 +114,7 @@ class CalStatWidget(QWidget):
         cpu_row.addWidget(cpu_label)
         cpu_row.addWidget(self.cpu_bar, 1)
 
-        # -------- RAM Row --------
+        # RAM Row
         ram_row = QHBoxLayout()
         ram_row.setContentsMargins(0, 0, 0, 0)
         ram_row.setSpacing(8)
