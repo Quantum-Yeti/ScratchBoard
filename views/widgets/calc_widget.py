@@ -68,7 +68,7 @@ class SimpleCalcView(QDialog):
         self.mode_button.setIconSize(QSize(32, 32))
         self.mode_button.setStyleSheet("text-align: center;")
         self.mode_button.setCheckable(True)
-        self.mode_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.mode_button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.mode_button.setFixedHeight(50)
         self.mode_button.toggled.connect(self._toggle_converter_mode)
         grid.addWidget(self.mode_button, 0, 0, 1, 4)
@@ -85,7 +85,7 @@ class SimpleCalcView(QDialog):
         for row, row_buttons in enumerate(buttons, start=1):
             for col, text in enumerate(row_buttons):
                 button = QPushButton(text)
-                button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
                 button.setStyleSheet("font-size: 20px; text-align: center;")
                 button.clicked.connect(lambda checked, b=text: self._on_btn_clicked(b))
 

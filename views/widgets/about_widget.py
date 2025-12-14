@@ -88,7 +88,7 @@ class AboutWidget(QDialog):
         self.update_btn.setToolTip("Check for Updates")
         self.update_btn.setIcon(QIcon(resource_path("resources/icons/update.png")))
 
-        # Connect button to Github releases
+        # Connect button to GitHub releases
         self.update_btn.clicked.connect(lambda: QDesktopServices.openUrl(
             QUrl(f"https://github.com/Quantum-Yeti/ScratchBoard/releases/")
         ))

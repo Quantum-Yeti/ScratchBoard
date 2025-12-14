@@ -245,6 +245,9 @@ class MainView(QWidget):
             for row, note in enumerate(notes):
                 card = NoteCard(note, on_click)
 
+                # Connecting right-click on image for image dialog
+                card.imgRightClicked.connect(self._open_image_popup)
+
                 # Forcing card to list row
                 card.setMinimumHeight(0)
                 card.setMaximumWidth(16777215)
