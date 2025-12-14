@@ -309,7 +309,7 @@ class MainMenuBar(QMenuBar):
         self.addMenu(help_menu)
 
         self.shortcut_action = QAction("Keyboard Shortcuts", self)
-        self.shortcut_action.setIcon(QIcon(resource_path("resources/icons/keyboard.png")))
+        self.shortcut_action.setIcon(QIcon(resource_path("resources/icons/keyboard_alt_white.png")))
         self.shortcut_action.setShortcut("Alt+K")
         help_menu.addAction(self.shortcut_action)
 
