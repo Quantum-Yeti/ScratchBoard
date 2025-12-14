@@ -49,7 +49,6 @@ class ProcessWorker(QObject):
         processes.sort(key=lambda p: p[1], reverse=True)
         self.process_arm.emit(processes[:5])
 
-
 # --- Dialog for Live Stats ---
 class StatsDialog(QDialog):
     def __init__(self, title, parent=None):
@@ -137,7 +136,7 @@ class CalStatWidget(QWidget):
         # Add stats frame to main layout
         layout.addWidget(stats_frame)
 
-        # Process box
+        # Process section
         process_frame = QFrame(self)
         process_layout = QVBoxLayout(process_frame)
         process_layout.setSpacing(0)
@@ -167,19 +166,27 @@ class CalStatWidget(QWidget):
             self.process_rows.append((name_lbl, cpu_lbl))
             process_layout.addWidget(row)
 
+        # Add the frame for the process box
         layout.addWidget(process_frame)
+
+        self.users_label = QLabel(self)
+        self.users_label.setStyleSheet("font-weight: bold; color: #ADFF2F;")
+        self.users_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.users_label)
 
         # Set up thread
         self.psutil_thread = QThread(self)
         self.psutil_worker = ProcessWorker()
         self.psutil_worker.moveToThread(self.psutil_thread)
 
+        # Connect to thread signals
         self.psutil_worker.stats_arm.connect(self.on_stats_ready)
         self.psutil_worker.process_arm.connect(self.on_processes_ready)
 
+        # Start thread
         self.psutil_thread.start()
 
-        # Timers
+        # Thread Timers
         self.timer_clock = QTimer(self)
         self.timer_clock.timeout.connect(self.update_time)
         self.timer_clock.timeout.connect(self.psutil_worker.get_stats)
@@ -189,7 +196,7 @@ class CalStatWidget(QWidget):
         self.timer_processes.timeout.connect(self.psutil_worker.get_process)
         self.timer_processes.start(6000)
 
-        # Initial update
+        # Call time update
         self.update_time()
 
     # UI Slots for Thread
