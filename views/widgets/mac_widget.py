@@ -31,7 +31,7 @@ class MacVendorView(QWidget):
 
         # Console-style output area
         self.console_output = QTextEdit()
-        self.console_output.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.console_output.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.console_output.setPlaceholderText("Console output area.")
         self.console_output.setReadOnly(True)
         self.console_output.setMinimumHeight(0)

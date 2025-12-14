@@ -1,11 +1,19 @@
 from PySide6.QtGui import QIcon, QCursor
-from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QStyle, \
-    QApplication, QFrame
+from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QApplication, QFrame
 from helpers.modules.modem_log_parser import ModemLogParser
 from PySide6.QtCore import Qt, QSize
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
+
+
+def _make_divider():
+    divider = QFrame()
+    divider.setFrameShape(QFrame.Shape.HLine)
+    divider.setFrameShadow(QFrame.Shadow.Sunken)
+    divider.setStyleSheet("color: #aaa;")
+    return divider
+
 
 class ModemLogParserView(QDialog):
     """
@@ -65,12 +73,12 @@ class ModemLogParserView(QDialog):
         layout.addLayout(button_row)
 
         # Output label
-        self.summary_title = QLabel("Summary")
+        self.summary_title = QLabel("Summary:")
         self.summary_title.setStyleSheet("font-size: 16px; font-weight: bold;")
         layout.addWidget(self.summary_title)
 
         # Output summary
-        self.summary_label = QLabel()
+        self.summary_label = QLabel("Waiting on input...")
         self.summary_label.setAlignment(Qt.AlignLeft)
         self.summary_label.setStyleSheet("color: #00A3E0;")
         self.summary_label.setWordWrap(True)
@@ -166,9 +174,3 @@ class ModemLogParserView(QDialog):
         self.output.clear()
         self.summary_label.clear()
 
-    def _make_divider(self):
-        divider = QFrame()
-        divider.setFrameShape(QFrame.HLine)
-        divider.setFrameShadow(QFrame.Sunken)
-        divider.setStyleSheet("color: #aaa;")
-        return divider
