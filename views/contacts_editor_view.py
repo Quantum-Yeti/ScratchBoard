@@ -43,7 +43,7 @@ class ContactEditorPanel(QDialog):
         # Top image
         self.image = QLabel()
         self.image.setPixmap(QPixmap(resource_path("resources/icons/astronaut_wave.png")))
-        self.image.setAlignment(Qt.AlignCenter)
+        self.image.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.image)
 
         # Name input
