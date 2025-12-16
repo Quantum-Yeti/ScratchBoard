@@ -93,12 +93,17 @@ class CalStatWidget(QWidget):
         time_layout.addWidget(self.date_label)
         sys_layout.addLayout(time_layout)
 
+        self.loading_label = QLabel("Loading system information...")
+        self.loading_label.setStyleSheet("color: #AAAAAA;")
+        self.loading_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        sys_layout.addWidget(self.loading_label)
+
         self.system_rows = []
         for _ in range(6):
             row = QHBoxLayout()
-            label = QLabel("Loading...")
+            label = QLabel("")
             label.setStyleSheet("color: #AAAAAA;")
-            value = QLabel("Calculating...")
+            value = QLabel("")
             value.setAlignment(Qt.AlignRight)
             value.setStyleSheet("color: #FFFFFF;")
 
@@ -133,12 +138,15 @@ class CalStatWidget(QWidget):
     # Thread slots
     @Slot(list)
     def on_system(self, info):
+        if info:
+            self.loading_label.hide()
+
         for i, (lbl, val) in enumerate(self.system_rows):
             if i < len(info):
                 lbl.setText(info[i][0])
                 val.setText(info[i][1])
             else:
-                lbl.setText("Calculating...")
+                lbl.setText("")
                 val.setText("")
 
     @Slot(str, str)
