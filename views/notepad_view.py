@@ -2,7 +2,7 @@ import re
 
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QFileDialog,
-    QLabel, QLineEdit, QComboBox, QSpinBox, QTabWidget, QApplication
+    QLabel, QLineEdit, QComboBox, QSpinBox, QApplication
 )
 from PySide6.QtGui import QFont, QIcon, QTextCursor, QTextCharFormat, QCursor
 from PySide6.QtCore import Qt
@@ -15,7 +15,7 @@ class NotepadDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Scratch Board: Notepad")
-        #self.setModal(True)
+        #self.setModal(False)
         self.resize(800, 600)
 
         # Allow to minimize and close
@@ -164,7 +164,7 @@ class NotepadDialog(QDialog):
             found = document.find(query, cursor)
             if found.isNull():
                 # Not found, start from top
-                cursor.movePosition(QTextCursor.Start)
+                cursor.movePosition(QTextCursor.MoveOperation.Start)
                 found = document.find(query, cursor)
             if not found.isNull():
                 self.text_edit.setTextCursor(found)
@@ -195,3 +195,6 @@ class NotepadDialog(QDialog):
         chars = len(text.replace(" ", "").replace("\n", ""))
 
         self.count_label.setText(f"Words: {words} - Chars: {chars}")
+
+
+
