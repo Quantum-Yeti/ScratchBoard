@@ -21,6 +21,8 @@ from views.widgets.log_widget import ModemLogParserView
 from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
 from views.info_widgets.wifi_standards_widget import WifiStandardsReference
+from views.widgets.mac_pop_widget import MacVendorPopup
+from views.widgets.mac_widget import MacVendorView
 from views.widgets.md_widget import MarkdownGuideWidget
 from views.widgets.password_widget import PassGenWidget
 from views.widgets.shortcut_widget import ShortcutGuide
@@ -82,6 +84,7 @@ class MainMenuBar(QMenuBar):
         self.modem_action = None
         self.pwd_action = None
         self.calc_action = None
+        self.mac_action = None
 
         # Views Menu
         self.contact_action = None
@@ -301,6 +304,11 @@ class MainMenuBar(QMenuBar):
         self.calc_action.setShortcut("Alt+C")
         tools_menu.addAction(self.calc_action)
 
+        self.mac_action = QAction("MAC Vendor Query", self)
+        self.mac_action.setIcon(QIcon(resource_path("resources/icons/robot_white.png")))
+        self.mac_action.setShortcut("Alt+T")
+        tools_menu.addAction(self.mac_action)
+
         _connect_hover_tooltips(tools_menu)
 
     # Build the Help menu
@@ -376,6 +384,7 @@ class MainMenuBar(QMenuBar):
         self.modem_action.triggered.connect(self._open_modem_parser)
         self.pwd_action.triggered.connect(self._open_pw_gen)
         self.calc_action.triggered.connect(self._open_calc)
+        self.mac_action.triggered.connect(self._open_mac)
 
         # Wire the help menu
         self.shortcut_action.triggered.connect(self._open_shortcuts)
@@ -443,6 +452,10 @@ class MainMenuBar(QMenuBar):
     def _open_calc(self):
         calc = SimpleCalcView(self.parent())
         calc.exec()
+
+    def _open_mac(self):
+        mac = MacVendorPopup(self.parent())
+        mac.show()
 
     def _export_notes(self):
         if not self.note_model:
