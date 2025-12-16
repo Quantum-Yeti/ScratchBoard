@@ -66,6 +66,7 @@ class CalStatWidget(QWidget):
         self.setObjectName("Cal + CPU Stats")
         self.setStyleSheet(cal_stat_style)
 
+        # Main vertical layout
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(10)
@@ -77,22 +78,26 @@ class CalStatWidget(QWidget):
         sys_layout = QVBoxLayout(sys_frame)
         sys_layout.setSpacing(4)
 
-        # Time and Date
+        # Time and Date Horizontal Layout
         time_layout = QHBoxLayout()
         time_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
+        # Time label
         self.time_label = QLabel()
         self.time_label.setObjectName("time_label")
         self.time_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
+        # Date label
         self.date_label = QLabel()
         self.date_label.setObjectName("date_label")
         self.date_label.setAlignment(Qt.AlignmentFlag.AlignRight)
 
+        # Add labels and layout
         time_layout.addWidget(self.time_label)
         time_layout.addWidget(self.date_label)
         sys_layout.addLayout(time_layout)
 
+        # System Info Rows
         self.loading_label = QLabel("Loading system information...")
         self.loading_label.setStyleSheet("color: #AAAAAA;")
         self.loading_label.setAlignment(Qt.AlignmentFlag.AlignCenter)

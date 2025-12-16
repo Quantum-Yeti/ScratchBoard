@@ -1,13 +1,14 @@
 import os
 import traceback
 
-from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap
+from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap, QShortcut, QKeySequence
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
 from helpers.modules.sync_helper import sync_db
 from models.note_model import NoteModel
 from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path
+from views.games.asteroid import AsteroidsWidget
 from views.info_widgets.fiber_widget import FiberReferenceDialog
 from views.info_widgets.gaming_widget import GamingReference
 from views.info_widgets.protocol_widget import InternetProtocolsTimeline
@@ -62,6 +63,10 @@ class MainMenuBar(QMenuBar):
     """
     def __init__(self, parent=None, model: NoteModel | None = None, dashboard=None):
         super().__init__(parent)
+
+        # Hidden attributes
+        self._asteroids_window: AsteroidsWidget | None = None
+        self._asteroids_shortcut = QShortcut(QKeySequence("Ctrl+Shift+A"), self)
 
         # Calls the note model to allow import/export
         self.note_model = model
@@ -390,6 +395,9 @@ class MainMenuBar(QMenuBar):
         self.md_action.triggered.connect(self._open_md_guide)
         self.about_action.triggered.connect(lambda: AboutWidget().exec())
 
+        # Hidden easter egg games
+        self._asteroids_shortcut.activated.connect(self._open_asteroids_widget)
+
     # Internal Helpers: opens non-category menu items
     def _open_notepad(self):
         ntp = NotepadDialog(self.parent())
@@ -455,6 +463,12 @@ class MainMenuBar(QMenuBar):
     def _open_mac(self):
         mac = MacVendorPopup(self.parent())
         mac.show()
+
+    def _open_asteroids_widget(self):
+        if getattr(self, '_asteroids_window', None) is None:
+            self._asteroids_window = AsteroidsWidget()
+        self._asteroids_window.show()
+        self._asteroids_window.raise_()
 
     def _export_notes(self):
         if not self.note_model:
