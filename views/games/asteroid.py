@@ -6,7 +6,7 @@ from PySide6.QtGui import QPainter, QPen, QColor, QIcon
 
 from utils.resource_path import resource_path
 
-# ---------- Physics tuning ----------
+# Physics Enums
 ROT_SPEED = 0.045
 THRUST = 0.09
 DRAG = 0.985
