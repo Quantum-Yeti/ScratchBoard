@@ -494,14 +494,14 @@ class MainMenuBar(QMenuBar):
             "This action will permanently delete the entire database.\n"
         )
         confirm.setIconPixmap(skull_icon)
-        confirm.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        confirm.setDefaultButton(QMessageBox.No)
+        confirm.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        confirm.setDefaultButton(QMessageBox.StandardButton.No)
         confirm.setDetailedText("This action is permanent. Please back up your database before continuing.")
-        confirm.setEscapeButton(QMessageBox.No)  # ESC cancels
+        confirm.setEscapeButton(QMessageBox.StandardButton.No)  # ESC cancels
 
         response = confirm.exec()
 
-        if response == QMessageBox.Yes:
+        if response == QMessageBox.StandardButton.Yes:
             try:
                 self.note_model.delete_all_notes()
                 QMessageBox.information(self, "Scratch Board: Database Deleted", "All data has been deleted.")

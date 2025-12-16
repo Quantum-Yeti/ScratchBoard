@@ -25,7 +25,9 @@ QLabel#time_label {
 
 QLabel#date_label {
     font-family: Segoe UI, Consolas, monospace;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 6px;
 }
 
 /* Progress bars */

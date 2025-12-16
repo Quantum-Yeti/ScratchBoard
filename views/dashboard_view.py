@@ -94,7 +94,7 @@ class DashboardView(QWidget):
         ref_layout = QVBoxLayout()
         self.reference_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         ref_layout.setAlignment(Qt.AlignTop)
-        ref_layout.addWidget(create_section_title("Custom Links", "reference"))
+        ref_layout.addWidget(create_section_title("Custom Links", "bolt"))
         ref_layout.addWidget(self.reference_widget)
         bottom_layout.addLayout(ref_layout, stretch=1)
 
@@ -112,7 +112,7 @@ class DashboardView(QWidget):
         self.cal_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         cal_layout = QVBoxLayout()
         cal_layout.setAlignment(Qt.AlignTop)
-        cal_layout.addWidget(create_section_title("Cal + CPU Stats", "calendar"))
+        cal_layout.addWidget(create_section_title("Sys Info", "dev_board"))
         cal_layout.addWidget(self.cal_widget)
         bottom_layout.addLayout(cal_layout, stretch=1)
 

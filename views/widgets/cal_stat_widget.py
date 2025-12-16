@@ -1,229 +1,155 @@
 import datetime
+import time
+import platform
 import psutil
 
 from PySide6.QtCore import QTimer, Qt, QObject, Slot, Signal, QThread
 from PySide6.QtWidgets import (
-    QWidget, QLabel, QVBoxLayout, QProgressBar, QFrame, QHBoxLayout, QDialog, QTextEdit
+    QWidget, QLabel, QVBoxLayout, QProgressBar,
+    QFrame, QHBoxLayout, QDialog, QTextEdit, QPushButton
 )
 
 from ui.themes.cal_stat_theme import cal_stat_style
 
 
+# Worker Thread
 class ProcessWorker(QObject):
+    """
+    Worker running in a separate thread to collect system statistics.
+    """
     stats_arm = Signal(int, int)
-    process_arm = Signal(list)
-    disk_arm = Signal(str)
+    system_arm = Signal(list)
     net_arm = Signal(str)
-    users_arm = Signal(str)
+    time_arm = Signal(str, str)
 
     @Slot()
-    def get_stats(self):
+    def get_time(self):
+        now = datetime.datetime.now()
+        time_str = now.strftime("%I:%M:%S %p")
+        date_str = now.strftime("%a, %b %d, %Y")
+        self.time_arm.emit(time_str, date_str)
+
+    @Slot()
+    def get_system_info(self):
         try:
-            cpu = int(psutil.cpu_percent())
-            ram = int(psutil.virtual_memory().percent)
+            boot = psutil.boot_time()
+            uptime = int(time.time() - boot)
+            days, rem = divmod(uptime, 86400)
+            hours, rem = divmod(rem, 3600)
+            minutes, _ = divmod(rem, 60)
+
+            net = psutil.net_io_counters()
+            sent = net.bytes_sent / (1024 * 1024)
+            recv = net.bytes_recv / (1024 * 1024)
+
+            info = [
+                ("Computer", platform.node()),
+                ("OS", f"{platform.system()} {platform.release()}"),
+                ("Architecture", platform.architecture()[0]),
+                ("RAM", f"{round(psutil.virtual_memory().total / (1024 ** 3))} GB"),
+                ("Uptime", f"{days}d {hours}h {minutes}m"),
+                ("Network:", f"Sent: {sent:.2f} MB | Received: {recv:.2f} MB"),
+            ]
         except Exception:
-            cpu = 0
-            ram = 0
+            info = []
 
-        self.stats_arm.emit(cpu, ram)
+        self.system_arm.emit(info)
 
-    @Slot()
-    def get_process(self):
-        processes = []
 
-        for proc in psutil.process_iter(attrs=["name", "cpu_percent"]):
-            try:
-                name = proc.info["name"]
-                cpu = int(proc.info["cpu_percent"])
-
-                if not name or not cpu:
-                    continue
-                if "idle" in name.lower():
-                    continue
-
-                processes.append([name, cpu])
-
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
-
-        processes.sort(key=lambda p: p[1], reverse=True)
-        self.process_arm.emit(processes[:5])
-
-# --- Dialog for Live Stats ---
-class StatsDialog(QDialog):
-    def __init__(self, title, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle(title)
-        self.resize(400, 300)
-        layout = QVBoxLayout(self)
-        self.text = QTextEdit(self)
-        self.text.setReadOnly(True)
-        layout.addWidget(self.text)
-
-    @Slot(str)
-    def update_text(self, content):
-        self.text.setPlainText(content)
-
+# Main Widget
 class CalStatWidget(QWidget):
+    """
+    Dashboard widget showing live system statistics.
+    """
     def __init__(self):
         super().__init__()
         self.setObjectName("Cal + CPU Stats")
         self.setStyleSheet(cal_stat_style)
 
-        # Main Vertical Layout
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(10)
 
-        # Time Label
-        self.time_label = QLabel(self)
+        # System Info Box
+        sys_frame = QFrame()
+        sys_frame.setStyleSheet("background-color: #1E1E1E; border-radius: 8px; padding: 2px;")
+
+        sys_layout = QVBoxLayout(sys_frame)
+        sys_layout.setSpacing(4)
+
+        # Time and Date
+        time_layout = QHBoxLayout()
+        time_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        self.time_label = QLabel()
         self.time_label.setObjectName("time_label")
-        self.time_label.setAlignment(Qt.AlignCenter)
-        self.time_label.setContentsMargins(0, -5, 0, 0)
-        layout.addWidget(self.time_label)
+        self.time_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-        # Date Label
-        self.date_label = QLabel(self)
+        self.date_label = QLabel()
         self.date_label.setObjectName("date_label")
-        self.date_label.setStyleSheet("font-weight: bold;")
-        self.date_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.date_label)
+        self.date_label.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-        # CPU + RAM Section
-        stats_frame = QFrame(self)
-        stats_frame.setFrameShape(QFrame.Shape.NoFrame)
+        time_layout.addWidget(self.time_label)
+        time_layout.addWidget(self.date_label)
+        sys_layout.addLayout(time_layout)
 
-        stats_layout = QVBoxLayout(stats_frame)
-        stats_layout.setContentsMargins(0, 0, 0, 0)
-        stats_layout.setSpacing(6)
+        self.system_rows = []
+        for _ in range(6):
+            row = QHBoxLayout()
+            label = QLabel("Loading...")
+            label.setStyleSheet("color: #AAAAAA;")
+            value = QLabel("Calculating...")
+            value.setAlignment(Qt.AlignRight)
+            value.setStyleSheet("color: #FFFFFF;")
 
-        # CPU Row
-        cpu_row = QHBoxLayout()
-        cpu_row.setContentsMargins(0, 0, 0, 0)
-        cpu_row.setSpacing(8)
+            row.addWidget(label)
+            row.addWidget(value)
+            self.system_rows.append((label, value))
+            sys_layout.addLayout(row)
 
-        cpu_label = QLabel("CPU", self)
-        cpu_label.setStyleSheet("font-weight: bold; color: #B8F1B0;")
-        cpu_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        cpu_label.setFixedWidth(35)  # keeps labels aligned
+        layout.addWidget(sys_frame)
 
-        self.cpu_bar = QProgressBar(self)
-        self.cpu_bar.setFormat("%p%")
+        # Thread Setup
+        self.thread = QThread(self)
+        self.worker = ProcessWorker()
+        self.worker.moveToThread(self.thread)
 
-        cpu_row.addWidget(cpu_label)
-        cpu_row.addWidget(self.cpu_bar, 1)
+        # Connect workers
+        self.worker.system_arm.connect(self.on_system)
+        self.worker.time_arm.connect(self.time_update)
 
-        # RAM Row
-        ram_row = QHBoxLayout()
-        ram_row.setContentsMargins(0, 0, 0, 0)
-        ram_row.setSpacing(8)
-
-        ram_label = QLabel("RAM", self)
-        ram_label.setStyleSheet("font-weight: bold; color: #B8F1B0;")
-        ram_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        ram_label.setFixedWidth(35)
-
-        self.ram_bar = QProgressBar(self)
-        self.ram_bar.setFormat("%p%")
-
-        ram_row.addWidget(ram_label)
-        ram_row.addWidget(self.ram_bar, 1)
-
-        # Add rows to stats layout
-        stats_layout.addLayout(cpu_row)
-        stats_layout.addLayout(ram_row)
-
-        # Add stats frame to main layout
-        layout.addWidget(stats_frame)
-
-        # Process section
-        process_frame = QFrame(self)
-        process_layout = QVBoxLayout(process_frame)
-        process_layout.setSpacing(0)
-        process_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.process_header = QLabel(process_frame)
-        self.process_header.setObjectName("process_header")
-        self.process_header.setAlignment(Qt.AlignCenter)
-        process_layout.addWidget(self.process_header)
-
-        self.process_rows = []
-
-        for _ in range(5):
-            row = QFrame(process_frame)
-            row_layout = QHBoxLayout(row)
-            row_layout.setContentsMargins(0, 0, 0, 0)
-
-            name_lbl = QLabel("-", row)
-            name_lbl.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-
-            cpu_lbl = QLabel("-", row)
-            cpu_lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-
-            row_layout.addWidget(name_lbl, 1)
-            row_layout.addWidget(cpu_lbl)
-
-            self.process_rows.append((name_lbl, cpu_lbl))
-            process_layout.addWidget(row)
-
-        # Add the frame for the process box
-        layout.addWidget(process_frame)
-
-        self.users_label = QLabel(self)
-        self.users_label.setStyleSheet("font-weight: bold; color: #ADFF2F;")
-        self.users_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.users_label)
-
-        # Set up thread
-        self.psutil_thread = QThread(self)
-        self.psutil_worker = ProcessWorker()
-        self.psutil_worker.moveToThread(self.psutil_thread)
-
-        # Connect to thread signals
-        self.psutil_worker.stats_arm.connect(self.on_stats_ready)
-        self.psutil_worker.process_arm.connect(self.on_processes_ready)
-
-        # Start thread
-        self.psutil_thread.start()
+        # Spin up the thread
+        self.thread.start()
 
         # Thread Timers
-        self.timer_clock = QTimer(self)
-        self.timer_clock.timeout.connect(self.update_time)
-        self.timer_clock.timeout.connect(self.psutil_worker.get_stats)
-        self.timer_clock.start(500)
+        self.clock_timer = QTimer(self)
+        self.clock_timer.timeout.connect(self.worker.get_time)
+        self.clock_timer.start(500)
 
-        self.timer_processes = QTimer(self)
-        self.timer_processes.timeout.connect(self.psutil_worker.get_process)
-        self.timer_processes.start(6000)
+        self.sys_timer = QTimer(self)
+        self.sys_timer.timeout.connect(self.worker.get_system_info)
+        self.sys_timer.start(5000)
 
-        # Call time update
-        self.update_time()
-
-    # UI Slots for Thread
-    @Slot(int, int)
-    def on_stats_ready(self, cpu, ram):
-        self.cpu_bar.setValue(cpu)
-        self.ram_bar.setValue(ram)
-
+    # Thread slots
     @Slot(list)
-    def on_processes_ready(self, processes):
-        for i, (name_lbl, cpu_lbl) in enumerate(self.process_rows):
-            if i < len(processes):
-                name, cpu = processes[i]
-                name_lbl.setText(name)
-                cpu_lbl.setText(f"{cpu:.1f}%")
+    def on_system(self, info):
+        for i, (lbl, val) in enumerate(self.system_rows):
+            if i < len(info):
+                lbl.setText(info[i][0])
+                val.setText(info[i][1])
             else:
-                name_lbl.setText("-")
-                cpu_lbl.setText("")
+                lbl.setText("Calculating...")
+                val.setText("")
 
-    # Update Functions
-    def update_time(self):
-        now = datetime.datetime.now()
-        self.time_label.setText(now.strftime("%I:%M:%S %p"))
-        self.date_label.setText(now.strftime("%A, %B %d, %Y"))
+    @Slot(str, str)
+    def time_update(self, time_str, date_str):
+        self.time_label.setText(time_str)
+        self.date_label.setText(date_str)
 
-    # Clean up thread events
+    # Clean close - shut down threads before exiting program
     def closeEvent(self, event):
-        self.psutil_thread.quit()
-        self.psutil_thread.wait()
+        self.clock_timer.stop()
+        self.sys_timer.stop()
+        self.thread.quit()
+        self.thread.wait()
         super().closeEvent(event)

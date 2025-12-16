@@ -138,7 +138,7 @@ class Sidebar(QWidget):
         #layout.addWidget(bat_btn)
 
         # GitHub repository button
-        logo_btn = QPushButton("Review Code")
+        logo_btn = QPushButton("Repository")
         logo_btn.setToolTip("Visit the project repository on GitHub")
         logo_btn.setIcon(QIcon(resource_path("resources/icons/dev_logo.png")))
         logo_btn.setIconSize(QSize(32, 32))
