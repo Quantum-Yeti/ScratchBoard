@@ -2,8 +2,9 @@ import math
 import random
 from PySide6.QtWidgets import QWidget, QApplication
 from PySide6.QtCore import QTimer, Qt, QPointF
-from PySide6.QtGui import QPainter, QPen, QColor
+from PySide6.QtGui import QPainter, QPen, QColor, QIcon
 
+from utils.resource_path import resource_path
 
 # ---------- Physics tuning ----------
 ROT_SPEED = 0.045
@@ -58,20 +59,30 @@ class Bullet:
 class AsteroidsWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("∎")
+        self.setWindowTitle("Scratch Board: Asteroids")
+        self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
         self.setFocusPolicy(Qt.StrongFocus)
         self.setFocus()
 
-        self.w, self.h = 900, 600
-        self.resize(self.w, self.h)
+        self.w, self.h = 980, 680
+        self.setFixedSize(self.w, self.h)
 
         # Ship
         self.ship_pos = QPointF(self.w / 2, self.h / 2)
         self.ship_vel = QPointF(0, 0)
         self.ship_angle = -math.pi / 2
+        self._ship_got_hit = False
 
         self.bullets = []
-        self.asteroids = [Asteroid(self.w, self.h) for _ in range(6)]
+
+        self.asteroids = []
+        for _ in range(6):
+            while True:
+                a = Asteroid(self.w, self.h)
+                delta = a.pos - self.ship_pos
+                if math.hypot(delta.x(), delta.y()) > 60:  # safe distance from ship
+                    self.asteroids.append(a)
+                    break
 
         self.keys = set()
         self.score = 0
@@ -188,12 +199,17 @@ class AsteroidsWidget(QWidget):
         p.drawText(10, 20, f"SCORE {self.score}")
 
     def check_ship_collision(self):
+        hit = False
         for a in self.asteroids:
             delta = self.ship_pos - a.pos
             dist = math.hypot(delta.x(), delta.y())
             if dist < a.size:
-                self.score -= 10  # lose points
+                hit = True
                 self.ship_vel = -self.ship_vel * 1.5
+
+        if hit and not self._ship_got_hit:
+            self.score -= 10
+        self._ship_got_hit = hit
 
 
 if __name__ == "__main__":
