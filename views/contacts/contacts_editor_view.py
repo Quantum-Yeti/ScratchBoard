@@ -64,6 +64,7 @@ class ContactEditorPanel(QDialog):
         self.email_input = QLineEdit(email)
         self.email_input.setPlaceholderText("Email")
         self.email_input.setToolTip("Enter an email address")
+        self.email_input.setPlaceholderText("N/A")
         layout.addWidget(QLabel("Email:"))
         layout.addWidget(self.email_input)
 
@@ -71,6 +72,7 @@ class ContactEditorPanel(QDialog):
         self.website_input = QLineEdit(website)
         self.website_input.setPlaceholderText("Website")
         self.website_input.setToolTip("Enter a website address")
+        self.website_input.setPlaceholderText("N/A")
         layout.addWidget(QLabel("Website:"))
         layout.addWidget(self.website_input)
 

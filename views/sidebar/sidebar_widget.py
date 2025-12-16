@@ -38,6 +38,7 @@ class Sidebar(QWidget):
         "Phone": "resources/icons/landline.png",
         "Video": "resources/icons/video.png",
         "Streaming": "resources/icons/streaming.png",
+        "Coaching": "resources/icons/football.png",
         "Notes": "resources/icons/notes.png",
         "Ideas": "resources/icons/ideas.png",
     }
@@ -51,6 +52,7 @@ class Sidebar(QWidget):
         "Phone": "View and manage your phone notes",
         "Video": "View and manage your video notes",
         "Streaming": "View and manage your streaming notes",
+        "Coaching": "View and manage your coaching notes",
         "Notes": "View and manage general notes",
         "Ideas": "View and manage your ideas",
     }

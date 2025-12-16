@@ -68,7 +68,7 @@ class ContactsView(QWidget):
             lbl = QLabel(f"<b>{text}</b>")
             lbl.setStyleSheet("color: #B0E0E6; font-size: 14px;")
             #lbl.setFixedWidth(width)
-            lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             #header_layout.addWidget(lbl)
             # Add labels to layout with stretch
             if text == "Name":
@@ -87,7 +87,7 @@ class ContactsView(QWidget):
         self.scroll_area = QScrollArea()
         self.scroll_area.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setFrameShape(QFrame.NoFrame)
+        self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
         self.list_widget = QWidget()
         self.list_layout = QVBoxLayout(self.list_widget)
         self.list_layout.setSpacing(8)
@@ -159,7 +159,7 @@ class ContactsView(QWidget):
             # Name column
             name_label = QLabel(contact["name"] if contact["name"] else "N/A")
             #name_label.setFixedWidth(150)
-            name_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            name_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             name_label.setStyleSheet("color: white; font-weight: bold; padding-left: 2px;")
             name_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             name_label.setAttribute(Qt.WA_TransparentForMouseEvents)
@@ -168,7 +168,7 @@ class ContactsView(QWidget):
             # Phone column
             phone_label = CopyableLabel(contact["phone"] if contact["phone"] else "N/A")
             #phone_label.setFixedWidth(120)
-            phone_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            phone_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             phone_label.setStyleSheet("color: #fff;")
             phone_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             #phone_label.setAttribute(Qt.WA_TransparentForMouseEvents)
@@ -177,19 +177,22 @@ class ContactsView(QWidget):
             # Email column
             email_label = QLabel(contact["email"] if contact["email"] else "N/A")
             #email_label.setFixedWidth(180)
-            email_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            email_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             email_label.setStyleSheet("color: #fff;")
             email_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             email_label.setAttribute(Qt.WA_TransparentForMouseEvents)
             row.addWidget(email_label, 3)
 
             # Website column
-            website_label = CopyableLabel()
+            website_label = CopyableLabel(contact["website"] if contact["website"] else "N/A")
             website_label.setTextFormat(Qt.RichText)
             website_label.setStyleSheet("color: #B0E0E6;")
-            website_label.setText(f'<a href="{contact["website"]}" style="color: #B0E0E6; text-decoration: none;">{contact["website"]}</a>')
+            if contact["website"]:
+                website_label.setText(f'<a href="{contact["website"]}" style="color: #B0E0E6; text-decoration: none;">{contact["website"]}</a>')
+            else:
+                website_label.setText("N/A")
             #website_label.setFixedWidth(200)
-            website_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            website_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             website_label.setOpenExternalLinks(True)
             website_label.setStyleSheet("color: #B0E0E6")
             website_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
@@ -203,7 +206,7 @@ class ContactsView(QWidget):
             row_widget.setObjectName("row")
             row_widget.setLayout(row)
             row_widget.setMouseTracking(True)
-            row_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+            row_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
             row_widget.setFixedHeight(60)
             row_widget.setStyleSheet("""
                 QWidget {
