@@ -22,7 +22,6 @@ from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
 from views.info_widgets.wifi_standards_widget import WifiStandardsReference
 from views.widgets.mac_pop_widget import MacVendorPopup
-from views.widgets.mac_widget import MacVendorView
 from views.widgets.md_widget import MarkdownGuideWidget
 from views.widgets.password_widget import PassGenWidget
 from views.widgets.shortcut_widget import ShortcutGuide

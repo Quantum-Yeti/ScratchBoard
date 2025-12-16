@@ -129,6 +129,10 @@ shortcut_list = [
                 "shortcut": "Alt+C",
                 "action": "Open Calculator"
             },
+            {
+                "shortcut": "Alt+T",
+                "action": "Open Mac Vendor Query"
+            }
         ]
     },
     {
