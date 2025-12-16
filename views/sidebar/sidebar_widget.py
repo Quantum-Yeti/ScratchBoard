@@ -63,6 +63,7 @@ class Sidebar(QWidget):
         :param model: Data model used by certain features such as the ScratchManager.
         """
         super().__init__()
+        self._notepad = None
         self.setObjectName("Sidebar")
         self.model = model
 
