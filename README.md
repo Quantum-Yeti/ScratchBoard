@@ -1,6 +1,6 @@
 # Scratch Board
 
-**Scratch Board** is a lightweight desktop productivity app that combines note-taking, scratch notes (sticky notes), and interactive tools such as a MAC vendor lookup. Designed for capturing quick notes and playful exploration, it keeps your ideas organized while adding a touch of fun.
+**Scratch Board** is a lightweight desktop productivity app that combines note-taking, scratch notes (sticky notes), a MAC vendor lookup, and much more. Designed for capturing quick notes and playful exploration, it keeps your ideas organized while adding a touch of fun.
 
 ---
 
