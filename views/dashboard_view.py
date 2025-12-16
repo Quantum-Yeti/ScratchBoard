@@ -8,7 +8,7 @@ from views.widgets.mac_widget import MacVendorView
 from views.widgets.reference_widget import ReferenceWidget
 from views.widgets.cal_stat_widget import CalStatWidget
 from views.notes.main_note_view import MainView
-from views.contacts_view import ContactsView
+from views.contacts.contacts_view import ContactsView
 from utils.resource_path import resource_path
 
 class DashboardView(QWidget):

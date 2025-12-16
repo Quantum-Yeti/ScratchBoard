@@ -31,10 +31,10 @@ class ContactEditorPanel(QDialog):
 
         # Set window title depending on editing or creating a contact.
         if contact_id:
-            self.setWindowTitle("Edit Contact")
+            self.setWindowTitle("Scratch Board: Edit Contact")
             self.setMinimumSize(325, 525)
         else:
-            self.setWindowTitle("New Contact")
+            self.setWindowTitle("Scratch Board: New Contact")
             self.setMinimumSize(325, 525)
 
         # Main vertical layout

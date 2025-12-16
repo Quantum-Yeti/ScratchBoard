@@ -1,6 +1,6 @@
 from PySide6.QtCore import QObject, QTimer
 from PySide6.QtWidgets import QMessageBox
-from views.contacts_editor_view import ContactEditorPanel  # Create similar to EditorPanel for contacts
+from views.contacts.contacts_editor_view import ContactEditorPanel  # Create similar to EditorPanel for contacts
 
 class ContactsController(QObject):
     """
