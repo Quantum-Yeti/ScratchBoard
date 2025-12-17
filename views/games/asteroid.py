@@ -1,215 +1,264 @@
 import math
 import random
+from dataclasses import dataclass
+
 from PySide6.QtWidgets import QWidget, QApplication
 from PySide6.QtCore import QTimer, Qt, QPointF
-from PySide6.QtGui import QPainter, QPen, QColor, QIcon
+from PySide6.QtGui import QPainter, QPen, QColor, QIcon, QPixmap
 
 from utils.resource_path import resource_path
 
 # Physics Enums
-ROT_SPEED = 0.045
-THRUST = 0.09
-DRAG = 0.985
-MAX_SPEED = 4.5
+WIDTH, HEIGHT = 980, 680
+FPS = 60
+DT = 1 / FPS
+
+ROT_SPEED = 3.0        # radians/sec
+THRUST = 240.0         # pixels/sec²
+DRAG = 0.99
+MAX_SPEED = 420.0
+
+BULLET_SPEED = 600.0
+BULLET_LIFE = 1.0      # seconds
+
+ASTEROID_MIN_SIZE = 20
+ASTEROID_START_SIZE = 50
 
 
-def wrap(pos, w, h):
-    return QPointF(pos.x() % w, pos.y() % h)
+def wrap(pos: QPointF) -> QPointF:
+    return QPointF(pos.x() % WIDTH, pos.y() % HEIGHT)
+
+def vec_length(v: QPointF) -> float:
+    return math.hypot(v.x(), v.y())
+
+def limit(v: QPointF, max_len: float) -> QPointF:
+    l = vec_length(v)
+    if l > max_len:
+        return v * (max_len / l)
+    return v
 
 
+@dataclass
+class Bullet:
+    pos: QPointF
+    vel: QPointF
+    life: float
+
+    def update(self):
+        self.pos += self.vel * DT
+        self.pos = wrap(self.pos)
+        self.life -= DT
+
+@dataclass
 class Asteroid:
-    def __init__(self, w, h, size=40):
-        self.pos = QPointF(random.randint(0, w), random.randint(0, h))
-        angle = random.random() * 2 * math.pi
-        speed = random.uniform(0.5, 1.5)
-        self.vel = QPointF(math.cos(angle) * speed, math.sin(angle) * speed)
-        self.size = size
-        self.shape = [
+    pos: QPointF
+    vel: QPointF
+    size: int
+    shape: list
+    color: QColor
+
+    @staticmethod
+    def spawn(size=ASTEROID_START_SIZE, pos=None):
+        if pos is None:
+            pos = QPointF(random.randrange(WIDTH), random.randrange(HEIGHT))
+
+        angle = random.random() * math.tau
+        speed = random.uniform(40, 120)
+        vel = QPointF(math.cos(angle), math.sin(angle)) * speed
+
+        shape = [
             QPointF(
                 math.cos(a) * size * random.uniform(0.7, 1.2),
-                math.sin(a) * size * random.uniform(0.7, 1.2),
+                math.sin(a) * size * random.uniform(0.7, 1.2)
             )
-            for a in [i * 2 * math.pi / 8 for i in range(8)]
+            for a in [i * math.tau / 8 for i in range(8)]
         ]
 
-        # Asteroid colors
-        self.color = QColor(
-            random.randint(50, 255),
-            random.randint(50, 255),
-            random.randint(50, 255)
+        color = QColor(
+            random.randint(80, 255),
+            random.randint(80, 255),
+            random.randint(80, 255)
         )
 
-    def update(self, w, h):
-        self.pos += self.vel
-        self.pos = wrap(self.pos, w, h)
+        return Asteroid(pos, vel, size, shape, color)
 
+    def update(self):
+        self.pos += self.vel * DT
+        self.pos = wrap(self.pos)
 
-class Bullet:
-    def __init__(self, pos, angle):
-        self.pos = QPointF(pos)
-        self.vel = QPointF(math.cos(angle) * 6, math.sin(angle) * 6)
-        self.life = 60
+@dataclass
+class Ship:
+    pos: QPointF
+    vel: QPointF
+    angle: float
+    hit_cooldown: float = 0.0
 
-    def update(self, w, h):
-        self.pos += self.vel
-        self.pos = wrap(self.pos, w, h)
-        self.life -= 1
+    def update(self, keys):
 
+        if self.hit_cooldown > 0:
+            self.hit_cooldown -= DT
+        if Qt.Key_Left in keys:
+            self.angle -= ROT_SPEED * DT
+        if Qt.Key_Right in keys:
+            self.angle += ROT_SPEED * DT
+
+        if Qt.Key_Up in keys:
+            forward = QPointF(math.cos(self.angle), math.sin(self.angle))
+            self.vel += forward * THRUST * DT
+
+        self.vel *= DRAG
+        self.vel = limit(self.vel, MAX_SPEED)
+        self.pos += self.vel * DT
+        self.pos = wrap(self.pos)
+
+    def shoot(self):
+        direction = QPointF(math.cos(self.angle), math.sin(self.angle))
+        return Bullet(
+            pos=QPointF(self.pos),
+            vel=direction * BULLET_SPEED,
+            life=BULLET_LIFE
+        )
 
 class AsteroidsWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Scratch Board: Asteroids")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
+        self.setFixedSize(WIDTH, HEIGHT)
         self.setFocusPolicy(Qt.StrongFocus)
-        self.setFocus()
 
-        self.w, self.h = 980, 680
-        self.setFixedSize(self.w, self.h)
-
-        # Ship
-        self.ship_pos = QPointF(self.w / 2, self.h / 2)
-        self.ship_vel = QPointF(0, 0)
-        self.ship_angle = -math.pi / 2
-        self._ship_got_hit = False
-
-        self.bullets = []
-
+        self.ship = Ship(QPointF(WIDTH/2, HEIGHT/2), QPointF(), -math.pi/2)
+        self.bullets: list[Bullet] = []
         self.asteroids = []
-        for _ in range(6):
-            while True:
-                a = Asteroid(self.w, self.h)
-                delta = a.pos - self.ship_pos
-                if math.hypot(delta.x(), delta.y()) > 60:  # safe distance from ship
-                    self.asteroids.append(a)
-                    break
+        while len(self.asteroids) < 6:
+            a = Asteroid.spawn()
+            if vec_length(a.pos - self.ship.pos) > 120:
+                self.asteroids.append(a)
 
         self.keys = set()
         self.score = 0
+        self.level = 1
 
-        self.timer = QTimer(self)
+        self.timer = QTimer()
         self.timer.timeout.connect(self.update_game)
-        self.timer.start(16)
+        self.timer.start(int(1000 / FPS))
 
-    # Keyboard Input
+        self.ship_image = QPixmap(
+            resource_path("resources/icons/game_ship.png")
+        )
+
+        # Scale once for performance
+        self.ship_image = self.ship_image.scaled(
+            40, 40,
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation
+        )
+
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Space:
-            self.bullets.append(Bullet(self.ship_pos, self.ship_angle))
+            self.bullets.append(self.ship.shoot())
         elif e.key() == Qt.Key_Escape:
             self.close()
         else:
             self.keys.add(e.key())
 
+
     def keyReleaseEvent(self, e):
         self.keys.discard(e.key())
 
-    def mousePressEvent(self, e):
-        self.bullets.append(Bullet(self.ship_pos, self.ship_angle))
-
     # Main Loop
     def update_game(self):
-        # Rotation
-        if Qt.Key_Left in self.keys:
-            self.ship_angle -= ROT_SPEED
-        if Qt.Key_Right in self.keys:
-            self.ship_angle += ROT_SPEED
+        self.ship.update(self.keys)
 
-        # Thrust
-        if Qt.Key_Up in self.keys:
-            thrust = QPointF(
-                math.cos(self.ship_angle),
-                math.sin(self.ship_angle)
-            ) * THRUST
-            self.ship_vel += thrust
-
-        # Velocity max
-        speed = self.ship_vel.manhattanLength()
-        if speed > MAX_SPEED:
-            self.ship_vel *= MAX_SPEED / speed
-
-        # Movement + drag
-        self.ship_pos += self.ship_vel
-        self.ship_vel *= DRAG
-        self.ship_pos = wrap(self.ship_pos, self.w, self.h)
-
-        # Bullets
-        for b in self.bullets[:]:
-            b.update(self.w, self.h)
-            if b.life <= 0:
-                self.bullets.remove(b)
-
-        # Asteroids
+        for b in self.bullets:
+            b.update()
         for a in self.asteroids:
-            a.update(self.w, self.h)
+            a.update()
 
-        self.check_collisions()
-        self.check_ship_collision()
+        self.handle_collisions()
+
+        self.bullets = [b for b in self.bullets if b.life > 0]
         self.update()
 
+        if not self.asteroids:
+            self.level += 1
+            self.spawn_wave()
+
+    def spawn_wave(self):
+        count = 4 + self.level * 2
+        self.asteroids.clear()
+
+        while len(self.asteroids) < count:
+            a = Asteroid.spawn()
+            if vec_length(a.pos - self.ship.pos) > 120:
+                self.asteroids.append(a)
+
     # Detect collisions
-    def check_collisions(self):
+    def handle_collisions(self):
+        new_asteroids = []
+
         for b in self.bullets[:]:
             for a in self.asteroids[:]:
-                delta = b.pos - a.pos
-                dist = math.hypot(delta.x(), delta.y())
-                if dist < a.size:
+                if vec_length(b.pos - a.pos) < a.size:
                     self.bullets.remove(b)
                     self.asteroids.remove(a)
                     self.score += 10
 
-                    if a.size > 20:
-                        self.asteroids.append(Asteroid(self.w, self.h, a.size // 2))
-                        self.asteroids.append(Asteroid(self.w, self.h, a.size // 2))
+                    if a.size > ASTEROID_MIN_SIZE:
+                        for _ in range(2):
+                            new_asteroids.append(
+                                Asteroid.spawn(
+                                    size=a.size // 2,
+                                    pos=QPointF(a.pos)
+                                )
+                            )
                     break
+
+        self.asteroids.extend(new_asteroids)
+
+        for a in self.asteroids:
+            if vec_length(self.ship.pos - a.pos) < a.size:
+                if self.ship.hit_cooldown <= 0:
+                    self.ship.vel = -self.ship.vel * 0.5
+                    self.score -= 10
+                    self.ship.hit_cooldown = 1.0  # 1 second invincibility
+                break
 
     # Paint the event
     def paintEvent(self, e):
         p = QPainter(self)
-        p.fillRect(self.rect(), QColor(0, 0, 0))
-        p.setPen(QPen(Qt.white, 1))
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.SmoothPixmapTransform)
 
         # Ship
-        ship_shape = [
-            QPointF(20, 0),
-            QPointF(-16, 6),
-            QPointF(-10, 0),
-            QPointF(-16, -6),
-        ]
-        ship = []
-        for pt in ship_shape:
-            x = pt.x() * math.cos(self.ship_angle) - pt.y() * math.sin(self.ship_angle)
-            y = pt.x() * math.sin(self.ship_angle) + pt.y() * math.cos(self.ship_angle)
-            ship.append(self.ship_pos + QPointF(x, y))
-        p.drawPolygon(ship)
+        p.save()
+
+        # Move origin to ship position
+        p.translate(self.ship.pos)
+
+        # Rotate (Qt uses degrees, 0° is along +X axis)
+        p.rotate(math.degrees(self.ship.angle) + 90)
+
+        # Draw centered
+        w = self.ship_image.width()
+        h = self.ship_image.height()
+        p.drawPixmap(-w / 2, -h / 2, self.ship_image)
+
+        p.restore()
 
         # Bullets
+        p.setPen(QPen(QColor(255, 255, 0), 3))
         for b in self.bullets:
             p.drawPoint(b.pos)
 
         # Asteroids
         for a in self.asteroids:
             p.setPen(QPen(a.color, 1))
-            poly = [a.pos + pt for pt in a.shape]
-            p.drawPolygon(poly)
+            p.drawPolygon([a.pos + pt for pt in a.shape])
 
         # Score
-        font = p.font()
-        font.setPointSize(20)
-        p.setFont(font)
-        p.drawText(10, 20, f"SCORE {self.score}")
-
-    def check_ship_collision(self):
-        hit = False
-        for a in self.asteroids:
-            delta = self.ship_pos - a.pos
-            dist = math.hypot(delta.x(), delta.y())
-            if dist < a.size:
-                hit = True
-                self.ship_vel = -self.ship_vel * 1.5
-
-        if hit and not self._ship_got_hit:
-            self.score -= 10
-        self._ship_got_hit = hit
+        p.setPen(Qt.white)
+        p.drawText(10, 25, f"SCORE {self.score}")
 
 
 if __name__ == "__main__":
