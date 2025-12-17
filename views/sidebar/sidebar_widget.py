@@ -155,7 +155,7 @@ class Sidebar(QWidget):
                 return None
 
         logo_btn = QPushButton(f"{username}")
-        logo_btn.setToolTip("Open the company homepage in your default browser")
+        logo_btn.setToolTip(f"Welcome, {username}: Open the company homepage in your default browser")
         logo_btn.setIcon(QIcon(resource_path("resources/icons/agent_yellow.png")))
         logo_btn.setIconSize(QSize(32, 32))
         logo_btn.setFlat(True)
