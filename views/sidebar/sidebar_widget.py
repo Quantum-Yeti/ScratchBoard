@@ -1,3 +1,6 @@
+import getpass
+import webbrowser
+
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QFrame
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
@@ -141,13 +144,28 @@ class Sidebar(QWidget):
         #layout.addWidget(bat_btn)
 
         # GitHub repository button
-        logo_btn = QPushButton("Repository")
-        logo_btn.setToolTip("Visit the project repository on GitHub")
-        logo_btn.setIcon(QIcon(resource_path("resources/icons/dev_logo.png")))
+        username = getpass.getuser()
+        def get_company_homepage():
+            try:
+                with open(resource_path("resources/site.txt"), "r") as f:
+                    url = f.read().strip()
+                    return url
+            except Exception as e:
+                print("Failed to load website.")
+                return None
+
+        logo_btn = QPushButton(f"{username}")
+        logo_btn.setToolTip("Open the company homepage in your default browser")
+        logo_btn.setIcon(QIcon(resource_path("resources/icons/agent_yellow.png")))
         logo_btn.setIconSize(QSize(32, 32))
         logo_btn.setFlat(True)
         logo_btn.setCursor(Qt.PointingHandCursor)
-        logo_btn.clicked.connect(open_github)
+        #logo_btn.clicked.connect(open_github)
+        def open_company_homepage():
+            url = get_company_homepage()
+            if url:
+                webbrowser.open(url)
+        logo_btn.clicked.connect(open_company_homepage())
         layout.addWidget(logo_btn, alignment=Qt.AlignBottom)
 
         # Keep track of scratch pad instance
