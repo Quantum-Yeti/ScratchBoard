@@ -165,7 +165,7 @@ class Sidebar(QWidget):
             url = get_company_homepage()
             if url:
                 webbrowser.open(url)
-        logo_btn.clicked.connect(open_company_homepage())
+        logo_btn.clicked.connect(open_company_homepage)
         layout.addWidget(logo_btn, alignment=Qt.AlignBottom)
 
         # Keep track of scratch pad instance
