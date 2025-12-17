@@ -1,5 +1,3 @@
-import sys
-import os
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtGui import QIcon, QKeySequence, QShortcut
 from PySide6.QtCore import Qt, QEvent, QPropertyAnimation, QEasingCurve, QPoint
@@ -12,6 +10,7 @@ class FloatingButton(QPushButton):
         self.setToolTip(f"{tooltip} ({shortcut})")
         self.setFixedSize(size, size)
         self.setCursor(Qt.PointingHandCursor)
+        self.setShortcut(QKeySequence("Shift+N"))
 
         # Load icon
         icon = QIcon(resource_path(icon_path))
@@ -21,7 +20,7 @@ class FloatingButton(QPushButton):
         # Animation for hover lift
         self._anim = QPropertyAnimation(self, b"pos", self)
         self._anim.setDuration(150)
-        self._anim.setEasingCurve(QEasingCurve.OutCubic)
+        self._anim.setEasingCurve(QEasingCurve.Type.OutCubic)
 
         # Event filter for parent resize & hover effects
         self.installEventFilter(self)
