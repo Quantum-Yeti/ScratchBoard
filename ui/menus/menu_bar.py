@@ -1,5 +1,6 @@
 import os
 import traceback
+import webbrowser
 
 from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap, QShortcut, QKeySequence
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
@@ -112,6 +113,7 @@ class MainMenuBar(QMenuBar):
         # Help Menu
         self.about_action = None
         self.md_action = None
+        self.repo_action = None
         self.shortcut_action = None
 
         # Build menus
@@ -330,6 +332,11 @@ class MainMenuBar(QMenuBar):
         self.md_action.setShortcut("Alt+M")
         help_menu.addAction(self.md_action)
 
+        self.repo_action = QAction("Code Repository", self)
+        self.repo_action.setIcon(QIcon(resource_path("resources/icons/dev_logo.png")))
+        self.repo_action.setShortcut("Shift+R")
+        help_menu.addAction(self.repo_action)
+
         self.about_action = QAction("About Scratch Board", self)
         self.about_action.setIcon(QIcon(resource_path("resources/icons/about.png")))
         self.about_action.setShortcut("Alt+A")
@@ -393,6 +400,7 @@ class MainMenuBar(QMenuBar):
         # Wire the help menu
         self.shortcut_action.triggered.connect(self._open_shortcuts)
         self.md_action.triggered.connect(self._open_md_guide)
+        self.repo_action.triggered.connect(self._open_repo)
         self.about_action.triggered.connect(lambda: AboutWidget().exec())
 
         # Hidden easter egg games
@@ -451,6 +459,9 @@ class MainMenuBar(QMenuBar):
         if not hasattr(self, '_md_widget'):
             self._md_widget = MarkdownGuideWidget()
         self._md_widget.show()
+
+    def _open_repo(self):
+        webbrowser.open("https://github.com/Quantum-Yeti/ScratchBoard")
 
     def _open_pw_gen(self):
         pwgen = PassGenWidget(self.parent())
