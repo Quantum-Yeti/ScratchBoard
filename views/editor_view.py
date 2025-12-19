@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 from pathlib import Path
 from PySide6.QtCore import Qt, QTimer, QEvent
 from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QDragEnterEvent, QDropEvent
@@ -12,7 +13,7 @@ from PySide6.QtWidgets import QDialog, QLabel, QVBoxLayout, QScrollArea
 from PySide6.QtGui import QPixmap
 
 from helpers.calc_helpers.count_words import count_words
-from helpers.image_helpers.drag_drop_image import save_qimage, save_file_drop
+from helpers.image_helpers.drop_img import save_qimage, save_file_drop
 from helpers.md_helpers.md_to_html import render_markdown_to_html
 from ui.menus.context_menu import ModifyContextMenu
 from utils.resource_path import resource_path
@@ -398,7 +399,6 @@ class EditorPanel(QDialog):
             dst_dir = Path("sb_data/images")
             dst_dir.mkdir(parents=True, exist_ok=True)
             dst = dst_dir / Path(path).name
-            import shutil
             shutil.copy(path, dst)
 
             md = f"\n![image]({dst.as_posix()})\n"

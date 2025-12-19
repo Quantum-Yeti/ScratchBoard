@@ -39,7 +39,7 @@ class ScratchManager(QWidget):
         # Add a new scratch note button
         self.new_btn = QPushButton("Add Scratch Note")
         self.new_btn.setToolTip("Add a new scratch note.")
-        self.new_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.new_btn.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self.new_btn.setMaximumWidth(200)
         self.new_btn.setMaximumHeight(60)
         self.new_btn.setStyleSheet("""
@@ -55,7 +55,7 @@ class ScratchManager(QWidget):
         # Reload all scratch notes from db after they are closed
         self.refresh_btn = QPushButton("Show All Notes")
         self.refresh_btn.setToolTip("Reloads all the scratch notes.")
-        self.refresh_btn.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.refresh_btn.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self.refresh_btn.setMaximumWidth(200)
         self.refresh_btn.setMaximumHeight(60)
         self.refresh_btn.setStyleSheet("""

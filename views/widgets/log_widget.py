@@ -1,6 +1,6 @@
 from PySide6.QtGui import QIcon, QCursor
 from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QApplication, QFrame
-from helpers.modules.modem_log_parser import ModemLogParser
+from helpers.widget_helpers.modem_log_parser import ModemLogParser
 from PySide6.QtCore import Qt, QSize
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style

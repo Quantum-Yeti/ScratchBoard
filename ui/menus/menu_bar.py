@@ -5,7 +5,7 @@ import webbrowser
 from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap, QShortcut, QKeySequence
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
-from helpers.modules.sync_helper import sync_db
+from helpers.widget_helpers.sync_helper import sync_db
 from models.note_model import NoteModel
 from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path

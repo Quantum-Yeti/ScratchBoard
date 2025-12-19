@@ -164,7 +164,7 @@ class Sidebar(QWidget):
         def open_company_homepage():
             url = get_company_homepage()
             if url:
-                webbrowser.open(url)
+                webbrowser.open(url, new=1)
         logo_btn.clicked.connect(open_company_homepage)
         layout.addWidget(logo_btn, alignment=Qt.AlignBottom)
 

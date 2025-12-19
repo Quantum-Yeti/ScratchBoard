@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QEvent, Signal
 
-from helpers.modules.contacts_copy_menu import CopyableLabel
+from helpers.widget_helpers.contacts_copy_menu import CopyableLabel
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
 from helpers.ui_helpers.floating_action import FloatingButton

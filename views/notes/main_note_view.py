@@ -1,12 +1,10 @@
-import base64
 import os
 import random
-from io import BytesIO
 
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout, \
-    QPushButton, QSizePolicy, QDialog, QMenu
-from PySide6.QtCore import Qt, QSize, QThread, Signal, QByteArray, QBuffer
+    QPushButton, QSizePolicy, QDialog
+from PySide6.QtCore import Qt, QSize, QThread, Signal
 
 from helpers.ui_helpers.empty_messages import empty_messages
 from helpers.ui_helpers.floating_action import FloatingButton

@@ -1,4 +1,4 @@
-# helpers/drag_drop_image.py
+# helpers/drop_img.py
 import os
 import shutil
 from pathlib import Path

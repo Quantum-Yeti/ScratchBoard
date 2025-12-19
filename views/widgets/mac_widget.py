@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QMes
 from ui.themes.mac_widget_style import mac_widget_style
 from utils.resource_path import resource_path
 
-from helpers.modules.oui_lookup import OUILookup
+from helpers.widget_helpers.oui_lookup import OUILookup
 
 class MacVendorView(QWidget):
     """
