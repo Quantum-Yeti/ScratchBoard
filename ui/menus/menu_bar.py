@@ -575,4 +575,8 @@ class MainMenuBar(QMenuBar):
         sync_db(db_path, default_onedrive)
 
         # Notify user on success
-        QMessageBox.information(self, "Success", f"Database synced to OneDrive:\n{default_onedrive}")
+        QMessageBox.information(self, "Success",
+                                f"Database synced to the OneDrive Desktop folder:\n{default_onedrive}\n\n"
+                                     f"Companies may not allow the OneDrive folder to automatically sync to the cloud.\n\n"
+                                     f"You may have to manually move the folder to the cloud version of OneDrive."
+                                )

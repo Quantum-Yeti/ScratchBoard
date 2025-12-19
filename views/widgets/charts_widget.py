@@ -31,7 +31,7 @@ def create_stacked_bar_chart(model):
     chart.setFont(segoe)
     chart.setTitleFont(QFont("Segoe UI", 12))
     chart.legend().setFont(segoe)
-    chart.setAnimationOptions(QChart.SeriesAnimations)
+    chart.setAnimationOptions(QChart.AnimationOption.AllAnimations)
     chart.setBackgroundVisible(False)
 
     categories = model.get_all_categories()
