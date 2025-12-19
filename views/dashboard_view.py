@@ -69,9 +69,6 @@ class DashboardView(QWidget):
         bottom_layout = QHBoxLayout()
         #bottom_layout.addStretch()
 
-
-
-
         # Reference Section
         self.reference_widget = ReferenceWidget(model)
         ref_layout = QVBoxLayout()
