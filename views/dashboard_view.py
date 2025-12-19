@@ -2,6 +2,8 @@ from PySide6.QtCharts import QChartView
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
+
+from helpers.ui_helpers.create_widget_title import create_section_title
 from views.widgets.charts_widget import create_stacked_bar_chart, create_multi_line_chart
 from views.widgets.stats_widget import StatsWidget
 from views.widgets.mac_widget import MacVendorView
@@ -67,27 +69,8 @@ class DashboardView(QWidget):
         bottom_layout = QHBoxLayout()
         #bottom_layout.addStretch()
 
-        # Helper for section titles
-        def create_section_title(text, icon_name, icon_size=32):
-            container = QWidget()
-            layout = QHBoxLayout(container)
-            layout.setContentsMargins(0, 0, 0, 0)
-            layout.setAlignment(Qt.AlignHCenter)
 
-            icon_label = QLabel()
-            pixmap = QPixmap(resource_path(f"resources/icons/{icon_name}.png"))
-            pixmap = pixmap.scaled(icon_size, icon_size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            icon_label.setPixmap(pixmap)
-            icon_label.setContentsMargins(0, 12, 0, 0)
 
-            text_label = QLabel(text)
-            text_label.setFixedHeight(icon_size)
-            text_label.setStyleSheet("font-weight: bold; font-size: 16px; color: white; margin-top: 10px; font-family: Segoe UI;")
-
-            layout.addWidget(icon_label)
-            layout.addWidget(text_label)
-
-            return container
 
         # Reference Section
         self.reference_widget = ReferenceWidget(model)

@@ -133,7 +133,7 @@ def create_multi_line_chart(model, days_back=14):
     chart.setFont(segoe)
     chart.setTitleFont(QFont("Segoe UI", 12))
     chart.legend().setFont(segoe)
-    chart.setAnimationOptions(QChart.AllAnimations)
+    chart.setAnimationOptions(QChart.AnimationOption.SeriesAnimations)
     chart.setBackgroundVisible(False)
     chart.setTitle("Note Activity Trends")
     chart.setTitleBrush(QColor("white"))

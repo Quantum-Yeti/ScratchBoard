@@ -26,6 +26,7 @@ from views.info_widgets.wifi_standards_widget import WifiStandardsReference
 from views.widgets.mac_pop_widget import MacVendorPopup
 from views.widgets.md_widget import MarkdownGuideWidget
 from views.widgets.password_widget import PassGenWidget
+from views.widgets.ref_pop_widget import ReferencePopup
 from views.widgets.shortcut_widget import ShortcutGuide
 
 # Internal tooltip hover function
@@ -90,6 +91,7 @@ class MainMenuBar(QMenuBar):
         self.pwd_action = None
         self.calc_action = None
         self.mac_action = None
+        self.ref_pop_action = None
 
         # Views Menu
         self.contact_action = None
@@ -315,6 +317,11 @@ class MainMenuBar(QMenuBar):
         self.mac_action.setShortcut("Alt+T")
         tools_menu.addAction(self.mac_action)
 
+        self.ref_action = QAction("Reference", self)
+        self.ref_action.setIcon(QIcon(resource_path("resources/icons/lightning_white.png")))
+        self.ref_action.setShortcut("Alt+X")
+        tools_menu.addAction(self.ref_action)
+
         _connect_hover_tooltips(tools_menu)
 
     # Build the Help menu
@@ -396,6 +403,7 @@ class MainMenuBar(QMenuBar):
         self.pwd_action.triggered.connect(self._open_pw_gen)
         self.calc_action.triggered.connect(self._open_calc)
         self.mac_action.triggered.connect(self._open_mac)
+        self.ref_action.triggered.connect(self._open_ref)
 
         # Wire the help menu
         self.shortcut_action.triggered.connect(self._open_shortcuts)
@@ -403,7 +411,7 @@ class MainMenuBar(QMenuBar):
         self.repo_action.triggered.connect(self._open_repo)
         self.about_action.triggered.connect(lambda: AboutWidget().exec())
 
-        # Hidden easter egg games
+        # Hidden Easter egg games
         self._asteroids_shortcut.activated.connect(self._open_asteroids_widget)
 
     # Internal Helpers: opens non-category menu items
@@ -474,6 +482,10 @@ class MainMenuBar(QMenuBar):
     def _open_mac(self):
         mac = MacVendorPopup(self.parent())
         mac.show()
+
+    def _open_ref(self):
+        self.reference_popup = ReferencePopup(self.note_model, self)
+        self.reference_popup.show()
 
     def _open_asteroids_widget(self):
         if getattr(self, '_asteroids_window', None) is None:
