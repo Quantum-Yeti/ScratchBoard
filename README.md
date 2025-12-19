@@ -20,8 +20,7 @@
 - **Dashboard:** Modern dashboard that includes statistics, graphs, and helpful widgets.  
 - **Sidebar Navigation:** Quickly switch between different views of the app.
 - **Contacts Rolodex:** Add, edit, and delete contacts with names, emails, phone numbers, and websites.
-- **CoPilot:** A note category to save important information from knowledge domains.
-- **Notes:** Includes categories such as Internet, Email, Phone, Video, Streaming, Notes, and Ideas.
+- **Note Categories:** Includes categories such as Internet, Email, Phone, Video, Streaming, Notes, and Ideas.
 
 ### Local Database Storage
 - Scratch Board uses a lightweight local SQLite database to securely store user-generated information such as scratch notes, contacts, categorized notes, and more.
