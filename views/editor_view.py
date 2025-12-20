@@ -138,7 +138,7 @@ class EditorPanel(QDialog):
 
         self.preview = QTextBrowser()
         self.preview.setObjectName("PreviewPanel")
-        self.preview.setPlaceholderText("Markdown \u2192 Html Preview")
+        self.preview.setPlaceholderText("This preview panel renders your Markdown/PlainText as Html.")
         self.preview.setAutoFillBackground(True)
         self.preview.setContentsMargins(0,0,6,0)
         self.preview.setOpenLinks(False)
@@ -162,6 +162,11 @@ class EditorPanel(QDialog):
 
         # Toggle Preview Button
         self.toggle_button = QPushButton(QIcon(resource_path("resources/icons/preview.png")), "Preview")
+        self.toggle_button.setStyleSheet("""
+            QPushButton:hover {
+                background-color: rgb(70, 130, 180);
+            }
+        """)
         self.toggle_button.clicked.connect(self.toggle_preview)
         bottom.addWidget(self.toggle_button)
 
@@ -354,11 +359,13 @@ class EditorPanel(QDialog):
         - If confirmed and a delete callback is provided, calls the callback with the note ID.
         - Closes the editor dialog after deletion.
         """
-        if self.delete_callback and QMessageBox.question(self, "Delete?",
-                                                         "Delete this note?",
-                                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No) == QMessageBox.StandardButton.Yes:
-            self.delete_callback(self.note_id)
-            self.accept()
+        if self.delete_callback and QMessageBox.question(
+            self,
+            "Delete?",
+            "Delete this note?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No) == QMessageBox.StandardButton.Yes:
+                self.delete_callback(self.note_id)
+                self.accept()
 
     #### --- INTERNAL HELPERS --- ####
     def _schedule_preview(self):
@@ -489,12 +496,12 @@ class EditorPanel(QDialog):
         add("header1.png", "# ", "", "Header")
         add("header2.png", "## ", "", "Header 2")
         add("header3.png", "### ", "", "Header 3")
-        add("link.png", "[Website title...", "](https://...)", "Link")
+        add("link.png", "[NAME THE WEBSITE...", "](ALWAYS USE HTTPS://...)", "Link")
         add("code_block.png", "```\n", "\n```", "Code Block")
         add("quote.png", "> ", "", "Quote")
         add("bullet.png", "- ", "", "Bullet List")
 
-        img = self.toolbar.addAction(QIcon(resource_path("resources/icons/insert_image.png")), "")
+        img = self.toolbar.addAction(QIcon(resource_path("resources/icons/insert_image.png")), "Insert Image")
         img.setToolTip("Insert image")
         img.triggered.connect(self._insert_image_dialog)
 
@@ -516,7 +523,7 @@ class EditorPanel(QDialog):
         url_str = url.toString()
 
         if url_str.startswith("file:///") and url_str.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
-            # Local image → open in your image viewer
+            # Local image → open in image viewer
             path = url_str[8:]  # remove 'file:///'
             if os.path.exists(path):
                 self._on_preview_img_clicked(path)
