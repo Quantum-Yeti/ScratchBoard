@@ -69,6 +69,21 @@ QTextBrowser#PreviewPanel {
     color: #dddddd;
 }
 
+/* Editor Toolbar Buttons */
+QToolBar#EditorToolbar QToolButton {
+    background: transparent;
+    border-radius: 6px;
+    padding: 8px;
+}
+
+QToolBar#EditorToolbar QToolButton:hover {
+    background-color: rgba(70, 130, 180, 160); /* steel blue */
+}
+
+QToolBar#EditorToolbar QToolButton:pressed {
+    background-color: rgba(70, 130, 180, 220);
+}
+
 /* Link colors */
 QTextBrowser#PreviewPanel a {
     color: #34eb61;

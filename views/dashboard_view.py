@@ -8,7 +8,7 @@ from views.widgets.charts_widget import create_stacked_bar_chart, create_multi_l
 from views.widgets.stats_widget import StatsWidget
 from views.widgets.mac_widget import MacVendorView
 from views.widgets.reference_widget import ReferenceWidget
-from views.widgets.cal_stat_widget import CalStatWidget
+from views.widgets.sys_inf_widget import CalStatWidget
 from views.notes.main_note_view import MainView
 from views.contacts.contacts_view import ContactsView
 from utils.resource_path import resource_path

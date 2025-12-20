@@ -110,6 +110,7 @@ class EditorPanel(QDialog):
 
         # Toolbar
         self.toolbar = QToolBar()
+        self.toolbar.setObjectName("EditorToolbar")
         self._add_toolbar_actions()
 
         # Stacked Widget (Editor / Preview)
