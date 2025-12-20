@@ -230,50 +230,50 @@ class MainMenuBar(QMenuBar):
         charts_menu = AdjustMenu("Charts", 260, self)
         self.addMenu(charts_menu)
 
+        self.speeds_action = QAction("Bandwidth Req Chart", self)
+        self.speeds_action.setIcon(QIcon(resource_path("resources/icons/speed.png")))
+        self.speeds_action.setShortcut("Ctrl+S")
+        charts_menu.addAction(self.speeds_action)
+
         self.signal_action = QAction("DOCSIS Signal Chart", self)
         self.signal_action.setIcon(QIcon(resource_path("resources/icons/signal.png")))
         self.signal_action.setShortcut("Ctrl+P")
         charts_menu.addAction(self.signal_action)
-
-        self.fiber_action = QAction("Fiber Signal Chart", self)
-        self.fiber_action.setIcon(QIcon(resource_path("resources/icons/fiber.png")))
-        self.fiber_action.setShortcut("Ctrl+Z")
-        charts_menu.addAction(self.fiber_action)
 
         self.ethernet_action = QAction("Ethernet Standards Chart", self)
         self.ethernet_action.setIcon(QIcon(resource_path("resources/icons/ethernet.png")))
         self.ethernet_action.setShortcut("Ctrl+E")
         charts_menu.addAction(self.ethernet_action)
 
-        self.wifi_standards_action = QAction("WiFi Standards Chart", self)
-        self.wifi_standards_action.setIcon(QIcon(resource_path("resources/icons/wifi.png")))
-        self.wifi_standards_action.setShortcut("Ctrl+W")
-        charts_menu.addAction(self.wifi_standards_action)
-
-        self.speeds_action = QAction("Bandwidth Req Chart", self)
-        self.speeds_action.setIcon(QIcon(resource_path("resources/icons/speed.png")))
-        self.speeds_action.setShortcut("Ctrl+S")
-        charts_menu.addAction(self.speeds_action)
-
-        self.protocol_action = QAction("Protocol Chart", self)
-        self.protocol_action.setIcon(QIcon(resource_path("resources/icons/server.png")))
-        self.protocol_action.setShortcut("Alt+R")
-        charts_menu.addAction(self.protocol_action)
-
-        self.voip_action = QAction("VoIP Info Chart", self)
-        self.voip_action.setIcon(QIcon(resource_path("resources/icons/phone_white.png")))
-        self.voip_action.setShortcut("Ctrl+N")
-        charts_menu.addAction(self.voip_action)
+        self.fiber_action = QAction("Fiber Signal Chart", self)
+        self.fiber_action.setIcon(QIcon(resource_path("resources/icons/fiber.png")))
+        self.fiber_action.setShortcut("Ctrl+Z")
+        charts_menu.addAction(self.fiber_action)
 
         self.gaming_action = QAction("Gaming Info Chart", self)
         self.gaming_action.setIcon(QIcon(resource_path("resources/icons/gaming_white.png")))
         self.gaming_action.setShortcut("Ctrl+G")
         charts_menu.addAction(self.gaming_action)
 
+        self.protocol_action = QAction("Protocol Chart", self)
+        self.protocol_action.setIcon(QIcon(resource_path("resources/icons/server.png")))
+        self.protocol_action.setShortcut("Alt+R")
+        charts_menu.addAction(self.protocol_action)
+
         self.storage_action = QAction("Storage Info Chart", self)
         self.storage_action.setIcon(QIcon(resource_path("resources/icons/storage_white.png")))
         self.storage_action.setShortcut("Alt+D")
         charts_menu.addAction(self.storage_action)
+
+        self.voip_action = QAction("VoIP Info Chart", self)
+        self.voip_action.setIcon(QIcon(resource_path("resources/icons/phone_white.png")))
+        self.voip_action.setShortcut("Ctrl+N")
+        charts_menu.addAction(self.voip_action)
+
+        self.wifi_standards_action = QAction("WiFi Standards Chart", self)
+        self.wifi_standards_action.setIcon(QIcon(resource_path("resources/icons/wifi.png")))
+        self.wifi_standards_action.setShortcut("Ctrl+W")
+        charts_menu.addAction(self.wifi_standards_action)
 
         _connect_hover_tooltips(charts_menu)
 
@@ -292,30 +292,30 @@ class MainMenuBar(QMenuBar):
         self.notepad_action.setShortcut("F12")
         tools_menu.addAction(self.notepad_action)
 
-        self.bat_action = QAction("Execute Batch File", self)
+        self.bat_action = QAction("Batch Execute", self)
         self.bat_action.setIcon(QIcon(resource_path("resources/icons/run.png")))
         self.bat_action.setShortcut("Alt+B")
         tools_menu.addAction(self.bat_action)
-
-        self.modem_action = QAction("Log Parser", self)
-        self.modem_action.setIcon(QIcon(resource_path("resources/icons/network.png")))
-        self.modem_action.setShortcut("Alt+L")
-        tools_menu.addAction(self.modem_action)
-
-        self.pwd_action = QAction("Password Generator", self)
-        self.pwd_action.setIcon(QIcon(resource_path("resources/icons/pw.png")))
-        self.pwd_action.setShortcut("Alt+P")
-        tools_menu.addAction(self.pwd_action)
 
         self.calc_action = QAction("Calculator", self)
         self.calc_action.setIcon(QIcon(resource_path("resources/icons/calculator.png")))
         self.calc_action.setShortcut("Alt+C")
         tools_menu.addAction(self.calc_action)
 
+        self.modem_action = QAction("Log Parser", self)
+        self.modem_action.setIcon(QIcon(resource_path("resources/icons/network.png")))
+        self.modem_action.setShortcut("Alt+L")
+        tools_menu.addAction(self.modem_action)
+
         self.mac_action = QAction("MAC Vendor Query", self)
         self.mac_action.setIcon(QIcon(resource_path("resources/icons/robot_white.png")))
         self.mac_action.setShortcut("Alt+T")
         tools_menu.addAction(self.mac_action)
+
+        self.pwd_action = QAction("Password Generator", self)
+        self.pwd_action.setIcon(QIcon(resource_path("resources/icons/pw.png")))
+        self.pwd_action.setShortcut("Alt+P")
+        tools_menu.addAction(self.pwd_action)
 
         self.ref_action = QAction("Reference", self)
         self.ref_action.setIcon(QIcon(resource_path("resources/icons/lightning_white.png")))
@@ -329,6 +329,11 @@ class MainMenuBar(QMenuBar):
         help_menu = AdjustMenu("Help", 260, self)
         self.addMenu(help_menu)
 
+        self.repo_action = QAction("Code Repository", self)
+        self.repo_action.setIcon(QIcon(resource_path("resources/icons/dev_logo.png")))
+        self.repo_action.setShortcut("Shift+R")
+        help_menu.addAction(self.repo_action)
+
         self.shortcut_action = QAction("Keyboard Shortcuts", self)
         self.shortcut_action.setIcon(QIcon(resource_path("resources/icons/keyboard_alt_white.png")))
         self.shortcut_action.setShortcut("Alt+K")
@@ -338,11 +343,6 @@ class MainMenuBar(QMenuBar):
         self.md_action.setIcon(QIcon(resource_path("resources/icons/markdown.png")))
         self.md_action.setShortcut("Alt+M")
         help_menu.addAction(self.md_action)
-
-        self.repo_action = QAction("Code Repository", self)
-        self.repo_action.setIcon(QIcon(resource_path("resources/icons/dev_logo.png")))
-        self.repo_action.setShortcut("Shift+R")
-        help_menu.addAction(self.repo_action)
 
         self.about_action = QAction("About Scratch Board", self)
         self.about_action.setIcon(QIcon(resource_path("resources/icons/about.png")))
