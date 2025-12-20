@@ -5,8 +5,8 @@ import psutil
 
 from PySide6.QtCore import QTimer, Qt, QObject, Slot, Signal, QThread
 from PySide6.QtWidgets import (
-    QWidget, QLabel, QVBoxLayout, QProgressBar,
-    QFrame, QHBoxLayout, QDialog, QTextEdit, QPushButton
+    QWidget, QLabel, QVBoxLayout,
+    QFrame, QHBoxLayout
 )
 
 from ui.themes.cal_stat_theme import cal_stat_style
