@@ -1,22 +1,22 @@
 import os
 import re
 import shutil
+import webbrowser
 from pathlib import Path
-from PySide6.QtCore import Qt, QTimer, QEvent
-from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QDragEnterEvent, QDropEvent
+from PySide6.QtCore import Qt, QTimer, QEvent, QUrl
+from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QAction, QPixmap
 from PySide6.QtWidgets import (
-    QHBoxLayout, QLineEdit, QPushButton,
-    QSplitter, QTextBrowser, QMessageBox, QWidget, QToolBar, QGraphicsOpacityEffect, QFileDialog
+    QDialog, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
+    QTextBrowser, QLabel, QPushButton, QToolBar, QStackedWidget,
+    QScrollArea, QFileDialog, QMessageBox, QGraphicsOpacityEffect
 )
-from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QDialog, QLabel, QVBoxLayout, QScrollArea
-from PySide6.QtGui import QPixmap
 
 from helpers.calc_helpers.count_words import count_words
 from helpers.image_helpers.drop_img import save_qimage, save_file_drop
 from helpers.md_helpers.md_to_html import render_markdown_to_html
 from ui.menus.context_menu import ModifyContextMenu
 from utils.resource_path import resource_path
+
 
 def _convert_image_paths(html):
     """
@@ -44,6 +44,7 @@ def _convert_image_paths(html):
     # Match all <img src="...">
     html = re.sub(r'<img\s+[^>]*src="([^"]+)"[^>]*>', repl, html)
     return html
+
 
 class EditorPanel(QDialog):
     """
@@ -82,7 +83,7 @@ class EditorPanel(QDialog):
         self.setWindowTitle("Scratch Board: Edit Note")
         self.resize(1100, 700)
         #self.setWindowFlag(Qt.WindowContextHelpButtonHint, False)
-        self.setWindowFlags (Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
+        self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
         self.setAcceptDrops(True)
 
         layout = QVBoxLayout(self)
@@ -107,29 +108,34 @@ class EditorPanel(QDialog):
         # Add the horizontal layout to the main vertical layout
         layout.addLayout(top_row)
 
-        # Splitter
-        splitter = QSplitter(Qt.Horizontal)
-        splitter.setHandleWidth(8)
-        layout.addWidget(splitter, stretch=1)
-
-        # Left side (Editor)
-        left = QWidget()
-        left_l = QVBoxLayout(left)
-
+        # Toolbar
         self.toolbar = QToolBar()
         self._add_toolbar_actions()
-        left_l.addWidget(self.toolbar)
+
+        # Stacked Widget (Editor / Preview)
+        self.stack = QStackedWidget()
+        layout.addWidget(self.stack, stretch=1)
+
+        # Editor Toggle
+        editor_page = QWidget()
+        editor_layout = QVBoxLayout(editor_page)
+        editor_layout.setContentsMargins(0, 0, 0, 0)
+        editor_layout.addWidget(self.toolbar)
 
         self.content_edit = ModifyContextMenu()
         self.content_edit.setPlainText(content or "")
         self.content_edit.setPlaceholderText("Use Plaintext, Markdown syntax, or the buttons to write and format.")
         self.content_edit.textChanged.connect(self._schedule_preview)
         self.content_edit.textChanged.connect(self._update_word_stats)
-        left_l.addWidget(self.content_edit, stretch=1)
+        editor_layout.addWidget(self.content_edit, stretch=1)
 
-        splitter.addWidget(left)
+        self.stack.addWidget(editor_page)  # index 0
 
-        # Right side (Preview)
+        # Preview Toggle
+        preview_page = QWidget()
+        preview_layout = QVBoxLayout(preview_page)
+        preview_layout.setContentsMargins(0, 0, 0, 0)
+
         self.preview = QTextBrowser()
         self.preview.setObjectName("PreviewPanel")
         self.preview.setPlaceholderText("Markdown \u2192 Html Preview")
@@ -138,16 +144,14 @@ class EditorPanel(QDialog):
         self.preview.setOpenLinks(False)
         self.preview.installEventFilter(self)
         self.preview.setOpenExternalLinks(True)
+        self.preview.anchorClicked.connect(self._on_preview_link_clicked)
 
         self._opacity = QGraphicsOpacityEffect(self.preview)
         self.preview.setGraphicsEffect(self._opacity)
         self._opacity.setOpacity(1)
 
-        splitter.addWidget(self.preview)
-
-        # initial sizes for left and right panels
-        splitter.setStretchFactor(0, 1)
-        splitter.setStretchFactor(1, 1)
+        preview_layout.addWidget(self.preview)
+        self.stack.addWidget(preview_page)  # index 1
 
         # Bottom Row
         bottom = QHBoxLayout()
@@ -156,10 +160,17 @@ class EditorPanel(QDialog):
         bottom.addWidget(self.word_label)
         bottom.addStretch()
 
+        # Toggle Preview Button
+        self.toggle_button = QPushButton(QIcon(resource_path("resources/icons/preview.png")), "Preview")
+        self.toggle_button.clicked.connect(self.toggle_preview)
+        bottom.addWidget(self.toggle_button)
+
+        # Save button
         btn_save = QPushButton(QIcon(resource_path("resources/icons/save.png")), "Save")
         btn_save.clicked.connect(self.save_note)
         bottom.addWidget(btn_save)
 
+        # Delete button
         btn_delete = QPushButton(QIcon(resource_path("resources/icons/delete.png")), "Delete")
         if delete_callback:
             btn_delete.clicked.connect(self.delete_note)
@@ -167,10 +178,12 @@ class EditorPanel(QDialog):
             btn_delete.setEnabled(False)
         bottom.addWidget(btn_delete)
 
+        # Cancel button
         btn_cancel = QPushButton(QIcon(resource_path("resources/icons/cancel.png")), "Cancel")
         btn_cancel.clicked.connect(self.reject)
         bottom.addWidget(btn_cancel)
 
+        # Add the bottom layout
         layout.addLayout(bottom)
 
         # Keyboard Shortcuts
@@ -187,6 +200,25 @@ class EditorPanel(QDialog):
         self._update_preview_no_animation()
         self.load_stylesheet()
 
+    #### --- Toggle Editor/Preview --- ####
+    def toggle_preview(self):
+        """
+        Toggle between the editor view and the preview view.
+
+        Updates the stacked widget to show either the editor or the preview.
+        Also updates the toggle button text accordingly.
+        """
+        if self.stack.currentIndex() == 0:
+            self._update_preview_no_animation()
+            self.stack.setCurrentIndex(1)
+            self.toggle_button.setText("Edit")
+            self.toggle_button.setIcon(QIcon(resource_path("resources/icons/edit_btn.png")))
+        else:
+            self.stack.setCurrentIndex(0)
+            self.toggle_button.setText("Preview")
+            self.toggle_button.setIcon(QIcon(resource_path("resources/icons/preview.png")))
+
+    #### --- Markdown Insertion --- ####
     def insert_md(self, start, end):
         """
         Insert Markdown formatting around the current text selection or at the cursor.
@@ -206,9 +238,10 @@ class EditorPanel(QDialog):
             cur.insertText(f"{start}{txt}{end}")
         else:
             cur.insertText(f"{start}{end}")
-            cur.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, len(end))
+            cur.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.MoveAnchor, len(end))
         self._schedule_preview()
 
+    #### --- Event Filter for Preview Links --- ####
     def eventFilter(self, obj, event):
         """
         Intercept and handle events for child widgets, specifically detecting
@@ -227,19 +260,20 @@ class EditorPanel(QDialog):
             bool: True if the event was handled (image link clicked), otherwise
             delegates to the default event filter.
         """
-        if obj is self.preview and event.type() == QEvent.MouseButtonRelease:
-            cursor = self.preview.cursorForPosition(event.pos())
+        if obj is self.preview and event.type() == QEvent.Type.MouseButtonRelease:
+            cursor = self.preview.cursorForPosition(event.position().toPoint())
             anchor = cursor.charFormat().anchorHref()
+
             if anchor.startswith("file:///"):
-                # strip the 'file:///' prefix to get the OS path
                 path = anchor[8:] if anchor.startswith("file:///") else anchor
                 if os.path.exists(path):
-                    self._on_preview_link_clicked(path)
+                    self._on_preview_img_clicked(path)
                     return True
 
         return super().eventFilter(obj, event)
 
-    def dragEnterEvent(self, event: QDragEnterEvent):
+    #### --- Drag & Drop --- ####
+    def dragEnterEvent(self, event):
         """
         Handle drag enter events for the editor panel.
 
@@ -252,7 +286,7 @@ class EditorPanel(QDialog):
         if event.mimeData().hasImage() or event.mimeData().hasUrls():
             event.acceptProposedAction()
 
-    def dropEvent(self, event: QDropEvent):
+    def dropEvent(self, event):
         """
         Handle drop events on the editor panel.
 
@@ -279,7 +313,7 @@ class EditorPanel(QDialog):
             self._schedule_preview()
             event.acceptProposedAction()
 
-    # Save/Delete
+    #### --- Save/Delete --- ####
     def save_note(self):
         """
         Save the current note with its title, content, and tags.
@@ -322,7 +356,7 @@ class EditorPanel(QDialog):
         """
         if self.delete_callback and QMessageBox.question(self, "Delete?",
                                                          "Delete this note?",
-                                                         QMessageBox.Yes | QMessageBox.No) == QMessageBox.Yes:
+                                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No) == QMessageBox.StandardButton.Yes:
             self.delete_callback(self.note_id)
             self.accept()
 
@@ -470,11 +504,7 @@ class EditorPanel(QDialog):
 
     def _toggle_fullscreen(self):
         """
-        Toggle the editor window between fullscreen and normal windowed mode.
-
-        Updates the internal `_is_fullscreen` flag to keep track of the current state.
-        If the editor is currently fullscreen, it will return to normal size.
-        If the editor is in normal mode, it will switch to fullscreen.
+        Toggle the dialog between normal and fullscreen mode.
         """
         if self._is_fullscreen:
             self.showNormal()
@@ -482,8 +512,26 @@ class EditorPanel(QDialog):
             self.showFullScreen()
         self._is_fullscreen = not self._is_fullscreen
 
-    def _on_preview_link_clicked(self, path):
-        """Opens the image in a full-window dialog."""
+    def _on_preview_link_clicked(self, url: QUrl):
+        url_str = url.toString()
+
+        if url_str.startswith("file:///") and url_str.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
+            # Local image → open in your image viewer
+            path = url_str[8:]  # remove 'file:///'
+            if os.path.exists(path):
+                self._on_preview_img_clicked(path)
+        elif url_str.startswith(("http://", "https://")):
+            # Web link → open in default browser
+            webbrowser.open(url_str)
+
+    def _on_preview_img_clicked(self, path):
+        """
+        Open an image in a popup dialog when clicked in the preview panel.
+
+        - Opens a QDialog with a QScrollArea to display the image.
+        - Scales the image proportionally to fit within 90% of the dialog size.
+        - Centers the image in the scrollable area.
+        """
         if not os.path.exists(path):
             return
 
@@ -492,19 +540,16 @@ class EditorPanel(QDialog):
         dlg.resize(900, 700)
 
         layout = QVBoxLayout(dlg)
-
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         layout.addWidget(scroll)
 
         lbl = QLabel()
         lbl.setAlignment(Qt.AlignCenter)
-
         pix = QPixmap(path)
-        # Scale pixmap to fit dialog window
+
         max_width = int(dlg.width() * 0.9)
         max_height = int(dlg.height() * 0.9)
-
         if pix.width() > max_width or pix.height() > max_height:
             pix = pix.scaled(max_width, max_height, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
@@ -513,8 +558,10 @@ class EditorPanel(QDialog):
 
         dlg.exec()
 
-    #### --- LOAD STYLES --- ####
     def load_stylesheet(self):
+        """
+        Load the QSS stylesheet for the editor dialog to style widgets consistently.
+        """
         try:
             with open(resource_path("ui/themes/editor_view_theme.qss"), "r", encoding="utf-8") as f:
                 self.setStyleSheet(f.read())
