@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt, Property, QPropertyAnimation, QEasingCurve
 from utils.resource_path import resource_path
-from helpers.calc_helpers.dashboard_stats import calculate_stats  # Make sure this returns new stats like avg words
+from domain.analytics.dashboard_stats import calculate_stats  # Make sure this returns new stats like avg words
 
 
 class StatCard(QWidget):

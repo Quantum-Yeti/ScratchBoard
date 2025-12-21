@@ -1,11 +1,10 @@
-import time
 from datetime import datetime
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QSpacerItem, QSizePolicy, QApplication
 from PySide6.QtGui import QPixmap, QPainterPath, QRegion
-from PySide6.QtCore import Qt, QThread, Signal, QRectF
+from PySide6.QtCore import Qt, QThread, Signal
 
-from helpers.start_helpers.run_startup import run_startup
+from startup.startup_runner import run_startup
 from utils.resource_path import resource_path
 
 def get_current_version():

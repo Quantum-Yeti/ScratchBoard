@@ -5,7 +5,7 @@ import webbrowser
 from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap, QShortcut, QKeySequence
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
-from helpers.widget_helpers.sync_helper import sync_db
+from services.sync_service import sync_db
 from models.note_model import NoteModel
 from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path
@@ -583,7 +583,7 @@ class MainMenuBar(QMenuBar):
         # Default OneDrive folder
         default_onedrive = os.path.join(os.path.expanduser("~"), "OneDrive", "Scratch Board")
 
-        # Calls sync_helper.py
+        # Calls sync_service.py
         sync_db(db_path, default_onedrive)
 
         # Notify user on success

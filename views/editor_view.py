@@ -12,8 +12,8 @@ from PySide6.QtWidgets import (
 )
 
 from helpers.calc_helpers.count_words import count_words
-from helpers.image_helpers.drop_img import save_qimage, save_file_drop
-from helpers.md_helpers.md_to_html import render_markdown_to_html
+from utils.image_io import save_qimage, save_file_drop
+from helpers.markdown.md_to_html import render_markdown_to_html
 from ui.menus.context_menu import ModifyContextMenu
 from utils.resource_path import resource_path
 

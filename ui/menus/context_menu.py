@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QTextEdit
 
 from ui.themes.context_menu_theme import menu_style
-from utils.menu_hover_tip import HoverToolTip
+from helpers.ui_helpers.menu_hover_tip import HoverToolTip
 
 class ModifyContextMenu(QTextEdit):
     def contextMenuEvent(self, event):

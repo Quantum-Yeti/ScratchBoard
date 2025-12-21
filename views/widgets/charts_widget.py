@@ -5,7 +5,7 @@ from PySide6.QtGui import QColor, QFont
 from PySide6.QtCore import Qt
 
 from helpers.ui_helpers.chart_pastel_list import PASTEL_CHART_COLORS
-from helpers.calc_helpers.dashboard_stats import calculate_stats
+from domain.analytics.dashboard_stats import calculate_stats
 
 segoe = QFont("Segoe UI", 11)
 

@@ -1,4 +1,3 @@
-# helpers/drop_img.py
 import os
 import shutil
 from pathlib import Path
@@ -13,7 +12,7 @@ def ensure_image_dir() -> Path:
 
 
 def save_qimage(image) -> str | None:
-    """Save an image from clipboard-drag data and return md_helpers path."""
+    """Save an image from clipboard-drag data and return markdown path."""
     dst = ensure_image_dir()
 
     # Using a timestamp avoids collisions
@@ -25,7 +24,7 @@ def save_qimage(image) -> str | None:
 
 
 def save_file_drop(local_path: str) -> str | None:
-    """Copy a dropped file into images folder and return md_helpers path."""
+    """Copy a dropped file into images folder and return markdown path."""
     if not Path(local_path).is_file():
         return None
 

@@ -8,7 +8,7 @@ from datetime import datetime
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 
-from helpers.image_helpers.drop_img import save_file_drop
+from utils.image_io import save_file_drop
 
 PASTEL_COLORS = ["#FFEBEE", "#FFF3E0", "#E8F5E9", "#E3F2FD", "#F3E5F5"]
 

@@ -1,12 +1,11 @@
 import getpass
-import webbrowser
 
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QFrame
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
 import subprocess
 
-from helpers.widget_helpers.open_company_url import open_company_homepage
+from helpers.ui_helpers.open_company_url import open_company_homepage
 from utils.resource_path import resource_path
 from managers.scratch_manager import ScratchManager
 from views.notepad_view import NotepadDialog
