@@ -170,7 +170,7 @@ class MainNotesView(QWidget):
 
             # Layout tuning
             main_layout.setAlignment(Qt.AlignCenter | Qt.AlignHCenter)
-            main_layout.setContentsMargins(20, 40, 20, 40)
+            main_layout.setContentsMargins(20, 10, 20, 40)
             main_layout.setSpacing(16)
 
             # Astronaut icon
