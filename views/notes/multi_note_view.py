@@ -51,7 +51,7 @@ class PopulateNotesThread(QThread):
                 note._cached_pix = pix
         self.thread_loaded.emit(self.notes, self.on_click)
 
-class MainView(QWidget):
+class MainNotesView(QWidget):
     """
     Main notes view widget.
 

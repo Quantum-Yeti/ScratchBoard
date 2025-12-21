@@ -14,7 +14,7 @@ from ui.menus.menu_bar import MainMenuBar
 from views.splash.splash_screen import SplashScreen
 from views.dashboard_view import DashboardView
 from views.sidebar.sidebar_widget import Sidebar
-from views.notes.main_note_view import MainView
+from views.notes.multi_note_view import MainNotesView
 from views.contacts.contacts_view import ContactsView
 from controllers.note_controller import NoteController
 from controllers.contacts_controller import ContactsController
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
 
         # Instantiate primary UI views
         categories = ["Contacts", "CoPilot", "Internet", "Email", "Phone", "Video", "Streaming", "Coaching", "Notes", "Ideas"]
-        self.main_view = MainView(categories)
+        self.main_view = MainNotesView(categories)
         self.contacts_view = ContactsView(categories)
 
         # Connect sidebar to model and pass signals

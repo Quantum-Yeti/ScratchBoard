@@ -9,7 +9,7 @@ from views.widgets.stats_widget import StatsWidget
 from views.widgets.mac_widget import MacVendorView
 from views.widgets.reference_widget import ReferenceWidget
 from views.widgets.sys_info_widget import CalStatWidget
-from views.notes.main_note_view import MainView
+from views.notes.multi_note_view import MainNotesView
 from views.contacts.contacts_view import ContactsView
 from utils.resource_path import resource_path
 
@@ -109,7 +109,7 @@ class DashboardView(QWidget):
         main_layout.addWidget(self.view_container)
 
         # Pre-create Notes & Contacts views
-        self.notes_view = MainView(self.model.get_all_categories())
+        self.notes_view = MainNotesView(self.model.get_all_categories())
         self.notes_view.add_btn.hide()
         self.contacts_view = ContactsView(self.model.get_all_categories())
 
