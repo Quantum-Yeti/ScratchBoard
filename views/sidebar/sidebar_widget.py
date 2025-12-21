@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QF
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
 import subprocess
 
+from helpers.widget_helpers.open_company_url import open_company_homepage
 from utils.resource_path import resource_path
 from managers.scratch_manager import ScratchManager
 from views.notepad_view import NotepadDialog
@@ -143,16 +144,8 @@ class Sidebar(QWidget):
         bat_btn.clicked.connect(self.open_bat_file)
         #layout.addWidget(bat_btn)
 
-        # GitHub repository button
+        # Get logged-in user
         username = getpass.getuser()
-        def get_company_homepage():
-            try:
-                with open(resource_path("resources/site.txt"), "r") as f:
-                    url = f.read().strip()
-                    return url
-            except Exception as e:
-                print("Failed to load website.")
-                return None
 
         logo_btn = QPushButton(f"{username}")
         logo_btn.setToolTip(f"Welcome, {username}: Open the company homepage in your default browser")
@@ -160,11 +153,7 @@ class Sidebar(QWidget):
         logo_btn.setIconSize(QSize(32, 32))
         logo_btn.setFlat(True)
         logo_btn.setCursor(Qt.PointingHandCursor)
-        #logo_btn.clicked.connect(open_github)
-        def open_company_homepage():
-            url = get_company_homepage()
-            if url:
-                webbrowser.open(url, new=1)
+
         logo_btn.clicked.connect(open_company_homepage)
         layout.addWidget(logo_btn, alignment=Qt.AlignBottom)
 
