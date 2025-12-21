@@ -1,7 +1,7 @@
 import json
 
 from PySide6.QtCore import QTimer, Signal, QObject
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox, QPushButton
 from views.editor_view import EditorPanel
 
 class NoteController(QObject):
@@ -67,7 +67,7 @@ class NoteController(QObject):
         # Convert JSON string to Python list for adding tags
         tags = json.loads(note["tags"]) if note["tags"] else []
 
-        EditorPanel(
+        editor = EditorPanel(
             parent=self.view,
             note_id=note["id"],
             title=note["title"],
@@ -75,7 +75,14 @@ class NoteController(QObject):
             save_callback=lambda t, c, tags=None: self.save_edit(note["id"], t, c, tags),
             delete_callback=lambda nid=note["id"]: self.delete_note(nid),
             tags=tags
-        ).exec()
+        )
+
+        # Force preview mode
+        editor.open_existing_in_preview()
+
+        editor.exec()
+
+
 
     def on_search_changed(self, text):
         """

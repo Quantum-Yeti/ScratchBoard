@@ -224,6 +224,12 @@ class EditorPanel(QDialog):
             self.toggle_button.setText("Preview")
             self.toggle_button.setIcon(QIcon(resource_path("resources/icons/preview.png")))
 
+    # Open an existing note in preview mode
+    def open_existing_in_preview(self):
+        self._update_preview_no_animation()  # ensure preview is up to date
+        self.stack.setCurrentIndex(1)  # switch to preview page
+        self.toggle_button.setText("Edit")  # update button text/icon
+
     #### --- Markdown Insertion --- ####
     def insert_md(self, start, end):
         """
