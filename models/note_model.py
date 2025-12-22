@@ -417,6 +417,15 @@ class NoteModel:
                 if not dst.exists():
                     shutil.copy(file, dst)
 
+        # Copy notepad folder
+        sb_notepad = Path("sb_data/notepad")
+        notepad_dst = temp_dir / "notepad"
+        notepad_dst.mkdir(exist_ok=True)
+
+        if sb_notepad.exists():
+            for txt_file in sb_notepad.glob("*.txt"):
+                shutil.copy(txt_file, notepad_dst / txt_file.name)
+
         # Export contacts
         for contact in self.get_contacts():
             export_data["contacts"].append(dict(contact))
@@ -438,6 +447,10 @@ class NoteModel:
             # Add images
             for img_file in images_dir.glob("*.*"):
                 zipf.write(img_file, arcname=f"images/{img_file.name}")
+
+            # Add notepad txt files
+            for txt_file in notepad_dst.glob("*.txt"):
+                zipf.write(txt_file, arcname=f"notepad/{txt_file.name}")
 
         # Clean up temp folder
         shutil.rmtree(temp_dir)
@@ -464,6 +477,14 @@ class NoteModel:
                     shutil.copy(file, dst_images / file.name)
                 except Exception as e:
                     print("Failed copying image:", file, e)
+
+        src_notepad = import_dir / "notepad"
+        dst_notepad = Path("sb_data/notepad")
+        dst_notepad.mkdir(parents=True, exist_ok=True)
+
+        if src_notepad.exists():
+            for txt_file in src_notepad.glob("*.txt"):
+                shutil.copy(txt_file, dst_notepad / txt_file.name)
 
         # Load JSON
         json_path = import_dir / "notes_export.json"
@@ -535,4 +556,19 @@ class NoteModel:
         cursor.execute("DELETE FROM reference_links")
 
         self.conn.commit()
+
+        folders_to_delete = [
+            Path("sb_data"),
+            Path("sb_data/images"),
+            Path("sb_data/notepad"),
+            Path("sb_data/db"),
+            Path("sb_temp_export"),
+            Path("sb_temp_import"),
+        ]
+
+        for folder in folders_to_delete:
+            if folder.exists():
+                shutil.rmtree(folder, ignore_errors=True)
+
+        print("All assets have been nuked.")
 

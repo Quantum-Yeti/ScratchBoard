@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QFileDialog,
@@ -178,12 +179,23 @@ class NotepadDialog(QDialog):
                 self.text_edit.setPlainText(f.read())
 
     def save_file(self):
+        notepad_dir = Path("sb_data/notepad")
+        notepad_dir.mkdir(parents=True, exist_ok=True)
+
         path, _ = QFileDialog.getSaveFileName(
-            self, "Save File", "", "Text Files (*.txt);;All Files (*)"
+            self,
+            "Save File",
+            str(notepad_dir),  # 👈 default starting folder
+            "Text Files (*.txt);;All Files (*)"
         )
-        if path:
-            with open(path, "w", encoding="utf-8") as f:
-                f.write(self.text_edit.toPlainText())
+
+        if not path:
+            return
+
+
+
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(self.text_edit.toPlainText())
 
     def update_count(self):
         text = self.text_edit.toPlainText()

@@ -317,7 +317,7 @@ class MainMenuBar(QMenuBar):
         self.pwd_action.setShortcut("Alt+P")
         tools_menu.addAction(self.pwd_action)
 
-        self.ref_action = QAction("Reference", self)
+        self.ref_action = QAction("Custom Links", self)
         self.ref_action.setIcon(QIcon(resource_path("resources/icons/lightning_white.png")))
         self.ref_action.setShortcut("Alt+X")
         tools_menu.addAction(self.ref_action)
