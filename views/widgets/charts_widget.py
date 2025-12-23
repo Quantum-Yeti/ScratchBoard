@@ -1,3 +1,4 @@
+import webbrowser
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -47,24 +48,36 @@ def dash_left_stats(model):
 
     save_icon = QIcon(resource_path("resources/icons/save_arm.png"))
     save_btn = QPushButton("Save Arm")
+    save_btn.setToolTip("Save your ARM statement (or a quick note).")
     save_btn.setStyleSheet(dash_action_button_style)
     save_btn.setIcon(save_icon)
 
     pop_icon = QIcon(resource_path("resources/icons/pop_arm.png"))
     pop_btn = QPushButton("Pop Arm")
+    pop_btn.setToolTip("Pop your ARM statement open.")
     pop_btn.setStyleSheet(dash_action_button_style)
     pop_btn.setIcon(pop_icon)
     pop_btn.clicked.connect(open_arm_pop)
 
     db_btn_icon = QIcon(resource_path("resources/icons/db_pop.png"))
     db_stats_btn = QPushButton("DB Stats")
+    db_stats_btn.setToolTip("Check your database stats and remember to backup often with File > Export > OneDrive upload.")
     db_stats_btn.setStyleSheet(dash_action_button_style)
     db_stats_btn.setIcon(db_btn_icon)
     db_stats_btn.clicked.connect(lambda: update_db_stats(model))
 
+    email_btn_icon = QIcon(resource_path("resources/icons/email_pop.png"))
+    email_btn = QPushButton("Email")
+    email_btn.setToolTip("Check your email.")
+    email_btn.setStyleSheet(dash_action_button_style)
+    email_btn.setIcon(email_btn_icon)
+    email_btn.clicked.connect(lambda: webbrowser.open("https://outlook.com"))
+
+    # Add buttons to button layout
     button_layout.addWidget(save_btn)
     button_layout.addWidget(pop_btn)
     button_layout.addWidget(db_stats_btn)
+    button_layout.addWidget(email_btn)
 
     # Add button layout to main layout
     layout.addLayout(button_layout)
