@@ -1,5 +1,6 @@
-from PySide6.QtGui import QIcon, QCursor
-from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QApplication, QFrame
+from PySide6.QtGui import QIcon, QCursor, QPixmap
+from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QApplication, QFrame, \
+    QSplitter, QSizePolicy
 from helpers.parsers.log_parser_helper import ModemLogParser
 from PySide6.QtCore import Qt, QSize
 
@@ -42,60 +43,84 @@ class ModemLogParserView(QDialog):
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(6)
 
-        # Input label
-        input_label = QLabel("Modem Log")
-        input_label.setStyleSheet("font-size: 16px; font-weight: bold;")
-        layout.addWidget(input_label)
+        # Header row (label on left, buttons on right)
+        header_row = QHBoxLayout()
 
-        # Input field
-        self.input = QTextEdit()
-        self.input.setPlaceholderText("Paste modem event logs here...")
-        self.input.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
-        self.input.setMinimumHeight(200)
-        layout.addWidget(self.input)
+        # Title icon
+        pixmap = QPixmap(resource_path("resources/icons/polyline.png"))
+        icon_label = QLabel()
+        icon_label.setPixmap(pixmap)
+        icon_label.setFixedSize(26, 26)
+        icon_label.setScaledContents(True)
 
-        # Button row - aligns parse + clear buttons
-        button_row = QHBoxLayout()
-        button_row.addStretch() # Left stretch
+        # Title label
+        title_label = QLabel("Modem Log Parser")
+        title_label.setStyleSheet("font-size: 20px; font-weight: bold; text-align: center;")
 
+        header_row.addWidget(icon_label)
+        header_row.addWidget(title_label)
+
+        header_row.addStretch()  # push buttons to the right
+
+        # Parse button
         parse_btn = QPushButton("Parse Logs")
         parse_btn.setIcon(QIcon(resource_path("resources/icons/query.png")))
         parse_btn.clicked.connect(self.parse_logs)
-        button_row.addWidget(parse_btn)
+        header_row.addWidget(parse_btn)
 
+        # Clear button
         clear_btn = QPushButton("Clear Logs")
         clear_btn.setIcon(QIcon(resource_path("resources/icons/clear.png")))
         clear_btn.clicked.connect(self.clear_logs)
-        button_row.addWidget(clear_btn)
+        header_row.addWidget(clear_btn)
 
-        button_row.addStretch() # Right stretch
+        # Add the row to the main layout
+        layout.addLayout(header_row)
 
-        layout.addLayout(button_row)
-
-        # Output label
+        # Summary label
         self.summary_title = QLabel("Summary:")
         self.summary_title.setStyleSheet("font-size: 16px; font-weight: bold;")
         layout.addWidget(self.summary_title)
 
-        # Output summary
-        self.summary_label = QLabel("Waiting on input...")
+        # Summary output
+        self.summary_label = QLabel("Copy and paste the modem log from your analytics tool to get results.")
         self.summary_label.setAlignment(Qt.AlignLeft)
         self.summary_label.setStyleSheet("color: #00A3E0;")
         self.summary_label.setWordWrap(True)
         layout.addWidget(self.summary_label)
 
-        # Output label
-        self.output_label = QLabel("Detailed Log Analysis")
-        self.output_label.setStyleSheet("font-size: 16px; font-weight: bold;")
-        layout.addWidget(self.output_label)
+        divider = _make_divider()
+        layout.addWidget(divider)
 
-        # Detailed output
+        splitter = QSplitter(Qt.Horizontal)
+        splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+        # Input field
+        self.input_title = QLabel("Log Input:")
+        self.input = QTextEdit()
+        self.input.setPlaceholderText("Paste the modem log here.")
+        self.input.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
+        self.input.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+        # Output field
+        self.output_title = QLabel("Log Output:")
         self.output = QTextEdit()
-        self.output.setPlaceholderText("Log output...")
+        self.output.setPlaceholderText("Waiting for log to parse.")
         self.output.setReadOnly(True)
-        self.output.setMinimumHeight(350)
         self.output.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
-        layout.addWidget(self.output)
+        self.output.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        # Add to splitter
+        splitter.addWidget(self.input)
+        splitter.addWidget(self.output)
+
+        # Sizing behavior
+        splitter.setStretchFactor(0, 1)
+        splitter.setStretchFactor(1, 2)
+        splitter.setSizes([500, 700])
+
+        # Add splitter to existing layout
+        layout.addWidget(splitter)
 
         # Set dialog size constraints
         self.resize(1200, 900)

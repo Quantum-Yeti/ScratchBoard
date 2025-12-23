@@ -5,8 +5,9 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QSize
 
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_widgets.info_dictionaries.speed_dict import requirements
+from views.info_chart_widgets.info_dictionaries.speed_dict import requirements
 
 
 class InternetSpeedRequirements(QDialog):
@@ -23,7 +24,7 @@ class InternetSpeedRequirements(QDialog):
             self.setStyleSheet(f.read())
 
         self.setWindowTitle("Scratch Board: Bandwidth Requirements Chart")
-        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(1100, 900)
 
         layout = QVBoxLayout(self)
@@ -35,27 +36,27 @@ class InternetSpeedRequirements(QDialog):
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignCenter)  # Centers everything horizontally
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centers everything horizontally
 
         # Image
         image_label = QLabel()
         image_label.setPixmap(QPixmap(resource_path("resources/icons/bandwidth.png")))
-        image_label.setAlignment(Qt.AlignVCenter)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         # Title
         title_label = QLabel("Bandwidth Requirements Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
-        title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)  # Prevents stretching
+        title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)  # Prevents stretching
 
         # Add widgets to layout
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
 
         # Add the container widget to the main layout
-        layout.addWidget(icon_title_widget, alignment=Qt.AlignCenter)
+        layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
@@ -68,6 +69,8 @@ class InternetSpeedRequirements(QDialog):
             "Notes"
         ])
         self.table.setWordWrap(True)
+        self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
+        self.table.horizontalScrollBar().setStyleSheet(vertical_scrollbar_style)
         layout.addWidget(self.table)
 
         # Close button
@@ -92,8 +95,8 @@ class InternetSpeedRequirements(QDialog):
         for row, req in enumerate(requirements):
             for col, key in enumerate(["activity", "min", "rec", "latency", "notes"]):
                 item = QTableWidgetItem(req[key])
-                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 item.setToolTip(req[key])
                 self.table.setItem(row, col, item)
 
@@ -106,4 +109,4 @@ class InternetSpeedRequirements(QDialog):
 
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)

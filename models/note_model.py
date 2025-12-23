@@ -549,26 +549,29 @@ class NoteModel:
         print(f"Data imported from {zip_path}")
 
     # DANGER ZONE: DELETE DATABASE FROM FILE MENU
-    def delete_all_notes(self):
-        cursor = self.conn.cursor()
-        cursor.execute("DELETE FROM notes")
-        cursor.execute("DELETE FROM contacts")
-        cursor.execute("DELETE FROM reference_links")
+    def nuke_everything(self):
+        try:
+            self.conn.close()
+        except Exception:
+            pass
 
-        self.conn.commit()
+        # Remove sb_data directory
+        sb_data = Path("sb_data")
+        if sb_data.exists():
+            shutil.rmtree(sb_data)
 
-        folders_to_delete = [
-            Path("sb_data"),
-            Path("sb_data/images"),
-            Path("sb_data/notepad"),
-            Path("sb_data/db"),
-            Path("sb_temp_export"),
-            Path("sb_temp_import"),
-        ]
+        # Recreate file structure
+        (sb_data / "db").mkdir(parents=True, exist_ok=True)
+        (sb_data / "images").mkdir(parents=True, exist_ok=True)
+        (sb_data / "notepad").mkdir(parents=True, exist_ok=True)
 
-        for folder in folders_to_delete:
-            if folder.exists():
-                shutil.rmtree(folder, ignore_errors=True)
+        # Recreate database connection
+        db_path = sb_data / "db" / "notes.db"
+        self.conn = sqlite3.connect(db_path)
+        self.conn.row_factory = sqlite3.Row
+
+        # Recreate schema + defaults
+        self._setup_db()
 
         print("All assets have been nuked.")
 

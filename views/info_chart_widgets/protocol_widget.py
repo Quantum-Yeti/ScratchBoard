@@ -3,8 +3,9 @@ from PySide6.QtGui import QIcon, QFont, QPixmap, Qt
 from PySide6.QtWidgets import QTableWidget, QHBoxLayout, QPushButton, QSizePolicy, QLabel, QVBoxLayout, QDialog, \
     QWidget, QTableWidgetItem
 
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_widgets.info_dictionaries.protocol_dict import internet_protocols
+from views.info_chart_widgets.info_dictionaries.protocol_dict import internet_protocols
 
 
 class InternetProtocolsTimeline(QDialog):
@@ -19,7 +20,7 @@ class InternetProtocolsTimeline(QDialog):
             self.setStyleSheet(f.read())
 
         self.setWindowTitle("Scratch Board: Recent Internet Protocols")
-        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(1200, 900)
 
         layout = QVBoxLayout(self)
@@ -31,22 +32,22 @@ class InternetProtocolsTimeline(QDialog):
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignCenter)
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         image_label = QLabel()
         image_label.setPixmap(QPixmap(resource_path("resources/icons/server_yellow.png")))
-        image_label.setAlignment(Qt.AlignVCenter)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         title_label = QLabel("Internet Protocols Timeline")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
-        title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
 
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
-        layout.addWidget(icon_title_widget, alignment=Qt.AlignCenter)
+        layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
@@ -55,6 +56,8 @@ class InternetProtocolsTimeline(QDialog):
             "Protocol", "Era", "Purpose", "Notes"
         ])
         self.table.setWordWrap(True)
+        self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
+        self.table.horizontalScrollBar().setStyleSheet(vertical_scrollbar_style)
         layout.addWidget(self.table)
 
         # Close button
@@ -80,7 +83,7 @@ class InternetProtocolsTimeline(QDialog):
             for col, key in enumerate(["protocol", "era", "purpose", "notes"]):
                 item = QTableWidgetItem(proto[key])
                 item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 item.setToolTip(proto[key])
                 self.table.setItem(row, col, item)
 
@@ -91,4 +94,4 @@ class InternetProtocolsTimeline(QDialog):
         self.table.setColumnWidth(3, 450)  # Notes
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)

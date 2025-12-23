@@ -3,8 +3,9 @@ from PySide6.QtGui import QIcon, QFont, QPixmap
 from PySide6.QtWidgets import QTableWidgetItem, QPushButton, QHBoxLayout, QTableWidget, QSizePolicy, QLabel, QWidget, \
     QVBoxLayout, QDialog
 
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_widgets.info_dictionaries.storage_dict import storage
+from views.info_chart_widgets.info_dictionaries.storage_dict import storage
 
 
 class DiskStorageChart(QDialog):
@@ -20,7 +21,7 @@ class DiskStorageChart(QDialog):
             self.setStyleSheet(f.read())
 
         self.setWindowTitle("Scratch Board: Disk Storage Info Chart")
-        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(900, 700)
 
         layout = QVBoxLayout(self)
@@ -32,24 +33,24 @@ class DiskStorageChart(QDialog):
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignCenter)
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Image
         image_label = QLabel()
         image_label.setPixmap(QPixmap(resource_path("resources/icons/storage.png")))
-        image_label.setAlignment(Qt.AlignVCenter)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         # Title
         title_label = QLabel("Disk Storage Info Chart")
         font = QFont("Segoe UI", 28)
         font.setBold(True)
         title_label.setFont(font)
-        title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
 
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
-        layout.addWidget(icon_title_widget, alignment=Qt.AlignCenter)
+        layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
@@ -60,6 +61,8 @@ class DiskStorageChart(QDialog):
             "Notes"
         ])
         self.table.setWordWrap(True)
+        self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
+        self.table.horizontalScrollBar().setStyleSheet(vertical_scrollbar_style)
         layout.addWidget(self.table)
 
         # Close button
@@ -84,8 +87,8 @@ class DiskStorageChart(QDialog):
         for row, req in enumerate(storage):
             for col, key in enumerate(["unit", "equivalent", "notes"]):
                 item = QTableWidgetItem(req[key])
-                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 item.setToolTip(req[key])
                 self.table.setItem(row, col, item)
 
@@ -95,4 +98,4 @@ class DiskStorageChart(QDialog):
         self.table.setColumnWidth(2, 450)  # Notes
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)

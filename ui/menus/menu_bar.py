@@ -10,19 +10,19 @@ from models.note_model import NoteModel
 from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path
 from views.games.asteroid import AsteroidsWidget
-from views.info_widgets.fiber_widget import FiberReferenceDialog
-from views.info_widgets.gaming_widget import GamingReference
-from views.info_widgets.protocol_widget import InternetProtocolsTimeline
-from views.info_widgets.signal_widget import SignalReference
-from views.info_widgets.ethernet_widget import EthernetReference
-from views.info_widgets.speed_widget import InternetSpeedRequirements
-from views.info_widgets.storage_widget import DiskStorageChart
-from views.info_widgets.voip_widget import VoIPReference
+from views.info_chart_widgets.fiber_widget import FiberReferenceDialog
+from views.info_chart_widgets.gaming_widget import GamingReference
+from views.info_chart_widgets.protocol_widget import InternetProtocolsTimeline
+from views.info_chart_widgets.signal_widget import SignalReference
+from views.info_chart_widgets.ethernet_widget import EthernetReference
+from views.info_chart_widgets.speed_widget import InternetSpeedRequirements
+from views.info_chart_widgets.storage_widget import DiskStorageChart
+from views.info_chart_widgets.voip_widget import VoIPReference
 from views.widgets.calc_widget import SimpleCalcView
 from views.widgets.log_widget import ModemLogParserView
 from views.notepad_view import NotepadDialog
 from views.widgets.about_widget import AboutWidget
-from views.info_widgets.wifi_standards_widget import WifiStandardsReference
+from views.info_chart_widgets.wifi_standards_widget import WifiStandardsReference
 from views.widgets.mac_pop_widget import MacVendorPopup
 from views.widgets.md_widget import MarkdownGuideWidget
 from views.widgets.password_widget import PassGenWidget
@@ -552,7 +552,7 @@ class MainMenuBar(QMenuBar):
 
         if response == QMessageBox.StandardButton.Yes:
             try:
-                self.note_model.delete_all_notes()
+                self.note_model.nuke_everything()
                 QMessageBox.information(self, "Scratch Board: Database Deleted", "All data has been deleted.")
 
                 # Forces refresh

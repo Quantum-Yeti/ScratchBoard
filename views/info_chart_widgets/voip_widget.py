@@ -3,8 +3,9 @@ from PySide6.QtGui import QIcon, QFont, QPixmap, Qt
 from PySide6.QtWidgets import QTableWidget, QPushButton, QHBoxLayout, QSizePolicy, QLabel, QWidget, QVBoxLayout, \
     QDialog, QTableWidgetItem
 
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_widgets.info_dictionaries.voip_dict import voip_signals
+from views.info_chart_widgets.info_dictionaries.voip_dict import voip_signals
 
 
 class VoIPReference(QDialog):
@@ -19,7 +20,7 @@ class VoIPReference(QDialog):
             pass  # silently continue if theme not found
 
         self.setWindowTitle("Scratch Board: VoIP Reference Chart")
-        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(1200, 900)
 
         layout = QVBoxLayout(self)
@@ -31,22 +32,22 @@ class VoIPReference(QDialog):
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignCenter)
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         image_label = QLabel()
         image_label.setPixmap(QPixmap(resource_path("resources/icons/phone.png")))  # add your icon
-        image_label.setAlignment(Qt.AlignVCenter)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         title_label = QLabel("VoIP Troubleshooting Reference Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
-        title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
 
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
-        layout.addWidget(icon_title_widget, alignment=Qt.AlignCenter)
+        layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
@@ -59,6 +60,8 @@ class VoIPReference(QDialog):
             "Troubleshooting Steps"
         ])
         self.table.setWordWrap(True)
+        self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
+        self.table.horizontalScrollBar().setStyleSheet(vertical_scrollbar_style)
         layout.addWidget(self.table)
 
         # Close button
@@ -83,8 +86,8 @@ class VoIPReference(QDialog):
         for row, sig in enumerate(voip_signals):
             for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
                 item = QTableWidgetItem(sig[key])
-                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 item.setToolTip(sig[key])
                 self.table.setItem(row, col, item)
 
@@ -97,4 +100,4 @@ class VoIPReference(QDialog):
 
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)

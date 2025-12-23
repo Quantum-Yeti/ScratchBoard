@@ -3,8 +3,9 @@ from PySide6.QtGui import QIcon, QPixmap, QFont
 from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHBoxLayout, QPushButton, QLabel, QWidget, QVBoxLayout, \
     QDialog, QSizePolicy
 
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_widgets.info_dictionaries.gaming_dict import gaming_server_issues
+from views.info_chart_widgets.info_dictionaries.gaming_dict import gaming_server_issues
 
 class GamingReference(QDialog):
     def __init__(self, parent=None):
@@ -18,7 +19,7 @@ class GamingReference(QDialog):
             pass
 
         self.setWindowTitle("Scratch Board: Gaming Network Reference Chart")
-        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(1200, 900)
 
         layout = QVBoxLayout(self)
@@ -30,22 +31,22 @@ class GamingReference(QDialog):
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignCenter)
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         image_label = QLabel()
         image_label.setPixmap(QPixmap(resource_path("resources/icons/gaming.png")))  # Add your gaming icon
-        image_label.setAlignment(Qt.AlignVCenter)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         title_label = QLabel("Gaming Network Reference Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
-        title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
 
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
-        layout.addWidget(icon_title_widget, alignment=Qt.AlignCenter)
+        layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
@@ -58,6 +59,8 @@ class GamingReference(QDialog):
             "Troubleshooting Steps"
         ])
         self.table.setWordWrap(True)
+        self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
+        self.table.horizontalScrollBar().setStyleSheet(vertical_scrollbar_style)
         layout.addWidget(self.table)
 
         # Close button
@@ -96,4 +99,4 @@ class GamingReference(QDialog):
 
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)

@@ -3,8 +3,9 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetIt
     QSizePolicy, QWidget
 from PySide6.QtCore import Qt, QSize
 
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_widgets.info_dictionaries.docsis_dict import docsis_signals
+from views.info_chart_widgets.info_dictionaries.docsis_dict import docsis_signals
 
 
 class SignalReference(QDialog):
@@ -16,7 +17,7 @@ class SignalReference(QDialog):
             self.setStyleSheet(f.read())
 
         self.setWindowTitle("Scratch Board: DOCSIS Modem Signal Reference Chart")
-        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(1200, 900)  # initial size
 
         layout = QVBoxLayout(self)
@@ -28,27 +29,27 @@ class SignalReference(QDialog):
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignCenter)  # Centers everything horizontally
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centers everything horizontally
 
         # Image
         image_label = QLabel()
         image_label.setPixmap(QPixmap(resource_path("resources/icons/waves_yellow.png")))
-        image_label.setAlignment(Qt.AlignVCenter)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         # Title
         title_label = QLabel("DOCSIS Signal Reference Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
-        title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)  # Prevents stretching
+        title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)  # Prevents stretching
 
         # Add widgets to layout
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
 
         # Add the container widget to the main layout
-        layout.addWidget(icon_title_widget, alignment=Qt.AlignCenter)
+        layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
@@ -61,6 +62,8 @@ class SignalReference(QDialog):
             "Troubleshooting Steps"
         ])
         self.table.setWordWrap(True)
+        self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
+        self.table.horizontalScrollBar().setStyleSheet(vertical_scrollbar_style)
         layout.addWidget(self.table)
 
         # Close button
@@ -90,8 +93,8 @@ class SignalReference(QDialog):
         for row, sig in enumerate(docsis_signals):
             for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
                 item = QTableWidgetItem(sig[key])
-                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 item.setToolTip(sig[key])
                 self.table.setItem(row, col, item)
 
@@ -108,4 +111,4 @@ class SignalReference(QDialog):
 
         # Stretch last column to use remaining space
         self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
