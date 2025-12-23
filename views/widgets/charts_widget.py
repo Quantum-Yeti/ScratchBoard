@@ -1,19 +1,19 @@
-import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from tkinter import dialog
 
-from PySide6.QtCharts import QChart, QSplineSeries, QBarSet, QBarSeries, QValueAxis, \
+from PySide6.QtCharts import QChart, QSplineSeries, QValueAxis, \
     QCategoryAxis
-from PySide6.QtGui import QColor, QFont, QPixmap, QIcon
+from PySide6.QtGui import QColor, QFont, QIcon
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QLabel, QScrollArea, QWidget, QGridLayout, QPushButton, QTextEdit, QVBoxLayout, \
-    QHBoxLayout, QDialog, QSizePolicy
+from PySide6.QtWidgets import QWidget, QPushButton, QTextEdit, QVBoxLayout, \
+    QHBoxLayout, QSizePolicy, QMessageBox
 
 from helpers.ui_helpers.chart_pastel_list import PASTEL_CHART_COLORS
 from domain.analytics.dashboard_stats import calculate_stats
 from ui.themes.dash_action_btn_style import dash_action_button_style
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
+from views.widgets.arm_pop_widget import open_arm_pop
 from views.widgets.db_stats_pop import update_db_stats
 
 segoe = QFont("Segoe UI", 11)
@@ -36,12 +36,14 @@ def dash_left_stats(model):
     layout.setContentsMargins(0, 0, 0, 0)
 
     arm_text = QTextEdit()
-    arm_text.setPlaceholderText("Type your ARM statement here then click save; it auto-loads after saving.")
+    arm_text.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
+    arm_text.setPlaceholderText("Type your ARM statement (or a quick note) here then click save; it auto-loads after saving.")
     layout.addWidget(arm_text, stretch=1)
 
     # Horizontal layout for buttons
     button_layout = QHBoxLayout()
-    button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # center the buttons
+    button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    button_layout.setContentsMargins(0, 0, 0, 5)
 
     save_icon = QIcon(resource_path("resources/icons/save_arm.png"))
     save_btn = QPushButton("Save Arm")
@@ -52,6 +54,7 @@ def dash_left_stats(model):
     pop_btn = QPushButton("Pop Arm")
     pop_btn.setStyleSheet(dash_action_button_style)
     pop_btn.setIcon(pop_icon)
+    pop_btn.clicked.connect(open_arm_pop)
 
     db_btn_icon = QIcon(resource_path("resources/icons/db_pop.png"))
     db_stats_btn = QPushButton("DB Stats")
@@ -67,9 +70,27 @@ def dash_left_stats(model):
     layout.addLayout(button_layout)
 
     def save_arm_statement():
-        Path("sb_data/notepad").mkdir(exist_ok=True)
-        with open("sb_data/notepad/arm_statement.txt", "w", encoding="utf-8") as f:
-            f.write(arm_text.toPlainText())
+        try:
+            Path("sb_data/notepad").mkdir(exist_ok=True)
+            with open("sb_data/notepad/arm_statement.txt", "w", encoding="utf-8") as s:
+                s.write(arm_text.toPlainText())
+
+            # Success message
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle("Success")
+            msg.setText("ARM statement saved successfully!")
+            msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+            msg.exec()
+
+        except Exception as e:
+            # Error message if something goes wrong
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setWindowTitle("Error")
+            msg.setText(f"Failed to save ARM statement: {str(e)}")
+            msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+            msg.exec()
 
     save_btn.clicked.connect(save_arm_statement)
 
@@ -80,10 +101,10 @@ def dash_left_stats(model):
     except FileNotFoundError:
         pass
 
-
     # Attach update methods so DashboardView can refresh dynamically
     panel.update_db_stats = update_db_stats
 
+    # Return the left panel layout and buttons
     return panel
 
 # Multi-line chart
@@ -181,7 +202,7 @@ def create_multi_line_chart(model, days_back=14):
         if i % 5 == 0:   # fewer labels
             axis_x.append(d.strftime("%b %d"), i)
     axis_x.setLabelsColor(QColor("white"))
-    chart.addAxis(axis_x, Qt.AlignBottom)
+    chart.addAxis(axis_x, Qt.AlignmentFlag.AlignBottom)
 
     # Y axis
     axis_y = QValueAxis()
@@ -200,7 +221,7 @@ def create_multi_line_chart(model, days_back=14):
     axis_y.setLineVisible(False)
     axis_y.setGridLineVisible(False)
     axis_y.setVisible(False)
-    chart.addAxis(axis_y, Qt.AlignLeft)
+    chart.addAxis(axis_y, Qt.AlignmentFlag.AlignLeft)
 
     # Starts the y-axis at a minimum of -1 to prevent lines visually dipping below 0
     #axis_y.setMin(-1) # Will leave for now
