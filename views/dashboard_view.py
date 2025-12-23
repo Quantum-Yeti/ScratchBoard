@@ -4,7 +4,7 @@ from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
 
 from helpers.ui_helpers.create_widget_title import create_section_title
-from views.widgets.charts_widget import create_stacked_bar_chart, create_multi_line_chart
+from views.widgets.charts_widget import dash_left_stats, create_multi_line_chart
 from views.widgets.stats_widget import StatsWidget
 from views.widgets.mac_widget import MacVendorView
 from views.widgets.reference_widget import ReferenceWidget
@@ -41,28 +41,28 @@ class DashboardView(QWidget):
         content_layout.addLayout(top_layout)
 
         if image_path:
-            self.banner = QLabel(alignment=Qt.AlignCenter)
+            self.banner = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
             top_layout.addWidget(self.banner)
             self.update_banner()
 
         self.stats_widget = StatsWidget(self.model)
         top_layout.addWidget(self.stats_widget)
 
-        # Charts
+        # Left Dash Panel + Charts
         charts_layout = QHBoxLayout()
         content_layout.addLayout(charts_layout, stretch=3)
 
-        self.stacked_bar_chart = create_stacked_bar_chart(self.model)
-        self.stacked_bar_view = QChartView(self.stacked_bar_chart)
-        self.stacked_bar_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        charts_layout.addWidget(self.stacked_bar_view, stretch=1)
+        self.dash_arm = dash_left_stats(self.model)
+
+        self.stacked_dash_panel = dash_left_stats(self.model)
+        charts_layout.addWidget(self.stacked_dash_panel, stretch=1)
 
         self.multi_line_chart = create_multi_line_chart(self.model)
         self.multi_line_view = QChartView(self.multi_line_chart)
         self.multi_line_view.setRenderHint(QPainter.RenderHint.Antialiasing)
         charts_layout.addWidget(self.multi_line_view, stretch=1)
 
-        self.stacked_bar_view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.stacked_dash_panel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.multi_line_view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Bottom Widgets
@@ -73,7 +73,7 @@ class DashboardView(QWidget):
         self.reference_widget = ReferenceWidget(model)
         ref_layout = QVBoxLayout()
         self.reference_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        ref_layout.setAlignment(Qt.AlignTop)
+        ref_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         ref_layout.addWidget(create_section_title("Custom Links", "bolt"))
         ref_layout.addWidget(self.reference_widget)
         bottom_layout.addLayout(ref_layout, stretch=1)
@@ -82,7 +82,7 @@ class DashboardView(QWidget):
         self.mac_vendor_view = MacVendorView()
         self.mac_vendor_view.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         mac_layout = QVBoxLayout()
-        mac_layout.setAlignment(Qt.AlignTop)
+        mac_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         mac_layout.addWidget(create_section_title("MAC Vendor Query", "robot"))
         mac_layout.addWidget(self.mac_vendor_view)
         bottom_layout.addLayout(mac_layout, stretch=1)
@@ -91,7 +91,7 @@ class DashboardView(QWidget):
         self.cal_widget = CalStatWidget()
         self.cal_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         cal_layout = QVBoxLayout()
-        cal_layout.setAlignment(Qt.AlignTop)
+        cal_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         cal_layout.addWidget(create_section_title("Sys Info", "dev_board"))
         cal_layout.addWidget(self.cal_widget)
         bottom_layout.addLayout(cal_layout, stretch=1)
@@ -146,27 +146,22 @@ class DashboardView(QWidget):
 
     def update_graphs(self):
         """
-        Refreshes both stacked bar and multi-line charts.
+        Refreshes multi-line chart.
         Old charts are removed, new charts are created, and legends update automatically.
         """
-        # --- Remove old series from stacked bar chart ---
-        if self.stacked_bar_view.chart():
-            self.stacked_bar_view.chart().removeAllSeries()
 
         # --- Remove old series from multi-line chart ---
         if self.multi_line_view.chart():
             self.multi_line_view.chart().removeAllSeries()
 
         # --- Create new charts ---
-        self.stacked_bar_chart = create_stacked_bar_chart(self.model)
+        self.dash_arm = dash_left_stats(self.model)
         self.multi_line_chart = create_multi_line_chart(self.model)
 
         # --- Replace charts in QChartView ---
-        self.stacked_bar_view.setChart(self.stacked_bar_chart)
         self.multi_line_view.setChart(self.multi_line_chart)
 
         # --- Force redraw to ensure view updates ---
-        self.stacked_bar_view.repaint()
         self.multi_line_view.repaint()
 
     def refresh_dashboard(self):

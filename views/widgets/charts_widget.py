@@ -1,104 +1,90 @@
+import json
 from datetime import datetime, timedelta
+from pathlib import Path
+from tkinter import dialog
+
 from PySide6.QtCharts import QChart, QSplineSeries, QBarSet, QBarSeries, QValueAxis, \
     QCategoryAxis
-from PySide6.QtGui import QColor, QFont
+from PySide6.QtGui import QColor, QFont, QPixmap, QIcon
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QLabel, QScrollArea, QWidget, QGridLayout, QPushButton, QTextEdit, QVBoxLayout, \
+    QHBoxLayout, QDialog, QSizePolicy
 
 from helpers.ui_helpers.chart_pastel_list import PASTEL_CHART_COLORS
 from domain.analytics.dashboard_stats import calculate_stats
+from ui.themes.dash_action_btn_style import dash_action_button_style
+from utils.resource_path import resource_path
+from views.widgets.db_stats_pop import update_db_stats
 
 segoe = QFont("Segoe UI", 11)
 
 # Stacked bar chart
-def create_stacked_bar_chart(model):
+def dash_left_stats(model):
     """
-    Creates a stacked bar chart showing the number of notes added per day
-    for each category over the last 10 days.
-    Parameters:
-        model (NoteModel): The NoteModel instance to fetch categories and notes from.
-    Returns:
-        QChart: A Qt QChart object configured as a stacked bar chart.
-            - X-axis represents dates (last 10 days).
-            - Y-axis represents the number of notes added.
-            - Each bar is color-coded by category.
-            - Chart includes a legend and a title.
-        Notes:
-            - If there are fewer than 10 days of notes, only the available dates are shown.
-            - Categories without notes on a given day will show as zero-height bars.
-            - The chart uses pastel coloring derived from the category name.
+    Dashboard left of multi-line chart stats:
+    - ARM statement input + save button
+    - Database stats (auto-refreshable)
+
+    Returns a QWidget with attached update methods for live refresh.
     """
-    chart = QChart()
-    chart.setFont(segoe)
-    chart.setTitleFont(QFont("Segoe UI", 12))
-    chart.legend().setFont(segoe)
-    chart.setAnimationOptions(QChart.AnimationOption.AllAnimations)
-    chart.setBackgroundVisible(False)
+    panel = QWidget()
+    panel.setStyleSheet("background-color: #2C2C2C;")
+    panel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
-    categories = model.get_all_categories()
+    layout = QVBoxLayout(panel)
+    layout.setSpacing(8)
+    layout.setContentsMargins(0, 0, 0, 0)
 
-    # All unique dates
-    all_dates = sorted({
-        datetime.fromisoformat(n["created"]).date()
-        for cat in categories
-        for n in model.get_notes(category_name=cat)
-    })
+    arm_text = QTextEdit()
+    arm_text.setPlaceholderText("Type your ARM statement here then click save; it auto-loads after saving.")
+    layout.addWidget(arm_text, stretch=1)
 
-    if not all_dates:
-        return chart
+    # Horizontal layout for buttons
+    button_layout = QHBoxLayout()
+    button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # center the buttons
 
-    all_dates = all_dates[-7:] # Limit to the last 7 days
+    save_icon = QIcon(resource_path("resources/icons/save_arm.png"))
+    save_btn = QPushButton("Save Arm")
+    save_btn.setStyleSheet(dash_action_button_style)
+    save_btn.setIcon(save_icon)
 
-    bar_series = QBarSeries()
-    overall_max = 0
+    pop_icon = QIcon(resource_path("resources/icons/pop_arm.png"))
+    pop_btn = QPushButton("Pop Arm")
+    pop_btn.setStyleSheet(dash_action_button_style)
+    pop_btn.setIcon(pop_icon)
 
-    for cat in categories:
-        notes = model.get_notes(category_name=cat)
-        notes_by_date = {}
-        for n in notes:
-            d = datetime.fromisoformat(n["created"]).date()
-            if d in all_dates:
-                notes_by_date[d] = notes_by_date.get(d, 0) + 1
+    db_btn_icon = QIcon(resource_path("resources/icons/db_pop.png"))
+    db_stats_btn = QPushButton("DB Stats")
+    db_stats_btn.setStyleSheet(dash_action_button_style)
+    db_stats_btn.setIcon(db_btn_icon)
+    db_stats_btn.clicked.connect(lambda: update_db_stats(model))
 
-        values = [notes_by_date.get(d, 0) for d in all_dates]
-        overall_max = max(overall_max, max(values, default=0))
+    button_layout.addWidget(save_btn)
+    button_layout.addWidget(pop_btn)
+    button_layout.addWidget(db_stats_btn)
 
-        bar_set = QBarSet(cat)
-        bar_set.append(values)
-        bar_set.setColor(QColor.fromHsv(hash(cat) % 360, 255, 200))
-        bar_series.append(bar_set)
+    # Add button layout to main layout
+    layout.addLayout(button_layout)
 
-    chart.addSeries(bar_series)
+    def save_arm_statement():
+        Path("sb_data/notepad").mkdir(exist_ok=True)
+        with open("sb_data/notepad/arm_statement.txt", "w", encoding="utf-8") as f:
+            f.write(arm_text.toPlainText())
 
-    # X axis
-    axis_x = QCategoryAxis()
-    for i, d in enumerate(all_dates):
-        axis_x.append(d.strftime("%b %d"), i)
-    axis_x.setLabelsColor(QColor("white"))
-    axis_x.setLineVisible(False)
-    axis_x.setGridLineVisible(False)
-    chart.addAxis(axis_x, Qt.AlignBottom)
+    save_btn.clicked.connect(save_arm_statement)
 
-    # Y-axis with explicit range
-    axis_y = QValueAxis()
-    axis_y.setTitleText("Notes Added")
-    axis_y.setLabelsColor(QColor("white"))
-    axis_y.setLineVisible(False)
-    axis_y.setGridLineVisible(False)
-    axis_y.setVisible(False)
-    axis_y.setLabelFormat("%d")
-    axis_y.setRange(0, overall_max + 1)
-    chart.addAxis(axis_y, Qt.AlignLeft)
+    # Load existing ARM statement
+    try:
+        with open("sb_data/notepad/arm_statement.txt", "r", encoding="utf-8") as f:
+            arm_text.setPlainText(f.read())
+    except FileNotFoundError:
+        pass
 
-    # Attach axes
-    bar_series.attachAxis(axis_x)
-    bar_series.attachAxis(axis_y)
 
-    chart.legend().setVisible(True)
-    chart.legend().setLabelColor(QColor("white"))
-    chart.setTitle("Notes Added per Day by Category")
-    chart.setTitleBrush(QColor("white"))
+    # Attach update methods so DashboardView can refresh dynamically
+    panel.update_db_stats = update_db_stats
 
-    return chart
+    return panel
 
 # Multi-line chart
 def create_multi_line_chart(model, days_back=14):
