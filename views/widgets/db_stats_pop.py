@@ -1,13 +1,25 @@
 import json
 from pathlib import Path
 
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QGridLayout, QLabel
+
+from utils.resource_path import resource_path
 
 
 def update_db_stats(model):
     db_dialog = QDialog()
-    db_dialog.setWindowTitle("Database Stats")
-    db_dialog.setMinimumSize(300, 200)
+    db_dialog.setWindowTitle("Scratch Board: Database Stats")
+    db_dialog.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
+    db_dialog.setMinimumSize(400, 300)
+    db_dialog.setStyleSheet("""
+        QDialog {
+            background-color: #1E1E1E;
+        }
+        QLabel {
+            font-weight: bold;
+        }
+    """)
 
     db_layout = QVBoxLayout(db_dialog)
 
@@ -40,17 +52,28 @@ def update_db_stats(model):
             b /= 1024
         return f"{b:.1f}TB"
 
-    stats_text = (
-        f"Notes: {num_notes}\n"
-        f"Categories: {num_categories}\n"
-        f"Tags: {num_tags}\n"
-        f"DB Size: {format_size(db_size)}\n"
-        f"Images: {num_images} (Total {format_size(images_size)})"
-    )
+    # Use a grid layout for rows and columns
+    grid = QGridLayout()
+    grid.setHorizontalSpacing(20)
+    grid.setVerticalSpacing(10)
 
-    stats_label = QLabel(stats_text)
-    stats_label.setStyleSheet("color: black; font-weight: bold;")
-    db_layout.addWidget(stats_label)
+    stats = [
+        ("Notes", num_notes),
+        ("Categories", num_categories),
+        ("Tags", num_tags),
+        ("DB Size", format_size(db_size)),
+        ("Images", f"{num_images} (Total {format_size(images_size)})")
+    ]
+
+    for row, (label_text, value) in enumerate(stats):
+        label = QLabel(label_text + ":")
+        label.setStyleSheet("color: #AAAAAA; font-weight: bold;")
+        value_label = QLabel(str(value))
+        value_label.setStyleSheet("color: #FFFFFF;")
+        grid.addWidget(label, row, 0)
+        grid.addWidget(value_label, row, 1)
+
+    db_layout.addLayout(grid)
 
     # Show dialog
     db_dialog.setLayout(db_layout)
