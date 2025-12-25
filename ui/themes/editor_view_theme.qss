@@ -9,6 +9,15 @@
     font-size: 14px;
 }
 
+QTextEdit, QTextBrowser {
+    background-color: #333;
+}
+
+QTextBrowser#PreviewPanel {
+    background-color: #333 !important;  /* Force the preview background color */
+    color: #dddddd;
+}
+
 QLineEdit#TitleEdit {
     background-color: #2a2a2a;
     border: 1px solid #444;
