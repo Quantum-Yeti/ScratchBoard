@@ -56,7 +56,7 @@ sb_data
 
 # Resources
 resources/wordlist.txt
-resources/site.txt
+resources/user_site.txt
 docs/build.txt
 build.txt
 

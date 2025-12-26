@@ -27,7 +27,7 @@ class ScratchManager(QWidget):
 
         self.setWindowTitle("Sticky Notes")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
-        self.setWindowFlag(Qt.WindowStaysOnTopHint)
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
         self.setMinimumWidth(200)
         self.setMinimumHeight(100)
         self.setMaximumWidth(200)

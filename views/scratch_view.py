@@ -31,8 +31,8 @@ class ScratchNote(QDialog):
         self.on_new_note = on_new_note
 
         self.setWindowTitle(title)
-        self.setWindowFlag(Qt.WindowStaysOnTopHint)
-        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
+        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setMinimumSize(300, 200)
         self.resize(450, 350)
 
@@ -146,6 +146,7 @@ class ScratchNote(QDialog):
         """)
 
     def mark_dirty(self):
+        """Marks the object as data changed (True) or data is unchanged (False)."""
         self.dirty = True
 
     def auto_save(self):

@@ -6,7 +6,7 @@ from utils.resource_path import resource_path
 
 def get_company_homepage():
         try:
-            with open(resource_path("resources/site.txt"), "r") as f:
+            with open(resource_path("resources/user_site.txt"), "r") as f:
                 url = f.read().strip()
                 return url
         except Exception as e:
