@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] – 2025-12-26
+
+### Added / Improved
+- **Rich Text Editing Enhancements:**  
+  - Added support for additional rich text formatting in the note editor, including bold, italic, multiple header sizes, bulleted and numbered lists, and horizontal line insertion.  
+  - Integrated link and image insertion buttons into the editor toolbar for a richer authoring experience.  
+  - Added highlight and custom text color selection dialogs, letting users visually style note content.
+
+- **Editor UI Improvements:**  
+  - Expanded toolbar actions and updated layout to better support extended formatting options.  
+  - Improved Markdown/HTML preview handling for consistent rendering of rich content.
+
+### Fixed
+- **Toolbar/Icon Issues:**  
+  - Fixed missing or incorrect toolbar icon display by verifying resource paths and action setup.  
+  - Resolved inconsistent hover/highlight behavior for bottom action buttons (Save, Delete, Cancel, Preview).
+
+- **Text Persistence:**  
+  - Confirmed that rich HTML content from the editor continues to be stored and retrieved correctly in the database.
+
+### Refactored
+- **Editor Logic Separation:**  
+  - Moved formatting and helper logic into `EditorManager` to improve separation of UI and business logic and facilitate reuse.  
+  - Cleaned up preview HTML preparation by centralizing style and path conversion logic.
+
+### Notes
+- Internal refactors and style updates help lay the groundwork for further rich text improvements in upcoming versions.
+
+
 ## [1.5.2] - 2025-12-09
 
 ### Added / Improved

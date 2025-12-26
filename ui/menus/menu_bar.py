@@ -339,11 +339,6 @@ class MainMenuBar(QMenuBar):
         self.shortcut_action.setShortcut("Alt+K")
         help_menu.addAction(self.shortcut_action)
 
-        self.md_action = QAction("MarkDown Guide", self)
-        self.md_action.setIcon(QIcon(resource_path("resources/icons/markdown.png")))
-        self.md_action.setShortcut("Alt+M")
-        help_menu.addAction(self.md_action)
-
         self.about_action = QAction("About Scratch Board", self)
         self.about_action.setIcon(QIcon(resource_path("resources/icons/about.png")))
         self.about_action.setShortcut("Alt+A")
@@ -407,7 +402,6 @@ class MainMenuBar(QMenuBar):
 
         # Wire the help menu
         self.shortcut_action.triggered.connect(self._open_shortcuts)
-        self.md_action.triggered.connect(self._open_md_guide)
         self.repo_action.triggered.connect(self._open_repo)
         self.about_action.triggered.connect(lambda: AboutWidget().exec())
 
@@ -587,8 +581,8 @@ class MainMenuBar(QMenuBar):
         sync_db(db_path, default_onedrive)
 
         # Notify user on success
-        QMessageBox.information(self, "Success",
+        QMessageBox.warning(self, "Success",
                                 f"Database synced to the OneDrive Desktop folder:\n{default_onedrive}\n\n"
-                                     f"Companies may not allow the OneDrive folder to automatically sync to the cloud.\n\n"
-                                     f"You may have to manually move the folder to the cloud version of OneDrive."
+                                     f"The company has restricted normal OneDrive cloud-sync.\n\n"
+                                     f"Consider using the export option in the menu and move it to your cloud OneDrive folder."
                                 )
