@@ -80,10 +80,10 @@ class NoteController(QObject):
         # Force preview mode
         editor.open_existing_in_preview()
 
+        # Opens the editor
         editor.exec()
 
-
-
+    ### --- Helpers --- ###
     def on_search_changed(self, text):
         """
         Update the search filter and refresh results.

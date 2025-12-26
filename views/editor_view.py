@@ -5,7 +5,7 @@ from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QAction, QPixmap
 from PySide6.QtWidgets import (
     QDialog, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
     QTextBrowser, QLabel, QPushButton, QToolBar, QStackedWidget,
-    QScrollArea, QFileDialog, QMessageBox, QGraphicsOpacityEffect, QTextEdit
+    QScrollArea, QMessageBox, QGraphicsOpacityEffect, QTextEdit
 )
 from utils.resource_path import resource_path
 from managers.editor_manager import EditorManager
@@ -20,7 +20,7 @@ class EditorPanel(QDialog):
 
         self.setWindowTitle("Scratch Board: Edit Note")
         self.resize(1100, 700)
-        self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint)
+        self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.WindowMinimizeButtonHint | Qt.WindowType.WindowMaximizeButtonHint | Qt.WindowType.WindowCloseButtonHint)
         self.setAcceptDrops(True)
 
         # Layouts
@@ -56,6 +56,7 @@ class EditorPanel(QDialog):
         editor_layout.setContentsMargins(0,0,0,0)
         editor_layout.addWidget(self.toolbar)
 
+        # Content in the edit screen
         self.content_edit = QTextEdit()
         self.content_edit.setAcceptRichText(True)
         self.content_edit.setStyleSheet("background-color: #333; color: #fff;")
@@ -66,7 +67,7 @@ class EditorPanel(QDialog):
         editor_layout.addWidget(self.content_edit, stretch=1)
         self.stack.addWidget(editor_page)
 
-        # Preview page
+        # Preview screen
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
         preview_layout.setContentsMargins(0,0,0,0)
@@ -91,22 +92,30 @@ class EditorPanel(QDialog):
         bottom.addWidget(self.word_label)
         bottom.addStretch()
 
+        # Toggle editor/preview
         self.toggle_button = QPushButton("Preview")
+        self.toggle_button.setIcon(QIcon(resource_path("resources/icons/toggle.png")))
         self.toggle_button.clicked.connect(self.toggle_preview)
         bottom.addWidget(self.toggle_button)
 
+        # Save note button
         btn_save = QPushButton("Save")
+        btn_save.setIcon(QIcon(resource_path("resources/icons/save.png")))
         btn_save.clicked.connect(self.save_note)
         bottom.addWidget(btn_save)
 
+        # Delete note button
         btn_delete = QPushButton("Delete")
+        btn_delete.setIcon(QIcon(resource_path("resources/icons/delete.png")))
         if delete_callback:
             btn_delete.clicked.connect(self.delete_note)
         else:
             btn_delete.setEnabled(False)
         bottom.addWidget(btn_delete)
 
+        # Cancel button
         btn_cancel = QPushButton("Cancel")
+        btn_cancel.setIcon(QIcon(resource_path("resources/icons/cancel.png")))
         btn_cancel.clicked.connect(self.reject)
         bottom.addWidget(btn_cancel)
         layout.addLayout(bottom)
@@ -155,15 +164,34 @@ class EditorPanel(QDialog):
             act.setToolTip(tip)
             act.triggered.connect(handler)
 
+        # Text styles
         action("bold.png", lambda: EditorManager.bold(self.content_edit.textCursor()), "Bold")
         action("italic.png", lambda: EditorManager.italic(self.content_edit.textCursor()), "Italic")
+
+        # Headers
         action("header1.png", lambda: EditorManager.header(self.content_edit.textCursor(), 18), "Header 1")
         action("header2.png", lambda: EditorManager.header(self.content_edit.textCursor(), 15), "Header 2")
         action("header3.png", lambda: EditorManager.header(self.content_edit.textCursor(), 13), "Header 3")
+
+        # Lists
         action("bullet.png", lambda: EditorManager.bullet_list(self.content_edit.textCursor()), "Bullet List")
+        action("numbered.png", lambda: EditorManager.numbered_list(self.content_edit.textCursor()), "Numbered List")
+
+        # Insert horizontal line
+        action("hr.png", lambda: EditorManager.insert_hr(self.content_edit.textCursor()), "Horizontal Line")
+
+        # Highlight / Text color
+        # --- Highlight / Text color ---
+        action("highlight.png", lambda: EditorManager.highlight(self.content_edit.textCursor(), parent=self),"Highlight")
+        action("text_color.png", lambda: EditorManager.text_color(self.content_edit.textCursor(), parent=self), "Text Color")
+
+        # Insert images
         img = self.toolbar.addAction(QIcon(resource_path("resources/icons/insert_image.png")), "")
         img.setToolTip("Insert Image")
         img.triggered.connect(lambda: EditorManager.insert_image_via_dialog(self, self.content_edit.textCursor()))
+
+        # Insert links
+        action("link.png", lambda: EditorManager.insert_link(self, self.content_edit.textCursor()), "Insert Link")
 
     ### --- Shortcuts --- ###
     def _bind_shortcuts(self):
@@ -173,10 +201,10 @@ class EditorPanel(QDialog):
             act.triggered.connect(handler)
             self.addAction(act)
 
-        ks("Ctrl+s", self.save_note)
-        ks("Ctrl+b", lambda: EditorManager.bold(self.content_edit.textCursor()))
-        ks("Ctrl+i", lambda: EditorManager.italic(self.content_edit.textCursor()))
-        ks("Ctrl+k", lambda: self.insert_md("[", "](https://)"))
+        #ks("Ctrl+s", self.save_note)
+        #ks("Ctrl+b", lambda: EditorManager.bold(self.content_edit.textCursor()))
+        #ks("Ctrl+i", lambda: EditorManager.italic(self.content_edit.textCursor()))
+        #ks("Ctrl+k", lambda: EditorManager.insert_link(self, self.content_edit.textCursor()))
         ks("F11", self._toggle_fullscreen)
 
     ### --- Markdown insertion --- ###
@@ -270,11 +298,11 @@ class EditorPanel(QDialog):
         scroll.setWidgetResizable(True)
         layout.addWidget(scroll)
         lbl = QLabel()
-        lbl.setAlignment(Qt.AlignCenter)
+        lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pix = QPixmap(path)
         max_w, max_h = int(dlg.width()*0.9), int(dlg.height()*0.9)
         if pix.width() > max_w or pix.height() > max_h:
-            pix = pix.scaled(max_w, max_h, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pix = pix.scaled(max_w, max_h, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         lbl.setPixmap(pix)
         scroll.setWidget(lbl)
         dlg.exec()
