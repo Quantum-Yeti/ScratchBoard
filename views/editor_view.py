@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QScrollArea, QMessageBox, QGraphicsOpacityEffect, QComboBox, QSizePolicy
 )
 
+from helpers.ui_helpers.image_pop import ImagePopup
 from ui.fonts.font_list import main_font_list
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.custom_q_edit import CustomQEdit
@@ -208,10 +209,9 @@ class EditorPanel(QDialog):
         spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.toolbar.addWidget(spacer)
 
-        # --- Font family selector (controlled list) ---
+        # Font family combo box selector (controlled list)
         self.font_combo = QComboBox()
         self.font_combo.setFixedWidth(150)
-
 
         for font_name in main_font_list:
             self.font_combo.addItem(font_name)
@@ -225,7 +225,7 @@ class EditorPanel(QDialog):
         # Spacing between font and size
         self.toolbar.addWidget(self._toolbar_spacer(12))
 
-        # --- Font size selector ---
+        # Font size combo box
         font_size_label = QLabel("Size: ")
         self.font_size_combo = QComboBox()
         self.font_size_combo.setEditable(True)
@@ -363,24 +363,10 @@ class EditorPanel(QDialog):
 
 
     def _show_image(self, path):
+        """Open an image using the ImagePopup helper."""
         if not os.path.exists(path):
             return
-        dlg = QDialog(self)
-        dlg.setWindowTitle("Scratch Board: Image Viewer")
-        dlg.resize(900,700)
-        layout = QVBoxLayout(dlg)
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        layout.addWidget(scroll)
-        lbl = QLabel()
-        lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        pix = QPixmap(path)
-        max_w, max_h = int(dlg.width()*0.9), int(dlg.height()*0.9)
-        if pix.width() > max_w or pix.height() > max_h:
-            pix = pix.scaled(max_w, max_h, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        lbl.setPixmap(pix)
-        scroll.setWidget(lbl)
-        dlg.exec()
+        ImagePopup.show(self, path)
 
     ### --- Load stylesheet --- ###
     def load_stylesheet(self):

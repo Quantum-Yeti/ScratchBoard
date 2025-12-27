@@ -3,11 +3,12 @@ import random
 
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout, \
-    QPushButton, QSizePolicy, QDialog
+    QPushButton, QSizePolicy, QDialog, QFrame
 from PySide6.QtCore import Qt, QSize, QThread, Signal
 
 from helpers.ui_helpers.empty_messages import empty_messages
 from helpers.ui_helpers.floating_action import FloatingButton
+from helpers.ui_helpers.image_pop import ImagePopup
 from ui.themes.floating_action_style import floating_btn_style
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
@@ -37,8 +38,8 @@ class PopulateNotesThread(QThread):
                     pix = pix.scaled(
                         self.max_size,
                         self.max_size,
-                        Qt.KeepAspectRatio,
-                        Qt.SmoothTransformation
+                        Qt.AspectRatioMode.KeepAspectRatio,
+                        Qt.TransformationMode.SmoothTransformation
                     )
 
                 #ba = QByteArray()
@@ -169,20 +170,20 @@ class MainNotesView(QWidget):
             main_layout = QVBoxLayout(empty_notes)
 
             # Layout tuning
-            main_layout.setAlignment(Qt.AlignCenter | Qt.AlignHCenter)
+            main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignHCenter)
             main_layout.setContentsMargins(20, 10, 20, 40)
             main_layout.setSpacing(16)
 
             # Astronaut icon
             icon_label = QLabel()
-            pixmap = QPixmap(resource_path("resources/icons/owl_empty.png"))
-            pixmap = pixmap.scaled(240, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pixmap = QPixmap(resource_path("resources/icons/splash.png"))
+            pixmap = pixmap.scaled(240, 240, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
             icon_label.setPixmap(pixmap)
-            icon_label.setAlignment(Qt.AlignCenter)
+            icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-            main_layout.addWidget(icon_label, alignment=Qt.AlignHCenter)
+            main_layout.addWidget(icon_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-            # Text message
+            # Text message labels
             text_label = QLabel(random.choice(empty_messages))
             text_label.setStyleSheet("""
                 color: white;
@@ -190,12 +191,12 @@ class MainNotesView(QWidget):
                 font-weight: bold;
                 font-style: italic;
             """)
-            text_label.setAlignment(Qt.AlignCenter)
+            text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             text_label.setWordWrap(True)
             text_label.setSizePolicy(text_label.sizePolicy().horizontalPolicy(),
                                      text_label.sizePolicy().verticalPolicy())
 
-            main_layout.addWidget(text_label, alignment=Qt.AlignHCenter)
+            main_layout.addWidget(text_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
             # Make the empty_notes widget expand to fill the scroll area
             empty_notes.setSizePolicy(
@@ -207,7 +208,7 @@ class MainNotesView(QWidget):
             container = QWidget()
             container_layout = QVBoxLayout(container)
             container_layout.addStretch(1)  # top spacer
-            container_layout.addWidget(empty_notes, alignment=Qt.AlignCenter)
+            container_layout.addWidget(empty_notes, alignment=Qt.AlignmentFlag.AlignCenter)
             container_layout.addStretch(1)  # bottom spacer
 
             self.grid_layout.addWidget(container, 0, 0, 1, -1)
@@ -225,7 +226,8 @@ class MainNotesView(QWidget):
                 r, c = divmod(idx, cols)
                 card = NoteCard(note, on_click)
 
-                card.imgRightClicked.connect(self._open_image_popup)
+                # Image popup helper
+                card.imgRightClicked.connect(lambda path, parent=self: ImagePopup.show(parent, path))
 
                 # Resets styles for grid when toggling
                 card.setMinimumHeight(0)
@@ -244,7 +246,7 @@ class MainNotesView(QWidget):
                 card = NoteCard(note, on_click)
 
                 # Connecting right-click on image for image dialog
-                card.imgRightClicked.connect(self._open_image_popup)
+                card.imgRightClicked.connect(lambda path, parent=self: ImagePopup.show(parent, path))
 
                 # Forcing card to list row
                 card.setMinimumHeight(0)
@@ -270,29 +272,4 @@ class MainNotesView(QWidget):
         # Re-populate if notes loaded
         if hasattr(self, "_last_notes") and hasattr(self, "_last_click"):
             self.populate_notes(self._last_notes, self._last_click)
-
-    def _open_image_popup(self, path):
-        dlg = QDialog(self)
-        dlg.setWindowTitle("Image Viewer")
-        dlg.resize(900, 700)
-
-        layout = QVBoxLayout(dlg)
-
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        layout.addWidget(scroll)
-
-        lbl = QLabel()
-        lbl.setAlignment(Qt.AlignCenter)
-
-        pix = QPixmap(path)
-        max_width = int(dlg.width() * 0.9)
-        max_height = int(dlg.height() * 0.9)
-
-        if pix.width() > max_width or pix.height() > max_height:
-            pix = pix.scaled(max_width, max_height, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-
-        lbl.setPixmap(pix)
-        scroll.setWidget(lbl)
-        dlg.exec()
 

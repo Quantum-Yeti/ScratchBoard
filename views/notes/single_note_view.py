@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser, QMenu
 from PySide6.QtCore import Qt, QEvent, Signal
 import markdown
 
-from ui.menus.context_menu import ModifyContextMenu
+from helpers.ui_helpers.image_pop import ImagePopup
 from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path
 
@@ -56,7 +56,7 @@ class NoteCard(QFrame):
         self.content_view = QTextBrowser()
         self.content_view.setOpenExternalLinks(True)
         self.content_view.setStyleSheet(
-            "background: transparent; border: none; a { color: #5DADE2; text-decoration: none;}"
+            "background: none; border: none; a { color: #5DADE2; text-decoration: none;}"
         )
 
         self.content_view.setMouseTracking(True)
@@ -64,12 +64,11 @@ class NoteCard(QFrame):
         self.content_view.viewport().installEventFilter(self)
 
         # Override context menu events on right click
-        self.content_view.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.content_view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.content_view.customContextMenuRequested.connect(
             lambda pos: show_context_menu(self.content_view, pos)
         )
 
-        # Render Markdown content to HTML
         # Render markdown to HTML
         rendered_markdown = markdown.markdown(self.note["content"])
 
@@ -104,8 +103,8 @@ class NoteCard(QFrame):
         self.content_view.setHtml(html)
 
         # Hide scrollbars but keep original size
-        self.content_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.content_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.content_view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.content_view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.content_view.setSizePolicy(
             self.content_view.sizePolicy().horizontalPolicy(),
             self.content_view.sizePolicy().verticalPolicy()
@@ -114,6 +113,9 @@ class NoteCard(QFrame):
         # Make sure double-click anywhere works within the box, does not work on text, links, or image_helpers
         for child in self.findChildren(QTextBrowser) + self.findChildren(QLabel):
             child.installEventFilter(self)
+
+        # Connect right-clicked image signal to helper popup
+        #self.imgRightClicked.connect(lambda path: ImagePopup.show(self, path))
 
         # Add content view to layout
         layout.addWidget(self.content_view)
@@ -148,13 +150,13 @@ class NoteCard(QFrame):
         Returns:
             bool: True if the event was handled, otherwise False.
         """
-        if event.type() == QEvent.MouseButtonDblClick:
+        if event.type() == QEvent.Type.MouseButtonDblClick:
             if callable(self.on_double_click):
                 self.on_double_click(self.note)
             return True
 
         if obj == self.content_view.viewport():
-            if event.type() == QEvent.MouseButtonRelease and event.button() == Qt.RightButton:
+            if event.type() == QEvent.Type.MouseButtonRelease and event.button() == Qt.RightButton:
                 cursor = self.content_view.cursorForPosition(event.pos())
                 fmt = cursor.charFormat()
                 if fmt.isImageFormat():
