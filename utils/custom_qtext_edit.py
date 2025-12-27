@@ -6,4 +6,3 @@ class CustomQEdit(QTextEdit):
     def insertFromMimeData(self, source):
         if source.hasText():
             self.insertPlainText(source.text())
-        s
