@@ -7,6 +7,8 @@ from PySide6.QtWidgets import (
     QTextBrowser, QLabel, QPushButton, QToolBar, QStackedWidget,
     QScrollArea, QMessageBox, QGraphicsOpacityEffect, QTextEdit
 )
+
+from utils.custom_qtext_edit import CustomQEdit
 from utils.resource_path import resource_path
 from managers.editor_manager import EditorManager
 
@@ -57,7 +59,7 @@ class EditorPanel(QDialog):
         editor_layout.addWidget(self.toolbar)
 
         # Content in the edit screen
-        self.content_edit = QTextEdit()
+        self.content_edit = CustomQEdit()
         self.content_edit.setAcceptRichText(True)
         self.content_edit.setStyleSheet("background-color: #333; color: #fff;")
         self.content_edit.setHtml(EditorManager.load_initial_content(content))

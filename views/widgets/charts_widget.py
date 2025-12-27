@@ -13,6 +13,7 @@ from helpers.ui_helpers.chart_pastel_list import PASTEL_CHART_COLORS
 from domain.analytics.dashboard_stats import calculate_stats
 from ui.themes.dash_action_btn_style import dash_action_button_style
 from ui.themes.scrollbar_style import vertical_scrollbar_style
+from utils.custom_qtext_edit import CustomQEdit
 from utils.resource_path import resource_path
 from views.widgets.arm_pop_widget import open_arm_pop
 from views.widgets.db_stats_pop import update_db_stats
@@ -36,7 +37,7 @@ def dash_left_stats(model):
     layout.setSpacing(8)
     layout.setContentsMargins(0, 0, 0, 0)
 
-    arm_text = QTextEdit()
+    arm_text = CustomQEdit()
     arm_text.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
     arm_text.setPlaceholderText("Type your ARM statement (or a quick note) here then click save; it auto-loads after saving.")
     layout.addWidget(arm_text, stretch=1)

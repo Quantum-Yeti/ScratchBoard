@@ -10,6 +10,7 @@ from PySide6.QtCore import Qt
 
 from ui.fonts.font_list import main_font_list
 from ui.themes.scrollbar_style import vertical_scrollbar_style
+from utils.custom_qtext_edit import CustomQEdit
 from utils.resource_path import resource_path
 
 class NotepadDialog(QDialog):
@@ -31,7 +32,7 @@ class NotepadDialog(QDialog):
         layout.setContentsMargins(10, 10, 10, 10)
 
         # Text edit area
-        self.text_edit = QTextEdit()
+        self.text_edit = CustomQEdit()
         self.text_edit.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         self.text_edit.setStyleSheet("""
             QTextEdit {

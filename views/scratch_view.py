@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBo
 from PySide6.QtCore import Qt, QTimer, QPoint, QSize
 from PySide6.QtGui import QColor, QIcon, QPixmap
 from helpers.ui_helpers.text_color_switcher import get_text_color
+from utils.custom_qtext_edit import CustomQEdit
 from utils.resource_path import resource_path
 
 PASTEL_COLORS = [
@@ -105,7 +106,7 @@ class ScratchNote(QDialog):
         layout.addLayout(top_bar)
 
         # Text edit
-        self.text_edit = QTextEdit()
+        self.text_edit = CustomQEdit()
         self.text_edit.setText(content)
         self.text_edit.setPlaceholderText("Start typing your sticky note.\nNotes are auto-saved until deleted.")
         layout.addWidget(self.text_edit)
