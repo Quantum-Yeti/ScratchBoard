@@ -143,6 +143,8 @@ class AsteroidsWidget(QWidget):
         self.timer.timeout.connect(self.update_game)
         self.timer.start(int(1000 / FPS))
 
+        self.game_running = False # Running flag for start/stop
+
         self.ship_image = QPixmap(
             resource_path("resources/icons/game_ship.png")
         )
@@ -156,27 +158,50 @@ class AsteroidsWidget(QWidget):
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Space:
-            self.bullets.append(self.ship.shoot())
+            if not self.game_running:
+                # Start or restart the game
+                self.start_game()
+            else:
+                # Shoot bullet if game is running
+                self.bullets.append(self.ship.shoot())
         elif e.key() == Qt.Key_Escape:
-            self.close()
+            if self.game_running:
+                # Stop the game
+                self.stop_game()
         else:
             self.keys.add(e.key())
-
 
     def keyReleaseEvent(self, e):
         self.keys.discard(e.key())
 
-    # Main Loop
-    def update_game(self):
-        self.ship.update(self.keys)
+    def start_game(self):
+        """Start or restart the game."""
+        self.game_running = True
+        self.ship = Ship(QPointF(WIDTH / 2, HEIGHT / 2), QPointF(), -math.pi / 2)
+        self.bullets.clear()
+        self.asteroids.clear()
+        self.score = 0
+        self.level = 1
+        self.spawn_wave()
+        self.timer.start(int(1000 / FPS))
 
+    def stop_game(self):
+        """Pause/stop the game."""
+        self.game_running = False
+        self.timer.stop()
+
+    # Main game loop
+    def update_game(self):
+        if not self.game_running:
+            return
+
+        self.ship.update(self.keys)
         for b in self.bullets:
             b.update()
         for a in self.asteroids:
             a.update()
 
         self.handle_collisions()
-
         self.bullets = [b for b in self.bullets if b.life > 0]
         self.update()
 
@@ -185,7 +210,7 @@ class AsteroidsWidget(QWidget):
             self.spawn_wave()
 
     def spawn_wave(self):
-        count = 4 + self.level * 2
+        count = 6 + self.level * 3
         self.asteroids.clear()
 
         while len(self.asteroids) < count:
@@ -258,6 +283,13 @@ class AsteroidsWidget(QWidget):
 
         # Score
         p.setPen(Qt.white)
+
+        # Set a larger font
+        font = p.font()  # get current font
+        font.setPointSize(24)  # increase font size
+        font.setBold(True)
+        p.setFont(font)
+
         p.drawText(10, 25, f"SCORE {self.score}")
 
 

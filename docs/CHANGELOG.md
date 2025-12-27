@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] – 2025-12-27
+
+### Added / Improved
+- **Text Editing Enhancements:**  
+  - Copied text in CustomQEdit now retains white color for consistency.
+  - Performance improvements for text insertion and rendering.
+
+### Fixed
+- **UI Bugs:**  
+  - Fixed text insertion color issue in CustomQEdit.
+
+### Refactored
+- Integrated FTS5 search for faster and more accurate text queries.
+- General code cleanup and optimizations across modules.
+
 ## [2.0.1] – 2025-12-26
 
 ### Added / Improved
