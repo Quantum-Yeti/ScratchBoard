@@ -71,12 +71,25 @@ class NoteModel:
             );
         """)
 
-        cur = self.conn.cursor()
+        # FTS5 Note Search
+        cur.execute("""
+                CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(
+                    note_id,
+                    title,
+                    content,
+                    tags
+                );
+            """)
+
+        #cur = self.conn.cursor()
+
+        # Backwards compatibility
         try:
             cur.execute("ALTER TABLE notes ADD COLUMN tags TEXT;")
         except sqlite3.OperationalError:
             # Column already exists
             pass
+
         self.conn.commit()
 
         # Contacts table
@@ -117,6 +130,12 @@ class NoteModel:
         cur.execute("CREATE INDEX IF NOT EXISTS idx_notes_title ON notes(title)")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(updated)")
 
+        cur.execute("""
+            INSERT INTO notes_fts(note_id, title, content, tags)
+            SELECT id, title, content, tags FROM notes
+            WHERE id NOT IN (SELECT note_id FROM notes_fts);
+        """)
+
         self.conn.commit()
 
     ### CATEGORY METHODS ###
@@ -147,25 +166,49 @@ class NoteModel:
             INSERT INTO notes (id, category_id, title, content, color, image_path, tags, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (note_id, category_id, title, content, color, image_path, tags_json, now, now))
+
+        self.conn.execute("""
+            INSERT INTO notes_fts(note_id, title, content, tags)
+            VALUES (?, ?, ?, ?)
+        """, (note_id, title, content, tags_json))
+
         self.conn.commit()
         return note_id
 
     def get_notes(self, category_name=None, search=None, order_by="updated DESC"):
         cur = self.conn.cursor()
         params = []
-        query = """
-            SELECT notes.*, categories.name as category_name
-            FROM notes
-            LEFT JOIN categories ON notes.category_id = categories.id
-            WHERE 1=1
-        """
-        if category_name and category_name != "All Categories":
-            query += " AND categories.name=?"
-            params.append(category_name)
+        # --- FTS search path ---
         if search:
-            term = f"%{search}%"
-            query += " AND (title LIKE ? OR content LIKE ? OR tags LIKE ?)"
-            params.extend([term, term, term])
+            query = """
+                   SELECT notes.*, categories.name AS category_name
+                   FROM notes
+                   JOIN notes_fts ON notes_fts.note_id = notes.id
+                   LEFT JOIN categories ON notes.category_id = categories.id
+                   WHERE notes_fts MATCH ?
+               """
+            params.append(search)
+
+            if category_name and category_name != "All Categories":
+                query += " AND categories.name = ?"
+                params.append(category_name)
+
+            query += f" ORDER BY {order_by}"
+
+            cur.execute(query, params)
+            return cur.fetchall()
+
+        # --- Non-search (normal listing) path ---
+        query = """
+               SELECT notes.*, categories.name AS category_name
+               FROM notes
+               LEFT JOIN categories ON notes.category_id = categories.id
+               WHERE 1=1
+           """
+
+        if category_name and category_name != "All Categories":
+            query += " AND categories.name = ?"
+            params.append(category_name)
         query += f" ORDER BY {order_by}"
         cur.execute(query, params)
         return cur.fetchall()
@@ -211,11 +254,26 @@ class NoteModel:
 
         query = f"UPDATE notes SET {', '.join(fields)} WHERE id=?"
         self.conn.execute(query, params)
+
+        # --- FTS sync ---
+        self.conn.execute("""
+            DELETE FROM notes_fts WHERE note_id = ?
+        """, (note_id,))
+
+        self.conn.execute("""
+            INSERT INTO notes_fts(note_id, title, content, tags)
+            SELECT id, title, content, tags
+            FROM notes
+            WHERE id = ?
+        """, (note_id,))
+
         self.conn.commit()
         return True
 
     def delete_note(self, note_id):
+        self.conn.execute("DELETE FROM notes_fts WHERE note_id=?", (note_id,))
         self.conn.execute("DELETE FROM notes WHERE id=?", (note_id,))
+
         self.conn.commit()
         return True
 
@@ -335,8 +393,8 @@ class NoteModel:
         return cur.fetchone()
 
     ### MISCELLANEOUS METHODS ###
-    def search_notes(self, term):
-        return self.get_notes(search=term)
+    def search_notes(self, term, category_name=None):
+        return self.get_notes(search=term, category_name=category_name)
 
     def get_most_recent_note(self):
         categories = self.get_all_categories()
