@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBo
 from PySide6.QtCore import Qt, QTimer, QPoint, QSize
 from PySide6.QtGui import QColor, QIcon, QPixmap
 from helpers.ui_helpers.text_color_switcher import get_text_color
-from utils.custom_qtext_edit import CustomQEdit
+from utils.custom_q_edit import CustomQEdit
 from utils.resource_path import resource_path
 
 PASTEL_COLORS = [

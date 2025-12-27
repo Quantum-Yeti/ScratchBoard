@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 
 from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QFileDialog,
+    QDialog, QVBoxLayout, QPushButton, QHBoxLayout, QFileDialog,
     QLabel, QLineEdit, QComboBox, QSpinBox, QApplication
 )
 from PySide6.QtGui import QFont, QIcon, QTextCursor, QTextCharFormat, QCursor
@@ -10,7 +10,7 @@ from PySide6.QtCore import Qt
 
 from ui.fonts.font_list import main_font_list
 from ui.themes.scrollbar_style import vertical_scrollbar_style
-from utils.custom_qtext_edit import CustomQEdit
+from utils.custom_q_edit import CustomQEdit
 from utils.resource_path import resource_path
 
 class NotepadDialog(QDialog):
@@ -22,9 +22,9 @@ class NotepadDialog(QDialog):
 
         # Allow to minimize and close
         self.setWindowFlags(
-            Qt.Window | Qt.WindowTitleHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
+            Qt.WindowType.Window | Qt.WindowType.WindowTitleHint | Qt.WindowType.WindowMinimizeButtonHint | Qt.WindowType.WindowMaximizeButtonHint | Qt.WindowType.WindowCloseButtonHint
         )
-        self.setWindowModality(Qt.NonModal)
+        self.setWindowModality(Qt.WindowModality.NonModal)
 
         self.center_on_screen(parent)
 
@@ -125,7 +125,7 @@ class NotepadDialog(QDialog):
                 font-family: Segoe UI;
             }
         """)
-        self.count_label.setAlignment(Qt.AlignVCenter)
+        self.count_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.text_edit.textChanged.connect(self.update_count)
         bottom_layout.addWidget(self.count_label)
 

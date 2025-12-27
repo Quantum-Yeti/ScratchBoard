@@ -5,10 +5,12 @@ from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QAction, QPixmap
 from PySide6.QtWidgets import (
     QDialog, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
     QTextBrowser, QLabel, QPushButton, QToolBar, QStackedWidget,
-    QScrollArea, QMessageBox, QGraphicsOpacityEffect, QTextEdit
+    QScrollArea, QMessageBox, QGraphicsOpacityEffect, QComboBox, QSizePolicy
 )
 
-from utils.custom_qtext_edit import CustomQEdit
+from ui.fonts.font_list import main_font_list
+from ui.themes.scrollbar_style import vertical_scrollbar_style
+from utils.custom_q_edit import CustomQEdit
 from utils.resource_path import resource_path
 from managers.editor_manager import EditorManager
 
@@ -62,6 +64,7 @@ class EditorPanel(QDialog):
         self.content_edit = CustomQEdit()
         self.content_edit.setAcceptRichText(True)
         self.content_edit.setStyleSheet("background-color: #333; color: #fff;")
+        self.content_edit.setStyleSheet(vertical_scrollbar_style)
         self.content_edit.setHtml(EditorManager.load_initial_content(content))
         self.content_edit.setPlaceholderText("Use Plaintext, Markdown syntax, or the buttons to write and format.")
         self.content_edit.textChanged.connect(self._schedule_preview)
@@ -80,6 +83,7 @@ class EditorPanel(QDialog):
         self.preview.installEventFilter(self)
         self.preview.setOpenExternalLinks(True)
         self.preview.setStyleSheet("background-color: #333; color: #fff;")
+        self.preview.setStyleSheet(vertical_scrollbar_style)
         self.preview.anchorClicked.connect(self._on_preview_link_clicked)
         self._opacity = QGraphicsOpacityEffect(self.preview)
         self.preview.setGraphicsEffect(self._opacity)
@@ -175,6 +179,11 @@ class EditorPanel(QDialog):
         action("header2.png", lambda: EditorManager.header(self.content_edit.textCursor(), 15), "Header 2")
         action("header3.png", lambda: EditorManager.header(self.content_edit.textCursor(), 13), "Header 3")
 
+        # Alignment
+        action("align_left.png", lambda: EditorManager.align_left(self.content_edit.textCursor()), "Align left")
+        action("align_center.png", lambda: EditorManager.align_center(self.content_edit.textCursor()), "Align center")
+        action("align_right.png", lambda: EditorManager.align_right(self.content_edit.textCursor()), "Align right")
+
         # Lists
         action("bullet.png", lambda: EditorManager.bullet_list(self.content_edit.textCursor()), "Bullet List")
         action("numbered.png", lambda: EditorManager.numbered_list(self.content_edit.textCursor()), "Numbered List")
@@ -194,6 +203,70 @@ class EditorPanel(QDialog):
 
         # Insert links
         action("link.png", lambda: EditorManager.insert_link(self, self.content_edit.textCursor()), "Insert Link")
+
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self.toolbar.addWidget(spacer)
+
+        # --- Font family selector (controlled list) ---
+        self.font_combo = QComboBox()
+        self.font_combo.setFixedWidth(150)
+
+
+        for font_name in main_font_list:
+            self.font_combo.addItem(font_name)
+
+        font_name_label = QLabel("Font: ")
+        self.font_combo.setCurrentText("Segoe UI")
+        self.font_combo.currentTextChanged.connect(self._set_font_family_from_name)
+        self.toolbar.addWidget(font_name_label)
+        self.toolbar.addWidget(self.font_combo)
+
+        # Spacing between font and size
+        self.toolbar.addWidget(self._toolbar_spacer(12))
+
+        # --- Font size selector ---
+        font_size_label = QLabel("Size: ")
+        self.font_size_combo = QComboBox()
+        self.font_size_combo.setEditable(True)
+        self.font_size_combo.setFixedWidth(80)
+
+        for size in [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32]:
+            self.font_size_combo.addItem(str(size))
+
+        self.font_size_combo.setCurrentText("12")
+        self.font_size_combo.currentTextChanged.connect(self._set_font_size)
+        self.toolbar.addWidget(font_size_label)
+        self.toolbar.addWidget(self.font_size_combo)
+
+    ### --- Font Combo Helpers --- ###
+    def _set_font_size(self, size_str: str):
+        try:
+            size = float(size_str)
+        except ValueError:
+            return
+
+        cursor = self.content_edit.textCursor()
+        if not cursor:
+            return
+
+        fmt = cursor.charFormat()
+        fmt.setFontPointSize(size)
+        cursor.mergeCharFormat(fmt)
+
+    def _set_font_family_from_name(self, font_name: str):
+        cursor = self.content_edit.textCursor()
+        if not cursor:
+            return
+
+        fmt = cursor.charFormat()
+        fmt.setFontFamily(font_name)
+        cursor.mergeCharFormat(fmt)
+
+    def _toolbar_spacer(self, width=4):
+        spacer = QWidget()
+        spacer.setFixedWidth(width)
+        return spacer
 
     ### --- Shortcuts --- ###
     def _bind_shortcuts(self):
