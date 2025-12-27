@@ -276,10 +276,6 @@ class EditorPanel(QDialog):
             act.triggered.connect(handler)
             self.addAction(act)
 
-        #ks("Ctrl+s", self.save_note)
-        #ks("Ctrl+b", lambda: EditorManager.bold(self.content_edit.textCursor()))
-        #ks("Ctrl+i", lambda: EditorManager.italic(self.content_edit.textCursor()))
-        #ks("Ctrl+k", lambda: EditorManager.insert_link(self, self.content_edit.textCursor()))
         ks("F11", self._toggle_fullscreen)
 
     ### --- Markdown insertion --- ###

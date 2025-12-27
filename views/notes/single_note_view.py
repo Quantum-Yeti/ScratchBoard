@@ -114,9 +114,6 @@ class NoteCard(QFrame):
         for child in self.findChildren(QTextBrowser) + self.findChildren(QLabel):
             child.installEventFilter(self)
 
-        # Connect right-clicked image signal to helper popup
-        #self.imgRightClicked.connect(lambda path: ImagePopup.show(self, path))
-
         # Add content view to layout
         layout.addWidget(self.content_view)
 

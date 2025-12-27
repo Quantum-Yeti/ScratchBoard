@@ -3,7 +3,7 @@ import random
 
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout, \
-    QPushButton, QSizePolicy, QDialog, QFrame
+    QPushButton, QSizePolicy
 from PySide6.QtCore import Qt, QSize, QThread, Signal
 
 from helpers.ui_helpers.empty_messages import empty_messages

@@ -14,7 +14,7 @@ class ImagePopup:
             margin_ratio: ratio of scroll area to use for image scaling
         """
         dlg = QDialog(parent)
-        dlg.setWindowTitle("Image Viewer")
+        dlg.setWindowTitle("Scratch Board: Image Viewer")
         dlg.resize(900, 700)
 
         layout = QVBoxLayout(dlg)
