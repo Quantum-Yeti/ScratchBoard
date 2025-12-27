@@ -302,6 +302,11 @@ class MainMenuBar(QMenuBar):
         self.calc_action.setShortcut("Alt+C")
         tools_menu.addAction(self.calc_action)
 
+        self.ref_action = QAction("Custom Links", self)
+        self.ref_action.setIcon(QIcon(resource_path("resources/icons/lightning_white.png")))
+        self.ref_action.setShortcut("Alt+X")
+        tools_menu.addAction(self.ref_action)
+
         self.modem_action = QAction("Log Parser", self)
         self.modem_action.setIcon(QIcon(resource_path("resources/icons/network.png")))
         self.modem_action.setShortcut("Alt+L")
@@ -309,18 +314,13 @@ class MainMenuBar(QMenuBar):
 
         self.mac_action = QAction("MAC Vendor Query", self)
         self.mac_action.setIcon(QIcon(resource_path("resources/icons/robot_white.png")))
-        self.mac_action.setShortcut("Alt+T")
+        self.mac_action.setShortcut("Alt+Q")
         tools_menu.addAction(self.mac_action)
 
         self.pwd_action = QAction("Password Generator", self)
         self.pwd_action.setIcon(QIcon(resource_path("resources/icons/pw.png")))
         self.pwd_action.setShortcut("Alt+P")
         tools_menu.addAction(self.pwd_action)
-
-        self.ref_action = QAction("Custom Links", self)
-        self.ref_action.setIcon(QIcon(resource_path("resources/icons/lightning_white.png")))
-        self.ref_action.setShortcut("Alt+X")
-        tools_menu.addAction(self.ref_action)
 
         _connect_hover_tooltips(tools_menu)
 

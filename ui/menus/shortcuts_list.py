@@ -118,6 +118,16 @@ shortcut_list = [
                 "action": "Run a *.bat file"
             },
             {
+                "shortcut": "Alt+C",
+                "action": "Open Calculator"
+
+            },
+            {
+                "shortcut": "Alt+X",
+                "action": "Open Custom Links"
+
+            },
+            {
                 "shortcut": "Alt+L",
                 "action": "Open Modem Log Parser"
             },
@@ -130,7 +140,7 @@ shortcut_list = [
                 "action": "Open Calculator"
             },
             {
-                "shortcut": "Alt+T",
+                "shortcut": "Alt+Q",
                 "action": "Open Mac Vendor Query"
             }
         ]
@@ -140,12 +150,12 @@ shortcut_list = [
         "shortcuts":
         [
             {
-                "shortcut": "Alt+K",
-                "action": "Open Keyboard Shortcuts"
+                "shortcut": "Shift+R",
+                "action": "Open Code Repository"
             },
             {
-                "shortcut": "Alt+M",
-                "action": "Open MarkDown Guide"
+                "shortcut": "Alt+K",
+                "action": "Open Keyboard Shortcuts"
             },
             {
                 "shortcut": "Alt+A",
