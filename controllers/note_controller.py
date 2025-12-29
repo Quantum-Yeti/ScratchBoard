@@ -1,7 +1,7 @@
 import json
 
 from PySide6.QtCore import QTimer, Signal, QObject
-from PySide6.QtWidgets import QMessageBox, QPushButton
+from PySide6.QtWidgets import QMessageBox
 from views.editor_view import EditorPanel
 
 class NoteController(QObject):
@@ -117,10 +117,7 @@ class NoteController(QObject):
         EditorPanel(self.view, None, "New Note", "", save_cb).exec()
 
     def save_edit(self, note_id, title, content, tags=None):
-        """
-        Save modification to an existing note.
-        :param note_id: ID of the note to save modification in the SQLite database.
-        """
+        """Save modification to an existing note."""
         self.model.edit_note(note_id, title=title, content=content, tags=tags)
         self._notify_change()
 

@@ -15,6 +15,13 @@ from utils.resource_path import resource_path
 from views.notes.single_note_view import NoteCard
 
 class PopulateNotesThread(QThread):
+    """
+    Background thread for preparing note images.
+
+    Scales and caches note images off the UI thread, then emits
+    the processed notes back to the main thread.
+    """
+
     thread_loaded = Signal(list, object) # notes + click handler
 
     def __init__(self, notes, on_click, max_size=250):
@@ -24,6 +31,7 @@ class PopulateNotesThread(QThread):
         self.max_size = max_size
 
     def run(self):
+        """Process note images and cache scaled pixmaps."""
         # Image cache once
         for note in self.notes:
             # If we already processed this note before, skip work entirely
@@ -34,6 +42,7 @@ class PopulateNotesThread(QThread):
             if img_path and os.path.exists(img_path):
                 pix = QPixmap(img_path)
 
+                # Scale image to a thumbnail size
                 if pix.width() > self.max_size or pix.height() > self.max_size:
                     pix = pix.scaled(
                         self.max_size,
@@ -42,33 +51,28 @@ class PopulateNotesThread(QThread):
                         Qt.TransformationMode.SmoothTransformation
                     )
 
-                #ba = QByteArray()
-                #buffer = QBuffer(ba)
-                #buffer.open(QBuffer.WriteOnly)
-                #pix.save(buffer, "PNG")
-                #encoded = base64.b64encode(ba.data()).decode("utf-8")
-                #buffer.close()
-
+                # Cache the pixmap on the note object
                 note._cached_pix = pix
+
+        # Notifies the main thread
         self.thread_loaded.emit(self.notes, self.on_click)
 
 class MainNotesView(QWidget):
     """
     Main notes view widget.
 
-    Provides a searchable, scrollable grid of note cards along with a
-    floating action button for creating new notes. Handles layout
-    initialization, category filtering, and dynamic population of the
-    note grid.
+    Displays notes in a scrollable grid or list layout, supports
+    searching, and provides a floating action button for adding notes.
     """
 
     def __init__(self, categories):
         super().__init__()
+
+        # Track thread and state
         self._thread = None
         self._last_click = None
         self._last_notes = None
         self.categories = categories
-
 
         # Main vertical layout
         layout = QVBoxLayout(self)
@@ -82,7 +86,7 @@ class MainNotesView(QWidget):
         self.search_input.setPlaceholderText("Search notes…")
         controls_layout.addWidget(self.search_input)
 
-        # Toggle button
+        # Toggle button for grid and list view
         self.toggle_view_btn = QPushButton()
         self.toggle_view_btn.setIcon(QIcon(resource_path("resources/icons/list.png")))
         self.toggle_view_btn.setIconSize(QSize(24, 24))
@@ -99,15 +103,20 @@ class MainNotesView(QWidget):
         self.scroll.setStyleSheet("border: none;")
         self.scroll.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         self.scroll.setWidgetResizable(True)
+
         self.grid_widget = QWidget()
         self.grid_layout = QGridLayout(self.grid_widget)
         self.grid_layout.setSpacing(12)
         self.grid_layout.setContentsMargins(0,0,0,0)
+
         self.scroll.setWidget(self.grid_widget)
         layout.addWidget(self.scroll)
 
-        # Floating add button
-        self.add_btn = FloatingButton(self, icon_path="resources/icons/add.png", tooltip="Add note", shortcut="Ctrl+N")
+        # Floating add note button
+        self.add_btn = FloatingButton(self,
+                                      icon_path="resources/icons/add.png",
+                                      tooltip="Add note",
+                                      shortcut="Ctrl+N")
         self.add_btn.setIconSize(self.size() * 0.6)  # 60% of button size
         self.setStyleSheet(floating_btn_style)
 
@@ -126,7 +135,7 @@ class MainNotesView(QWidget):
         Populate notes in a background thread safely.
 
         If a previous populate thread is still running, it will be
-        terminated cleanly before starting a new one.
+        terminated cleanly before starting a new one, this avoids thread races.
         """
         self._last_notes = notes
         self._last_click = on_click
@@ -165,11 +174,12 @@ class MainNotesView(QWidget):
                 widget.setParent(None)  # detach safely
                 widget.deleteLater()
 
+        # Empty state - no notes
         if not notes:
             empty_notes = QWidget()
             main_layout = QVBoxLayout(empty_notes)
 
-            # Layout tuning
+            # Layout
             main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignHCenter)
             main_layout.setContentsMargins(20, 10, 20, 40)
             main_layout.setSpacing(16)
@@ -183,7 +193,7 @@ class MainNotesView(QWidget):
 
             main_layout.addWidget(icon_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-            # Text message labels
+            # Empty message labels
             text_label = QLabel(random.choice(empty_messages))
             text_label.setStyleSheet("""
                 color: white;
@@ -214,6 +224,7 @@ class MainNotesView(QWidget):
             self.grid_layout.addWidget(container, 0, 0, 1, -1)
             return
 
+        # Grid view
         if self.view_mode == "grid":
             cols = 3
 
@@ -226,21 +237,25 @@ class MainNotesView(QWidget):
                 r, c = divmod(idx, cols)
                 card = NoteCard(note, on_click)
 
-                # Image popup helper
+                # Image popup helper, right-click
                 card.imgRightClicked.connect(lambda path, parent=self: ImagePopup.show(parent, path))
 
                 # Resets styles for grid when toggling
                 card.setMinimumHeight(0)
+                self.scroll.setMaximumHeight(16777215)
                 card.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
 
                 self.grid_layout.addWidget(card, r, c)
             self.grid_layout.setContentsMargins(8,8,8,8)
 
-        else:  # LIST VIEW
+        # List View
+        else:
             # Force single column stretching
             for i in range(self.grid_layout.columnCount()):
                 self.grid_layout.setColumnStretch(i, 0)
             self.grid_layout.setColumnStretch(0, 1)
+
+            card_height = None
 
             for row, note in enumerate(notes):
                 card = NoteCard(note, on_click)
@@ -255,11 +270,22 @@ class MainNotesView(QWidget):
 
                 self.grid_layout.addWidget(card, row, 0, 1, -1)
 
+                # Get height of the first card
+                if row == 0:
+                    card_height = card.sizeHint().height()
+
+            if card_height:
+                spacing = self.grid_layout.spacing()
+                max_height = (card_height * 3) + (spacing * 2)
+                self.scroll.setMaximumHeight(max_height)
+
+
         # Force UI refresh
         self.grid_widget.adjustSize()
         self.scroll.updateGeometry()
 
     def toggle_view_mode(self):
+        """Toggle between grid and list layouts."""
         if self.view_mode == "grid":
             self.view_mode = "list"
             self.toggle_view_btn.setIcon(QIcon(resource_path("resources/icons/grid.png")))

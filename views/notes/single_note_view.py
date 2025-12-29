@@ -1,11 +1,13 @@
 import base64
+import json
+import random
+from datetime import datetime
 from io import BytesIO
 
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser, QMenu
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser, QMenu, QHBoxLayout
 from PySide6.QtCore import Qt, QEvent, Signal
 import markdown
 
-from helpers.ui_helpers.image_pop import ImagePopup
 from ui.themes.context_menu_theme import menu_style
 from utils.resource_path import resource_path
 
@@ -41,18 +43,66 @@ class NoteCard(QFrame):
         self.on_double_click = on_double_click
         self.setObjectName("NoteCard")
 
+        tag_label = None
+
         # Main vertical layout for title and content
         layout = QVBoxLayout(self)
         layout.setSpacing(6)
         layout.setContentsMargins(12, 12, 12, 12)
 
-        # Title label
+        # Note Title + first tag row
+        title_row = QHBoxLayout()
+        title_row.setSpacing(8)
+
+        # Title
         title_label = QLabel(note["title"])
         title_label.setObjectName("NoteTitle")
-        title_label.setStyleSheet("background: transparent; border: none;")
-        layout.addWidget(title_label)
+        title_label.setStyleSheet("background: transparent; border: none; font-weight: bold;")
+        title_row.addWidget(title_label)
 
-        # Content area (rendered Markdown)
+        title_row.addStretch(1)
+
+        # Tags, if any
+        if "tags" in note.keys() and note["tags"]:
+            try:
+                tags = json.loads(note["tags"])
+                if tags:
+
+                    # Random background colors
+                    # Light pastel color palette
+                    pastel_colors = [
+                        "#FFB3BA",  # Light red/pink
+                        "#FFDFBA",  # Light orange
+                        "#FFFFBA",  # Light yellow
+                        "#BAFFC9",  # Light green
+                        "#BAE1FF",  # Light blue
+                        "#E3BAFF",  # Light purple
+                        "#FFD1BA",  # Light peach
+                    ]
+
+                    color = random.choice(pastel_colors)
+
+                    tag_label = QLabel(f"{tags[0]}")
+                    tag_label.setObjectName("NoteTag")
+                    tag_label.setStyleSheet(f"""
+                        QLabel {{
+                            background-color: {color};
+                            color: #333333;
+                            padding: 2px 6px;
+                            border-radius: 6px;
+                            font-size: 13px;
+                        }}
+                    """)
+                    title_row.addWidget(tag_label)
+
+                    title_row.setAlignment(tag_label, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
+
+            except Exception:
+                pass
+
+        layout.addLayout(title_row)
+
+        # Content area
         self.content_view = QTextBrowser()
         self.content_view.setOpenExternalLinks(True)
         self.content_view.setStyleSheet(
@@ -72,7 +122,7 @@ class NoteCard(QFrame):
         # Render markdown to HTML
         rendered_markdown = markdown.markdown(self.note["content"])
 
-        # Optional cached image appended below text
+        # Cached image
         img_html = ""
         cached = getattr(self.note, "_cached_pix", None)
         img_path = getattr(self.note, "image_path", None)
@@ -83,7 +133,7 @@ class NoteCard(QFrame):
             encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
             img_html = f'<br><img src="data:image/png;base64,{encoded}" data-path="{img_path}" />'
 
-        # Combine everything with your styling
+        # Combine everything with styling
         html = f"""
             <style>
                 a {{
@@ -116,6 +166,21 @@ class NoteCard(QFrame):
 
         # Add content view to layout
         layout.addWidget(self.content_view)
+
+        layout.addStretch(1)
+
+        # Meta data
+        meta = QLabel()
+        meta.setStyleSheet("background: transparent; border: none; font-size: 10px;")
+        created_raw = note["created"]
+        updated_raw = note["updated"]
+        created_date = datetime.fromisoformat(created_raw)
+        updated_date = datetime.fromisoformat(updated_raw)
+        created_str = created_date.strftime("%b %d, %Y")
+        updated_str = updated_date.strftime("%b %d, %Y")
+
+        meta.setText(f"Created: {created_str} | Updated: {updated_str}")
+        layout.addWidget(meta, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignBottom)
 
         # Apply stylesheet
         self.load_stylesheet()
