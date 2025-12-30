@@ -2,7 +2,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QSizePolicy
 from PySide6.QtCore import Qt, QSize
 
-from views.scratch_view import ScratchNote
+from views.sticky_view import ScratchNote
 from utils.resource_path import resource_path
 import random
 

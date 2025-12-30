@@ -7,7 +7,7 @@ import subprocess
 
 from helpers.ui_helpers.open_company_url import open_company_homepage
 from utils.resource_path import resource_path
-from managers.scratch_manager import ScratchManager
+from managers.sticky_manager import ScratchManager
 from views.notepad_view import NotepadDialog
 
 
@@ -80,7 +80,7 @@ class Sidebar(QWidget):
             btn = QPushButton(name)
             btn.setIcon(QIcon(resource_path(icon_file)))
             btn.setIconSize(QSize(32, 32))
-            btn.setCursor(Qt.PointingHandCursor)
+            btn.setCursor(Qt.CursorShape.PointingHandCursor)
 
             # Initialize and set category tooltips
             cat_tooltips = Sidebar.CATEGORY_TOOLTIPS.get(name, "")
@@ -93,8 +93,8 @@ class Sidebar(QWidget):
             # Add visual separators between certain categories
             if name == "CoPilot" or name == "Streaming":
                 separator = QFrame()
-                separator.setFrameShape(QFrame.HLine)  # Horizontal line
-                separator.setFrameShadow(QFrame.Plain)  # Gives subtle 3D effect
+                separator.setFrameShape(QFrame.Shape.HLine)  # Horizontal line
+                separator.setFrameShadow(QFrame.Shadow.Plain)  # Gives subtle 3D effect
                 separator.setStyleSheet("""
                     QFrame {
                         background-color: #2E2E2E;
@@ -112,16 +112,16 @@ class Sidebar(QWidget):
         dash_btn.setToolTip("View the dashboard")
         dash_btn.setIcon(QIcon(resource_path("resources/icons/dashboard.png")))
         dash_btn.setIconSize(QSize(32, 32))
-        dash_btn.setCursor(Qt.PointingHandCursor)
+        dash_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         dash_btn.clicked.connect(lambda: self.dashboard_clicked.emit())
         layout.addWidget(dash_btn)
 
         # Scratch pad button
-        self.scratch_btn = QPushButton("Scratch Pad")
+        self.scratch_btn = QPushButton("Sticky Notes")
         self.scratch_btn.setToolTip("Open Scratch Pad to create sticky notes")
         self.scratch_btn.setIcon(QIcon(resource_path("resources/icons/scratch.png")))
         self.scratch_btn.setIconSize(QSize(32, 32))
-        self.scratch_btn.setCursor(Qt.PointingHandCursor)
+        self.scratch_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.scratch_btn.clicked.connect(self.open_scratch_pad)
         layout.addWidget(self.scratch_btn)
 
@@ -130,7 +130,7 @@ class Sidebar(QWidget):
         note_btn.setToolTip("Open Notepad")
         note_btn.setIcon(QIcon(resource_path("resources/icons/notepad.png")))
         note_btn.setIconSize(QSize(32, 32))
-        note_btn.setCursor(Qt.PointingHandCursor)
+        note_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         note_btn.clicked.connect(self.open_notepad)
         layout.addWidget(note_btn)
 
@@ -139,7 +139,7 @@ class Sidebar(QWidget):
         bat_btn.setToolTip("Select and run a batch file")
         bat_btn.setIcon(QIcon(resource_path("resources/icons/run.png")))
         bat_btn.setIconSize(QSize(32, 32))
-        bat_btn.setCursor(Qt.PointingHandCursor)
+        bat_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         bat_btn.clicked.connect(self.open_bat_file)
         #layout.addWidget(bat_btn)
 
@@ -151,10 +151,10 @@ class Sidebar(QWidget):
         logo_btn.setIcon(QIcon(resource_path("resources/icons/agent_yellow.png")))
         logo_btn.setIconSize(QSize(32, 32))
         logo_btn.setFlat(True)
-        logo_btn.setCursor(Qt.PointingHandCursor)
+        logo_btn.setCursor(Qt.CursorShape.PointingHandCursor)
 
         logo_btn.clicked.connect(open_company_homepage)
-        layout.addWidget(logo_btn, alignment=Qt.AlignBottom)
+        layout.addWidget(logo_btn, alignment=Qt.AlignmentFlag.AlignBottom)
 
         # Keep track of scratch pad instance
         self._scratch_pad = None
