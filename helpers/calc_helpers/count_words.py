@@ -2,7 +2,6 @@ from typing import Union
 
 from PySide6.QtGui import QTextDocument
 
-
 def count_words(source: Union[str, QTextDocument]) -> tuple[int, int]:
     """
     Count the number of words and characters.
