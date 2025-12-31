@@ -27,8 +27,8 @@ class ScratchManager(QWidget):
         self.setWindowTitle("Scratch Board: Sticky Note Manager")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
         self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
-        self.setMinimumWidth(300)
-        self.setMinimumHeight(200)
+        self.setMinimumWidth(200)
+        self.setMinimumHeight(100)
 
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(4, 4, 4, 4)

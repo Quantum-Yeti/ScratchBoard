@@ -1,5 +1,8 @@
+
 import os
 import re
+from datetime import datetime
+
 from PySide6.QtCore import Qt, QTimer, QEvent, QUrl
 from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QAction, QPixmap
 from PySide6.QtWidgets import (
@@ -9,6 +12,8 @@ from PySide6.QtWidgets import (
 )
 
 from helpers.ui_helpers.image_pop import ImagePopup
+from models import note_model
+from models.note_model import NoteModel
 from ui.fonts.font_list import main_font_list
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.custom_q_edit import CustomQEdit
@@ -18,6 +23,7 @@ from managers.editor_manager import EditorManager
 class EditorPanel(QDialog):
     def __init__(self, parent, note_id, title, content, save_callback, delete_callback=None, tags=None):
         super().__init__(parent)
+        self.note_model = NoteModel()
         self.note_id = note_id
         self.save_callback = save_callback
         self.delete_callback = delete_callback
@@ -94,9 +100,16 @@ class EditorPanel(QDialog):
 
         # Bottom row
         bottom = QHBoxLayout()
+
+        # Word count section
         self.word_label = QLabel("Words: 0 — Chars: 0")
         self.word_label.setContentsMargins(10,0,0,0)
         bottom.addWidget(self.word_label)
+
+        # Creation date
+        self.update_label = QLabel()
+        bottom.addWidget(self.update_label)
+
         bottom.addStretch()
 
         # Toggle editor/preview
@@ -138,6 +151,7 @@ class EditorPanel(QDialog):
 
         # Initial update
         self._update_word_stats()
+        self._update_timestamps()
         self._update_preview_no_animation()
         self.load_stylesheet()
 
@@ -155,6 +169,21 @@ class EditorPanel(QDialog):
     def _update_word_stats(self):
         words, chars = EditorManager.count_words_and_chars(self.content_edit.toPlainText())
         self.word_label.setText(f"Words: {words} — Chars: {chars}")
+
+    ### --- Timestamps --- ###
+    def _update_timestamps(self):
+        """Update the creation and modification timestamps for the note file."""
+        note = self.note_model.get_note_by_id(self.note_id) # fetch from DB
+        if note:
+            #created = note["created"]  # ISO string from SQLite
+            updated = note["updated"]
+            #created_dt = datetime.fromisoformat(created)
+            updated_dt = datetime.fromisoformat(updated)
+            #self.created_label.setText(f"Created: {created_dt.strftime('%Y-%m-%d %H:%M')}")
+            self.update_label.setText(f"Updated: {updated_dt.strftime('%Y-%m-%d')}")
+        else:
+            #self.created_label.setText("Created: N/A")
+            self.update_label.setText("Updated: N/A")
 
     ### --- Preview update --- ###
     def _schedule_preview(self):
