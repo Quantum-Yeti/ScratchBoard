@@ -167,7 +167,7 @@ def create_multi_line_chart(model, days_back=14):
     stat_keys = [
         ("daily_notes", "Daily Notes"),
         ("daily_words", "Daily Words"),
-        #("rolling_notes", "Avg Notes/Day"),
+        ("rolling_notes", "Avg Notes/Day"),
         ("rolling_words", "Avg Words/Day"),
         ("total_ratio", "Note Ratio"),
         ("cumulative_wave", "Words/Week"),
@@ -182,6 +182,7 @@ def create_multi_line_chart(model, days_back=14):
 
     # Generate a series for each stat
     max_value = 0
+    min_value = float("inf")
     for idx, (key, name) in enumerate(stat_keys):
         series = QSplineSeries()
         series.setName(name)
@@ -199,8 +200,9 @@ def create_multi_line_chart(model, days_back=14):
 
         for i, stats in enumerate(daily_stats):
             val = stats.get(key, 0)
-            max_value = max(max_value, val)
             series.append(i, val)
+            max_value = max(max_value, val)
+            min_value = min(min_value, val)
 
         chart.addSeries(series)
 
