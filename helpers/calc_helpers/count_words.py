@@ -1,27 +1,31 @@
-def count_words(text: str) -> tuple[int, int]:
+from typing import Union
+
+from PySide6.QtGui import QTextDocument
+
+
+def count_words(source: Union[str, QTextDocument]) -> tuple[int, int]:
     """
-    Count the number of words and characters in a given string.
+    Count the number of words and characters.
 
-    A word is defined as a sequence of non-whitespace characters separated by spaces.
-    Characters are counted including spaces and punctuation.
-
-    Parameters:
-        text (str): The input string to analyze.
+    - If given a QTextDocument, images/HTML are ignored automatically.
+    - If given a string, it is counted as-is.
 
     Returns:
-        tuple[int, int]: A tuple containing:
-            - number of words in the text
-            - number of characters in the text
+        (word_count, character_count)
     """
-    # Return - words and - characters if the input text is empty or None
-    if not text:
+    if not source:
         return 0, 0
 
-    # Count words by splitting the text on whitespace and filtering empty strings
-    words = len([w for w in text.split() if w.strip()])
+    # Normalize input → plain text only
+    if isinstance(source, QTextDocument):
+        text = source.toPlainText()
+    else:
+        text = str(source)
 
-    # Count all characters in the text including spaces and punctuation
+    if not text.strip():
+        return 0, 0
+
+    words = len(text.split())
     chars = len(text)
 
-    # Return the word count and character count as a tuple
     return words, chars

@@ -1,7 +1,6 @@
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QSizePolicy
 from PySide6.QtCore import Qt, QSize
-
 from views.sticky_view import ScratchNote
 from utils.resource_path import resource_path
 import random
@@ -25,55 +24,43 @@ class ScratchManager(QWidget):
         self.model = model
         self.active_notes = []
 
-        self.setWindowTitle("Sticky Notes")
+        self.setWindowTitle("Scratch Board: Sticky Note Manager")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
         self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint)
-        self.setMinimumWidth(200)
-        self.setMinimumHeight(100)
-        self.setMaximumWidth(200)
-        self.setMaximumHeight(100)
+        self.setMinimumWidth(300)
+        self.setMinimumHeight(200)
 
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(4, 4, 4, 4)
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(4, 4, 4, 4)
 
-        # Add a new scratch note button
-        self.new_btn = QPushButton("Add Scratch Note")
-        self.new_btn.setToolTip("Add a new scratch note.")
-        self.new_btn.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        self.new_btn.setMaximumWidth(200)
-        self.new_btn.setMaximumHeight(60)
-        self.new_btn.setStyleSheet("""
-            QPushButton {
-                padding: 6px 12px;  /* top/bottom, left/right */
-            }
-        """)
-        layout.addWidget(self.new_btn)
-        self.new_btn.setIcon(QIcon(resource_path("resources/icons/sticky_note_btn.png")))
-        self.new_btn.setIconSize(QSize(32, 32))
-        self.new_btn.clicked.connect(self.new_note)
+        # Initialize buttons
+        self._initialize_buttons()
 
-        # Reload all scratch notes from db after they are closed
-        self.refresh_btn = QPushButton("Show All Notes")
-        self.refresh_btn.setToolTip("Reloads all the scratch notes.")
-        self.refresh_btn.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        self.refresh_btn.setMaximumWidth(200)
-        self.refresh_btn.setMaximumHeight(60)
-        self.refresh_btn.setStyleSheet("""
-            QPushButton {
-                padding: 6px 12px;  /* top/bottom, left/right */
-            }
-        """)
-        self.refresh_btn.setIcon(QIcon(resource_path("resources/icons/refresh_btn.png")))
-        self.refresh_btn.setIconSize(QSize(32, 32))
-        self.refresh_btn.clicked.connect(self.show_all_notes)
-
-        layout.addWidget(self.new_btn)
-        layout.addWidget(self.refresh_btn)
-
+        # Load existing notes on startup
         self.load_existing_notes()
 
+    def _initialize_buttons(self):
+        """Set up the action buttons."""
+        self.new_btn = self._create_button("Add Sticky Note", "resources/icons/sticky_note_btn.png", self.new_note)
+        self.refresh_btn = self._create_button("Show All Notes", "resources/icons/refresh_btn.png", self.show_all_notes)
+
+        self.layout.addWidget(self.new_btn)
+        self.layout.addWidget(self.refresh_btn)
+
+    def _create_button(self, text, icon_path, callback):
+        """Helper function to create buttons."""
+        button = QPushButton(text)
+        button.setToolTip(text)
+        button.setIcon(QIcon(resource_path(icon_path)))
+        button.setIconSize(QSize(32, 32))
+        button.clicked.connect(callback)
+        button.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        button.setMaximumWidth(200)
+        button.setMaximumHeight(60)
+        return button
+
     def load_existing_notes(self):
-        """Load all sticky notes from the DB and open them."""
+        """Load all sticky notes from the DB and open them automatically."""
         if not self.model:
             return
 
@@ -95,8 +82,10 @@ class ScratchManager(QWidget):
         self.open_note(title="New Note", content="", color=color)
 
     def show_all_notes(self):
-        """Reopen all scratch notes from the database."""
+        """Open all sticky notes from the database."""
         if not self.model:
             return
 
-        self.load_existing_notes()
+        notes = self.model.get_notes(category_name="Sticky Notes")
+        for note in notes:
+            self.open_note(note_id=note["id"], title=note["title"], content=note["content"])

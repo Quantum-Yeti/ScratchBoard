@@ -1,8 +1,8 @@
 import base64
 import json
 import random
-from datetime import datetime
 from io import BytesIO
+from json import JSONDecodeError
 
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser, QMenu, QHBoxLayout
 from PySide6.QtCore import Qt, QEvent, Signal
@@ -43,8 +43,6 @@ class NoteCard(QFrame):
         self.on_double_click = on_double_click
         self.setObjectName("NoteCard")
 
-        tag_label = None
-
         # Main vertical layout for title and content
         layout = QVBoxLayout(self)
         layout.setSpacing(6)
@@ -66,39 +64,37 @@ class NoteCard(QFrame):
         if "tags" in note.keys() and note["tags"]:
             try:
                 tags = json.loads(note["tags"])
-                if tags:
+            except (JSONDecodeError, TypeError):
+                tags = []
 
-                    # Random background colors
-                    # Light pastel color palette
-                    pastel_colors = [
-                        "#FFB3BA",  # Light red/pink
-                        "#FFDFBA",  # Light orange
-                        "#FFFFBA",  # Light yellow
-                        "#BAFFC9",  # Light green
-                        "#BAE1FF",  # Light blue
-                        "#E3BAFF",  # Light purple
-                        "#FFD1BA",  # Light peach
-                    ]
+            if isinstance(tags, list) and tags:
+                # Random background pastel colors
+                pastel_colors = [
+                    "#FFB3BA",  # Light red/pink
+                    "#FFDFBA",  # Light orange
+                    "#FFFFBA",  # Light yellow
+                    "#BAFFC9",  # Light green
+                    "#BAE1FF",  # Light blue
+                    "#E3BAFF",  # Light purple
+                    "#FFD1BA",  # Light peach
+                ]
 
-                    color = random.choice(pastel_colors)
+                color = random.choice(pastel_colors)
 
-                    tag_label = QLabel(f"{tags[0]}")
-                    tag_label.setObjectName("NoteTag")
-                    tag_label.setStyleSheet(f"""
-                        QLabel {{
-                            background-color: {color};
-                            color: #333333;
-                            padding: 2px 6px;
-                            border-radius: 6px;
-                            font-size: 13px;
-                        }}
-                    """)
-                    title_row.addWidget(tag_label)
+                tag_label = QLabel(f"{tags[0]}")
+                tag_label.setObjectName("NoteTag")
+                tag_label.setStyleSheet(f"""
+                    QLabel {{
+                        background-color: {color};
+                        color: #333333;
+                        padding: 2px 6px;
+                        border-radius: 6px;
+                        font-size: 13px;
+                    }}
+                """)
+                title_row.addWidget(tag_label)
 
-                    title_row.setAlignment(tag_label, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
-
-            except Exception:
-                pass
+                title_row.setAlignment(tag_label, Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
 
         layout.addLayout(title_row)
 
@@ -167,21 +163,6 @@ class NoteCard(QFrame):
         # Add content view to layout
         layout.addWidget(self.content_view)
 
-        layout.addStretch(1)
-
-        # Meta data
-        meta = QLabel()
-        meta.setStyleSheet("background: transparent; border: none; font-size: 10px;")
-        created_raw = note["created"]
-        updated_raw = note["updated"]
-        created_date = datetime.fromisoformat(created_raw)
-        updated_date = datetime.fromisoformat(updated_raw)
-        created_str = created_date.strftime("%b %d, %Y")
-        updated_str = updated_date.strftime("%b %d, %Y")
-
-        meta.setText(f"Created: {created_str} | Updated: {updated_str}")
-        layout.addWidget(meta, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignBottom)
-
         # Apply stylesheet
         self.load_stylesheet()
 
@@ -200,7 +181,7 @@ class NoteCard(QFrame):
         Args:
             event (QMouseEvent): The mouse event triggering the double click.
         """
-        if event.button() == Qt.LeftButton and callable(self.on_double_click):
+        if event.button() == Qt.MouseButton.LeftButton and callable(self.on_double_click):
             self.on_double_click(self.note)
 
     def eventFilter(self, obj, event):
@@ -218,7 +199,7 @@ class NoteCard(QFrame):
             return True
 
         if obj == self.content_view.viewport():
-            if event.type() == QEvent.Type.MouseButtonRelease and event.button() == Qt.RightButton:
+            if event.type() == QEvent.Type.MouseButtonRelease and event.button() == Qt.MouseButton.RightButton:
                 cursor = self.content_view.cursorForPosition(event.pos())
                 fmt = cursor.charFormat()
                 if fmt.isImageFormat():

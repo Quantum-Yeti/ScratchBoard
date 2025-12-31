@@ -69,9 +69,9 @@ class EditorManager:
         return True
 
     @staticmethod
-    def count_words_and_chars(text: str) -> tuple[int, int]:
+    def count_words_and_chars(source) -> tuple[int, int]:
         """Return number of words and characters in text."""
-        return count_words(text)
+        return count_words(source)
 
     # Formatting helpers
     @staticmethod
