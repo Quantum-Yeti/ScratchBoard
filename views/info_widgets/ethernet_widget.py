@@ -1,63 +1,72 @@
-from PySide6.QtCore import QSize
-from PySide6.QtGui import QIcon, QFont, QPixmap, Qt
-from PySide6.QtWidgets import QTableWidget, QPushButton, QHBoxLayout, QSizePolicy, QLabel, QWidget, QVBoxLayout, \
-    QDialog, QTableWidgetItem
+from PySide6.QtGui import QIcon, QPixmap, QFont
+from PySide6.QtWidgets import (
+    QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
+    QPushButton, QHBoxLayout, QLabel, QSizePolicy, QWidget
+)
+from PySide6.QtCore import Qt, QSize
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_chart_widgets.info_dictionaries.voip_dict import voip_signals
+from views.info_widgets.info_dictionaries.ethernet_dict import ethernet_specs
 
 
-class VoIPReference(QDialog):
+class EthernetReference(QDialog):
+    """
+    Displays a reference table of Ethernet cable categories,
+    their capabilities, and typical use cases.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # Apply a chart theme if available
-        try:
-            with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
-                self.setStyleSheet(f.read())
-        except Exception:
-            pass  # silently continue if theme not found
+        # Apply the chart_theme.qss
+        with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
+            self.setStyleSheet(f.read())
 
-        self.setWindowTitle("Scratch Board: VoIP Reference Chart")
+        self.setWindowTitle("Scratch Board: Ethernet Cable Reference Chart")
         self.setWindowModality(Qt.WindowModality.WindowModal)
-        self.resize(1200, 900)
+        self.resize(1100, 900)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
 
-        # Top icon + title
+        # Top image and title of chart
         icon_title_widget = QWidget()
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centers everything horizontally
 
+        # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/phone.png")))  # add your icon
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/ethernet_purple.png")))
         image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        title_label = QLabel("VoIP Troubleshooting Reference Chart")
+        # Title
+        title_label = QLabel("Ethernet Reference Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)  # Prevents stretching
 
+        # Add widgets to layout
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
+
+        # Add the container widget to the main layout
         layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
-        self.table.setColumnCount(5)
+        self.table.setColumnCount(6)
         self.table.setHorizontalHeaderLabels([
-            "Metric / Signal",
-            "Normal Range",
-            "Symptoms / Common Issues",
-            "Explanation",
-            "Troubleshooting Steps"
+            "Category",
+            "Max Speed",
+            "Max Bandwidth",
+            "Max Length",
+            "PoE Support",
+            "Typical Use Cases"
         ])
         self.table.setWordWrap(True)
         self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
@@ -75,28 +84,33 @@ class VoIPReference(QDialog):
         btn_layout.addStretch()
         btn_layout.addWidget(close_btn)
         btn_layout.addStretch()
+
         layout.addLayout(btn_layout)
 
-        # Populate table
+        # Fill table & adjust size
         self._populate_table()
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(voip_signals))
-        for row, sig in enumerate(voip_signals):
-            for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
-                item = QTableWidgetItem(sig[key])
+        self.table.setRowCount(len(ethernet_specs))
+
+        keys = ["cat", "speed", "bandwidth", "length", "poe", "use"]
+
+        for row, entry in enumerate(ethernet_specs):
+            for col, key in enumerate(keys):
+                item = QTableWidgetItem(entry[key])
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                item.setToolTip(sig[key])
+                item.setToolTip(entry[key])
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        self.table.setColumnWidth(0, 180)
-        self.table.setColumnWidth(1, 100)
-        self.table.setColumnWidth(2, 250)
-        self.table.setColumnWidth(3, 350)
-        self.table.setColumnWidth(4, 300)
+        self.table.setColumnWidth(0, 110)  # Category
+        self.table.setColumnWidth(1, 140)  # Speed
+        self.table.setColumnWidth(2, 150)  # Bandwidth
+        self.table.setColumnWidth(3, 120)  # Length
+        self.table.setColumnWidth(4, 140)  # PoE
+        self.table.setColumnWidth(5, 300)  # Use cases
 
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)

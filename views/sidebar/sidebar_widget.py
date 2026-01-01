@@ -8,7 +8,7 @@ import subprocess
 from helpers.ui_helpers.open_company_url import open_company_homepage
 from utils.resource_path import resource_path
 from managers.sticky_manager import ScratchManager
-from views.notepad_view import NotepadDialog
+from views.notepad.notepad_view import NotepadDialog
 
 
 def open_github():

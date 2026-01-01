@@ -12,7 +12,7 @@ from startup.startup_runner import run_startup
 from helpers.ui_helpers.update_window_title import update_window_title
 from ui.menus.menu_bar import MainMenuBar
 from views.splash.splash_screen import SplashScreen
-from views.dashboard_view import DashboardView
+from views.dashbooard.dashboard_view import DashboardView
 from views.sidebar.sidebar_widget import Sidebar
 from views.notes.multi_note_view import MainNotesView
 from views.contacts.contacts_view import ContactsView

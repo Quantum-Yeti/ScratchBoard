@@ -1,4 +1,4 @@
-from PySide6.QtGui import QIcon, QPixmap, QFont
+from PySide6.QtGui import QIcon, QFont, QPixmap
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QHBoxLayout, QLabel, QSizePolicy, QWidget
@@ -7,14 +7,15 @@ from PySide6.QtCore import Qt, QSize
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_chart_widgets.info_dictionaries.ethernet_dict import ethernet_specs
+from views.info_widgets.info_dictionaries.speed_dict import requirements
 
 
-class EthernetReference(QDialog):
+class InternetSpeedRequirements(QDialog):
     """
-    Displays a reference table of Ethernet cable categories,
-    their capabilities, and typical use cases.
+    Shows common internet use-cases with recommended and minimum speeds,
+    plus latency expectations and notes.
     """
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -22,7 +23,7 @@ class EthernetReference(QDialog):
         with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
             self.setStyleSheet(f.read())
 
-        self.setWindowTitle("Scratch Board: Ethernet Cable Reference Chart")
+        self.setWindowTitle("Scratch Board: Bandwidth Requirements Chart")
         self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(1100, 900)
 
@@ -39,11 +40,11 @@ class EthernetReference(QDialog):
 
         # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/ethernet_purple.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/bandwidth.png")))
         image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         # Title
-        title_label = QLabel("Ethernet Reference Chart")
+        title_label = QLabel("Bandwidth Requirements Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
@@ -59,14 +60,13 @@ class EthernetReference(QDialog):
 
         # Table
         self.table = QTableWidget()
-        self.table.setColumnCount(6)
+        self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels([
-            "Category",
-            "Max Speed",
-            "Max Bandwidth",
-            "Max Length",
-            "PoE Support",
-            "Typical Use Cases"
+            "Activity / Application",
+            "Minimum Speed",
+            "Recommended Speed",
+            "Latency Requirement",
+            "Notes"
         ])
         self.table.setWordWrap(True)
         self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
@@ -84,33 +84,28 @@ class EthernetReference(QDialog):
         btn_layout.addStretch()
         btn_layout.addWidget(close_btn)
         btn_layout.addStretch()
-
         layout.addLayout(btn_layout)
 
-        # Fill table & adjust size
+        # fill the table
         self._populate_table()
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(ethernet_specs))
-
-        keys = ["cat", "speed", "bandwidth", "length", "poe", "use"]
-
-        for row, entry in enumerate(ethernet_specs):
-            for col, key in enumerate(keys):
-                item = QTableWidgetItem(entry[key])
+        self.table.setRowCount(len(requirements))
+        for row, req in enumerate(requirements):
+            for col, key in enumerate(["activity", "min", "rec", "latency", "notes"]):
+                item = QTableWidgetItem(req[key])
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                item.setToolTip(entry[key])
+                item.setToolTip(req[key])
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        self.table.setColumnWidth(0, 110)  # Category
-        self.table.setColumnWidth(1, 140)  # Speed
-        self.table.setColumnWidth(2, 150)  # Bandwidth
-        self.table.setColumnWidth(3, 120)  # Length
-        self.table.setColumnWidth(4, 140)  # PoE
-        self.table.setColumnWidth(5, 300)  # Use cases
+        self.table.setColumnWidth(0, 250)  # Activity
+        self.table.setColumnWidth(1, 120)  # Min speed
+        self.table.setColumnWidth(2, 160)  # Rec speed
+        self.table.setColumnWidth(3, 130)  # Latency
+        self.table.setColumnWidth(4, 350)  # Notes
 
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)

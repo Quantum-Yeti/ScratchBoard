@@ -1,24 +1,25 @@
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QPixmap, QFont
-from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHBoxLayout, QPushButton, QLabel, QWidget, QVBoxLayout, \
-    QDialog, QSizePolicy
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon, QFont, QPixmap, Qt
+from PySide6.QtWidgets import QTableWidget, QHBoxLayout, QPushButton, QSizePolicy, QLabel, QVBoxLayout, QDialog, \
+    QWidget, QTableWidgetItem
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_chart_widgets.info_dictionaries.gaming_dict import gaming_server_issues
+from views.info_widgets.info_dictionaries.protocol_dict import internet_protocols
 
-class GamingReference(QDialog):
+
+class InternetProtocolsTimeline(QDialog):
+    """
+    Shows a timeline of major recent internet protocols, their eras, purpose, and notes.
+    """
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # Apply a chart theme if available
-        try:
-            with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
-                self.setStyleSheet(f.read())
-        except Exception:
-            pass
+        with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
+            self.setStyleSheet(f.read())
 
-        self.setWindowTitle("Scratch Board: Gaming Network Reference Chart")
+        self.setWindowTitle("Scratch Board: Recent Internet Protocols")
         self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(1200, 900)
 
@@ -26,7 +27,7 @@ class GamingReference(QDialog):
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
 
-        # Top icon + title
+        # Top image and title
         icon_title_widget = QWidget()
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
@@ -34,10 +35,10 @@ class GamingReference(QDialog):
         icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/gaming.png")))  # Add your gaming icon
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/server_yellow.png")))
         image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        title_label = QLabel("Gaming Network Reference Chart")
+        title_label = QLabel("Internet Protocols Timeline")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
@@ -50,13 +51,9 @@ class GamingReference(QDialog):
 
         # Table
         self.table = QTableWidget()
-        self.table.setColumnCount(5)
+        self.table.setColumnCount(4)
         self.table.setHorizontalHeaderLabels([
-            "Metric / Signal",
-            "Normal Range",
-            "Symptoms / Common Issues",
-            "Explanation",
-            "Troubleshooting Steps"
+            "Protocol", "Era", "Purpose", "Notes"
         ])
         self.table.setWordWrap(True)
         self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
@@ -81,22 +78,20 @@ class GamingReference(QDialog):
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(gaming_server_issues))
-        for row, sig in enumerate(gaming_server_issues):
-            for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
-                item = QTableWidgetItem(sig[key])
+        self.table.setRowCount(len(internet_protocols))
+        for row, proto in enumerate(internet_protocols):
+            for col, key in enumerate(["protocol", "era", "purpose", "notes"]):
+                item = QTableWidgetItem(proto[key])
                 item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                item.setToolTip(sig[key])
+                item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                item.setToolTip(proto[key])
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        self.table.setColumnWidth(0, 180)
-        self.table.setColumnWidth(1, 100)
-        self.table.setColumnWidth(2, 250)
-        self.table.setColumnWidth(3, 350)
-        self.table.setColumnWidth(4, 300)
-
+        self.table.setColumnWidth(0, 250)  # Protocol
+        self.table.setColumnWidth(1, 150)  # Era
+        self.table.setColumnWidth(2, 300)  # Purpose
+        self.table.setColumnWidth(3, 450)  # Notes
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)

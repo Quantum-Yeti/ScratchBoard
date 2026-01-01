@@ -1,59 +1,74 @@
-from PySide6.QtCore import QSize
-from PySide6.QtGui import QIcon, QFont, QPixmap, Qt
-from PySide6.QtWidgets import QTableWidget, QHBoxLayout, QPushButton, QSizePolicy, QLabel, QVBoxLayout, QDialog, \
-    QWidget, QTableWidgetItem
+from PySide6.QtGui import QIcon, QFont, QPixmap
+from PySide6.QtWidgets import (
+    QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
+    QPushButton, QHBoxLayout, QSizePolicy, QLabel, QWidget
+)
+from PySide6.QtCore import Qt, QSize
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_chart_widgets.info_dictionaries.protocol_dict import internet_protocols
+from views.info_widgets.info_dictionaries.wifi_dict import standards
 
 
-class InternetProtocolsTimeline(QDialog):
+class WifiStandardsReference(QDialog):
     """
-    Shows a timeline of major recent internet protocols, their eras, purpose, and notes.
+    Reference chart for Wi-Fi standards including speeds, frequencies,
+    features, and real-world performance expectations.
     """
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        # Apply the chart_theme.qss
         with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
             self.setStyleSheet(f.read())
 
-        self.setWindowTitle("Scratch Board: Recent Internet Protocols")
+        self.setWindowTitle("Scratch Board: Wi-Fi Standards Reference Chart")
         self.setWindowModality(Qt.WindowModality.WindowModal)
-        self.resize(1200, 900)
+        self.resize(1100, 900)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
 
-        # Top image and title
+        # Top image and title of chart
         icon_title_widget = QWidget()
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centers everything horizontally
 
+        # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/server_yellow.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/wifi_channel.png")))
         image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        title_label = QLabel("Internet Protocols Timeline")
+        # Title
+        title_label = QLabel("WiFi Standards Reference Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)  # Prevents stretching
 
+        # Add widgets to layout
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
+
+        # Add the container widget to the main layout
         layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
-        self.table.setColumnCount(4)
+        self.table.setColumnCount(7)
         self.table.setHorizontalHeaderLabels([
-            "Protocol", "Era", "Purpose", "Notes"
+            "Standard",
+            "Max Speed",
+            "Bands",
+            "Channel Width",
+            "MIMO / Features",
+            "Real-World Speed",
+            "Notes"
         ])
         self.table.setWordWrap(True)
         self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
@@ -73,25 +88,29 @@ class InternetProtocolsTimeline(QDialog):
         btn_layout.addStretch()
         layout.addLayout(btn_layout)
 
-        # Populate table
+        # Fill table
         self._populate_table()
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(internet_protocols))
-        for row, proto in enumerate(internet_protocols):
-            for col, key in enumerate(["protocol", "era", "purpose", "notes"]):
-                item = QTableWidgetItem(proto[key])
-                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+        self.table.setRowCount(len(standards))
+        for row, wifi in enumerate(standards):
+            for col, key in enumerate(["std", "speed", "bands", "width", "features", "real", "notes"]):
+                item = QTableWidgetItem(wifi[key])
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                item.setToolTip(proto[key])
+                item.setToolTip(wifi[key])
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        self.table.setColumnWidth(0, 250)  # Protocol
-        self.table.setColumnWidth(1, 150)  # Era
-        self.table.setColumnWidth(2, 300)  # Purpose
-        self.table.setColumnWidth(3, 450)  # Notes
+        self.table.setColumnWidth(0, 130)  # Standard
+        self.table.setColumnWidth(1, 120)  # Max speed
+        self.table.setColumnWidth(2, 110)  # Bands
+        self.table.setColumnWidth(3, 130)  # Channel width
+        self.table.setColumnWidth(4, 220)  # Features
+        self.table.setColumnWidth(5, 150)  # Real speed
+        self.table.setColumnWidth(6, 260)  # Notes
+
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)

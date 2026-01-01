@@ -1,72 +1,63 @@
-from PySide6.QtGui import QIcon, QFont, QPixmap
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
-    QPushButton, QHBoxLayout, QLabel, QSizePolicy, QWidget
-)
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon, QFont, QPixmap, Qt
+from PySide6.QtWidgets import QTableWidget, QPushButton, QHBoxLayout, QSizePolicy, QLabel, QWidget, QVBoxLayout, \
+    QDialog, QTableWidgetItem
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_chart_widgets.info_dictionaries.speed_dict import requirements
+from views.info_widgets.info_dictionaries.voip_dict import voip_signals
 
 
-class InternetSpeedRequirements(QDialog):
-    """
-    Shows common internet use-cases with recommended and minimum speeds,
-    plus latency expectations and notes.
-    """
-
+class VoIPReference(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # Apply the chart_theme.qss
-        with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
-            self.setStyleSheet(f.read())
+        # Apply a chart theme if available
+        try:
+            with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
+                self.setStyleSheet(f.read())
+        except Exception:
+            pass  # silently continue if theme not found
 
-        self.setWindowTitle("Scratch Board: Bandwidth Requirements Chart")
+        self.setWindowTitle("Scratch Board: VoIP Reference Chart")
         self.setWindowModality(Qt.WindowModality.WindowModal)
-        self.resize(1100, 900)
+        self.resize(1200, 900)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
 
-        # Top image and title of chart
+        # Top icon + title
         icon_title_widget = QWidget()
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centers everything horizontally
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/bandwidth.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/phone.png")))  # add your icon
         image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        # Title
-        title_label = QLabel("Bandwidth Requirements Chart")
+        title_label = QLabel("VoIP Troubleshooting Reference Chart")
         font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)  # Prevents stretching
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
 
-        # Add widgets to layout
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
-
-        # Add the container widget to the main layout
         layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
         self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels([
-            "Activity / Application",
-            "Minimum Speed",
-            "Recommended Speed",
-            "Latency Requirement",
-            "Notes"
+            "Metric / Signal",
+            "Normal Range",
+            "Symptoms / Common Issues",
+            "Explanation",
+            "Troubleshooting Steps"
         ])
         self.table.setWordWrap(True)
         self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
@@ -86,26 +77,26 @@ class InternetSpeedRequirements(QDialog):
         btn_layout.addStretch()
         layout.addLayout(btn_layout)
 
-        # fill the table
+        # Populate table
         self._populate_table()
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(requirements))
-        for row, req in enumerate(requirements):
-            for col, key in enumerate(["activity", "min", "rec", "latency", "notes"]):
-                item = QTableWidgetItem(req[key])
+        self.table.setRowCount(len(voip_signals))
+        for row, sig in enumerate(voip_signals):
+            for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
+                item = QTableWidgetItem(sig[key])
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                item.setToolTip(req[key])
+                item.setToolTip(sig[key])
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        self.table.setColumnWidth(0, 250)  # Activity
-        self.table.setColumnWidth(1, 120)  # Min speed
-        self.table.setColumnWidth(2, 160)  # Rec speed
-        self.table.setColumnWidth(3, 130)  # Latency
-        self.table.setColumnWidth(4, 350)  # Notes
+        self.table.setColumnWidth(0, 180)
+        self.table.setColumnWidth(1, 100)
+        self.table.setColumnWidth(2, 250)
+        self.table.setColumnWidth(3, 350)
+        self.table.setColumnWidth(4, 300)
 
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)

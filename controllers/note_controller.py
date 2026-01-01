@@ -2,7 +2,7 @@ import json
 
 from PySide6.QtCore import QTimer, Signal, QObject
 from PySide6.QtWidgets import QMessageBox
-from views.editor_view import EditorPanel
+from views.editor.editor_view import EditorPanel
 
 class NoteController(QObject):
     """

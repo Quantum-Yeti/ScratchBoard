@@ -1,48 +1,44 @@
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QFont, QPixmap
-from PySide6.QtWidgets import QTableWidgetItem, QPushButton, QHBoxLayout, QTableWidget, QSizePolicy, QLabel, QWidget, \
-    QVBoxLayout, QDialog
+from PySide6.QtGui import QIcon, QPixmap, QFont
+from PySide6.QtWidgets import QTableWidgetItem, QTableWidget, QHBoxLayout, QPushButton, QLabel, QWidget, QVBoxLayout, \
+    QDialog, QSizePolicy
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_chart_widgets.info_dictionaries.storage_dict import storage
+from views.info_widgets.info_dictionaries.gaming_dict import gaming_server_issues
 
-
-class DiskStorageChart(QDialog):
-    """
-    Shows common storage units and their equivalences with notes.
-    """
-
+class GamingReference(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # Apply the chart theme
-        with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
-            self.setStyleSheet(f.read())
+        # Apply a chart theme if available
+        try:
+            with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
+                self.setStyleSheet(f.read())
+        except Exception:
+            pass
 
-        self.setWindowTitle("Scratch Board: Disk Storage Info Chart")
+        self.setWindowTitle("Scratch Board: Gaming Network Reference Chart")
         self.setWindowModality(Qt.WindowModality.WindowModal)
-        self.resize(900, 700)
+        self.resize(1200, 900)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
 
-        # Top image and title
+        # Top icon + title
         icon_title_widget = QWidget()
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
         icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/storage.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/gaming.png")))  # Add your gaming icon
         image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        # Title
-        title_label = QLabel("Disk Storage Info Chart")
-        font = QFont("Segoe UI", 28)
+        title_label = QLabel("Gaming Network Reference Chart")
+        font = QFont("Segoe UI", 32)
         font.setBold(True)
         title_label.setFont(font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
@@ -54,11 +50,13 @@ class DiskStorageChart(QDialog):
 
         # Table
         self.table = QTableWidget()
-        self.table.setColumnCount(3)
+        self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels([
-            "Unit",
-            "Equivalent",
-            "Notes"
+            "Metric / Signal",
+            "Normal Range",
+            "Symptoms / Common Issues",
+            "Explanation",
+            "Troubleshooting Steps"
         ])
         self.table.setWordWrap(True)
         self.table.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
@@ -78,24 +76,27 @@ class DiskStorageChart(QDialog):
         btn_layout.addStretch()
         layout.addLayout(btn_layout)
 
-        # Fill table
+        # Populate table
         self._populate_table()
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(storage))
-        for row, req in enumerate(storage):
-            for col, key in enumerate(["unit", "equivalent", "notes"]):
-                item = QTableWidgetItem(req[key])
-                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-                item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                item.setToolTip(req[key])
+        self.table.setRowCount(len(gaming_server_issues))
+        for row, sig in enumerate(gaming_server_issues):
+            for col, key in enumerate(["name", "range", "symptoms", "explanation", "steps"]):
+                item = QTableWidgetItem(sig[key])
+                item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                item.setToolTip(sig[key])
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        self.table.setColumnWidth(0, 150)  # Unit
-        self.table.setColumnWidth(1, 200)  # Equivalent
-        self.table.setColumnWidth(2, 450)  # Notes
+        self.table.setColumnWidth(0, 180)
+        self.table.setColumnWidth(1, 100)
+        self.table.setColumnWidth(2, 250)
+        self.table.setColumnWidth(3, 350)
+        self.table.setColumnWidth(4, 300)
+
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)

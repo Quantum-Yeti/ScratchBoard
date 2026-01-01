@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt, QSize
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_chart_widgets.info_dictionaries.fiber_dict import signals
+from views.info_widgets.info_dictionaries.fiber_dict import signals
 
 
 class FiberReferenceDialog(QDialog):

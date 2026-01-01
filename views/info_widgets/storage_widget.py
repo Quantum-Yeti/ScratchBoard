@@ -1,73 +1,63 @@
-from PySide6.QtGui import QIcon, QFont, QPixmap
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
-    QPushButton, QHBoxLayout, QSizePolicy, QLabel, QWidget
-)
 from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QIcon, QFont, QPixmap
+from PySide6.QtWidgets import QTableWidgetItem, QPushButton, QHBoxLayout, QTableWidget, QSizePolicy, QLabel, QWidget, \
+    QVBoxLayout, QDialog
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
-from views.info_chart_widgets.info_dictionaries.wifi_dict import standards
+from views.info_widgets.info_dictionaries.storage_dict import storage
 
 
-class WifiStandardsReference(QDialog):
+class DiskStorageChart(QDialog):
     """
-    Reference chart for Wi-Fi standards including speeds, frequencies,
-    features, and real-world performance expectations.
+    Shows common storage units and their equivalences with notes.
     """
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # Apply the chart_theme.qss
+        # Apply the chart theme
         with open(resource_path("ui/themes/charts_theme.qss"), "r") as f:
             self.setStyleSheet(f.read())
 
-        self.setWindowTitle("Scratch Board: Wi-Fi Standards Reference Chart")
+        self.setWindowTitle("Scratch Board: Disk Storage Info Chart")
         self.setWindowModality(Qt.WindowModality.WindowModal)
-        self.resize(1100, 900)
+        self.resize(900, 700)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(8)
 
-        # Top image and title of chart
+        # Top image and title
         icon_title_widget = QWidget()
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centers everything horizontally
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Image
         image_label = QLabel()
-        image_label.setPixmap(QPixmap(resource_path("resources/icons/wifi_channel.png")))
+        image_label.setPixmap(QPixmap(resource_path("resources/icons/storage.png")))
         image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         # Title
-        title_label = QLabel("WiFi Standards Reference Chart")
-        font = QFont("Segoe UI", 32)
+        title_label = QLabel("Disk Storage Info Chart")
+        font = QFont("Segoe UI", 28)
         font.setBold(True)
         title_label.setFont(font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
-        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)  # Prevents stretching
+        title_label.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
 
-        # Add widgets to layout
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
-
-        # Add the container widget to the main layout
         layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Table
         self.table = QTableWidget()
-        self.table.setColumnCount(7)
+        self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels([
-            "Standard",
-            "Max Speed",
-            "Bands",
-            "Channel Width",
-            "MIMO / Features",
-            "Real-World Speed",
+            "Unit",
+            "Equivalent",
             "Notes"
         ])
         self.table.setWordWrap(True)
@@ -93,24 +83,19 @@ class WifiStandardsReference(QDialog):
         self._resize_table()
 
     def _populate_table(self):
-        self.table.setRowCount(len(standards))
-        for row, wifi in enumerate(standards):
-            for col, key in enumerate(["std", "speed", "bands", "width", "features", "real", "notes"]):
-                item = QTableWidgetItem(wifi[key])
+        self.table.setRowCount(len(storage))
+        for row, req in enumerate(storage):
+            for col, key in enumerate(["unit", "equivalent", "notes"]):
+                item = QTableWidgetItem(req[key])
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                item.setToolTip(wifi[key])
+                item.setToolTip(req[key])
                 self.table.setItem(row, col, item)
 
     def _resize_table(self):
-        self.table.setColumnWidth(0, 130)  # Standard
-        self.table.setColumnWidth(1, 120)  # Max speed
-        self.table.setColumnWidth(2, 110)  # Bands
-        self.table.setColumnWidth(3, 130)  # Channel width
-        self.table.setColumnWidth(4, 220)  # Features
-        self.table.setColumnWidth(5, 150)  # Real speed
-        self.table.setColumnWidth(6, 260)  # Notes
-
+        self.table.setColumnWidth(0, 150)  # Unit
+        self.table.setColumnWidth(1, 200)  # Equivalent
+        self.table.setColumnWidth(2, 450)  # Notes
         self.table.resizeRowsToContents()
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)

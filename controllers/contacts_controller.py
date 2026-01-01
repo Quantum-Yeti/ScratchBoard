@@ -1,6 +1,6 @@
 from PySide6.QtCore import QObject, QTimer
 from PySide6.QtWidgets import QMessageBox
-from views.contacts.contacts_editor_view import ContactEditorPanel  # Create similar to EditorPanel for contacts
+from managers.contacts_manager import ContactsManagerPanel  # Create similar to EditorPanel for contacts
 
 class ContactsController(QObject):
     """
@@ -50,7 +50,7 @@ class ContactsController(QObject):
 
         :param contact: Contact data dictionary with keys.
         """
-        ContactEditorPanel(
+        ContactsManagerPanel(
             parent=self.view,
             contact_id=contact["id"],
             name=contact["name"],
@@ -92,7 +92,7 @@ class ContactsController(QObject):
             self._notify_change()
 
         # None + empty strings -> new contact
-        ContactEditorPanel(self.view, None, "", "", "", "", save_cb).exec()
+        ContactsManagerPanel(self.view, None, "", "", "", "", save_cb).exec()
 
     def save_edit(self, contact_id, name, phone, email, website):
         """
