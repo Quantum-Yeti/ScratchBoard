@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFi
 
 from services.sync_service import sync_db
 from models.note_model import NoteModel
-from ui.themes.context_menu_theme import menu_style
+from ui.themes.menu_theme import menu_style
 from utils.resource_path import resource_path
 from utils.run_update import run_update_batch_file
 from views.games.asteroid import AsteroidsWidget

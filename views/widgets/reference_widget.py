@@ -4,7 +4,7 @@ from PySide6.QtGui import QDesktopServices, Qt, QAction, QIcon
 from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLayout, QLineEdit, QPushButton, QWidget, \
     QMenu, QMessageBox, QSizePolicy
 
-from ui.themes.context_menu_theme import menu_style
+from ui.themes.menu_theme import menu_style
 from ui.themes.reference_list_style import ref_list_style
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path

@@ -8,14 +8,14 @@ from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QTextBrowser, QMenu, 
 from PySide6.QtCore import Qt, QEvent, Signal
 import markdown
 
-from ui.themes.context_menu_theme import menu_style
+from ui.themes.menu_theme import menu_style
 from utils.resource_path import resource_path
 
 
 def show_context_menu(widget, pos):
     """Show a dark-themed context menu with hover color."""
     menu = QMenu(widget)
-    menu.setStyleSheet(menu_style)  # your dark + hover blue style
+    menu.setStyleSheet(menu_style)
 
     # Convert local pos to global coordinates
     global_pos = widget.mapToGlobal(pos)

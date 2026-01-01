@@ -25,7 +25,7 @@ QMenu::item {
 /* Hover or keyboard selection */
 QMenu::item:selected,
 QMenu::item:hover {
-    background-color: #505090;  
+    background: #2F3B47;  
     color: #FFFFFF;             
 }
 """

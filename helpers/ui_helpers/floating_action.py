@@ -1,16 +1,19 @@
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtGui import QIcon, QKeySequence, QShortcut
 from PySide6.QtCore import Qt, QEvent, QPropertyAnimation, QEasingCurve, QPoint
+
+from ui.themes.floating_action_style import floating_btn_style
 from utils.resource_path import resource_path
 
 class FloatingButton(QPushButton):
-    def __init__(self, parent, icon_path="resources/icons/add.png", tooltip="Add", shortcut="Ctrl+N", size=50):
+    def __init__(self, parent, icon_path="resources/icons/add.png", tooltip="Add Note", shortcut="Ctrl+N", size=50):
         super().__init__(parent)
         self.setObjectName("FloatingButton")
         self.setToolTip(f"{tooltip} ({shortcut})")
         self.setFixedSize(size, size)
-        self.setCursor(Qt.PointingHandCursor)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setShortcut(QKeySequence("Shift+N"))
+        self.setStyleSheet(floating_btn_style)
 
         # Load icon
         icon = QIcon(resource_path(icon_path))
@@ -29,7 +32,7 @@ class FloatingButton(QPushButton):
 
         # Keyboard shortcut
         self.shortcut = QShortcut(QKeySequence(shortcut), parent)
-        self.shortcut.setContext(Qt.ApplicationShortcut)
+        self.shortcut.setContext(Qt.ShortcutContext.ApplicationShortcut)
         self.shortcut.activated.connect(self.click)
 
     def eventFilter(self, obj, event):

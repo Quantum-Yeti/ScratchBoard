@@ -7,10 +7,12 @@ from PySide6.QtWidgets import (QApplication,
                                QHBoxLayout,
                                QWidget,
                                QStackedLayout,
-                               QMessageBox)
+                               QMessageBox, QMenu)
 from startup.startup_runner import run_startup
 from helpers.ui_helpers.update_window_title import update_window_title
 from ui.menus.menu_bar import MainMenuBar
+from ui.themes.menu_theme import menu_style
+from utils.global_context_menu import ContextMenuStyler
 from views.splash.splash_screen import SplashScreen
 from views.dashbooard.dashboard_view import DashboardView
 from views.sidebar.sidebar_widget import Sidebar
@@ -180,6 +182,8 @@ def main():
     # Initialize and run the start_helpers splash screen
     splash = SplashScreen(resource_path("resources/icons/astronaut_splash.png"))
     run_startup(splash.set_progress)
+
+
 
     # Initialize and display the main application window
     window = MainWindow()

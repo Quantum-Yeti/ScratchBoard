@@ -3,9 +3,7 @@ from PySide6.QtWidgets import QToolTip, QMenu
 
 
 class HoverToolTip(QObject):
-    """
-    Event filter that displays tooltips for QMenu actions when hovering with a mouse.
-    """
+    """Event filter that displays tooltips for QMenu actions when hovering with a mouse."""
     def eventFilter(self, obj, event):
         """
         Intercepts events for QMenu actions when hovering with a mouse.

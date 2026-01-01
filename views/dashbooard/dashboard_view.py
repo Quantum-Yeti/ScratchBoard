@@ -175,7 +175,7 @@ class DashboardView(QWidget):
             return
         pixmap = QPixmap(self.image_path)
         self.banner.setPixmap(
-            pixmap.scaled(200, self.height()//2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            pixmap.scaled(200, self.height()//2, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         )
 
     def go_to_dashboard(self):

@@ -2,7 +2,8 @@
 floating_btn_style = """
     QPushButton#FloatingButton {
         border: none;
-        border-radius: 30px;
+        border-radius: 50%;
+        background-color: #4A6B8A;
     }
     QPushButton#FloatingButton:hover {
         background-color: #3498eb;

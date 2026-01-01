@@ -33,19 +33,7 @@
         background-color: #1E88E5;
     }
 
-/* Floating Action Button */
-    QPushButton#FloatingButton {
-        background-color: #505050;
-        color: #FFFFFF;
-        font-size: 28px;
-        font-weight: bold;
-        border-radius: 30px;
-        border: none;
-    }
 
-    QPushButton#FloatingButton:hover {
-        background-color: #2196F3;
-    }
 
 /* ==============================
    NOTE CARDS
@@ -58,7 +46,7 @@
     }
 
     QFrame#NoteCard a {
-        color: #34deeb;
+        color: #34DEEB;
     }
 
     QLabel#NoteTitle {
@@ -170,7 +158,7 @@
 /* ============================
     LINKS
     =========================== */
-    a { color: #58a6ff; text-decoration: none; }
+    a { color: #B0E0E6; text-decoration: none; }
 
 
 # Contacts View ===============
