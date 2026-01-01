@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QMes
     QSizePolicy
 
 from ui.themes.mac_widget_style import mac_widget_style
+from utils.custom_context_menu import ContextMenuUtility
 from utils.resource_path import resource_path
 
 from utils.oui_lookup import OUILookup
@@ -38,6 +39,8 @@ class MacVendorView(QWidget):
         self.console_output.setStyleSheet(mac_widget_style)
         layout.addWidget(self.console_output, stretch=1)
 
+        self.context_menu_helper = ContextMenuUtility(self.console_output)
+
         # Horizontal layout for input + buttons
         input_layout = QHBoxLayout()
 
@@ -45,6 +48,8 @@ class MacVendorView(QWidget):
         self.input_mac = QLineEdit()
         self.input_mac.setPlaceholderText("Enter MAC (e.g., 00:1A:2B:33:44:55)")
         input_layout.addWidget(self.input_mac, 1)  # input on the left
+
+        self.context_menu = ContextMenuUtility(self.input_mac)
 
         # Add stretch so buttons move to the right
         input_layout.addStretch()
@@ -71,12 +76,7 @@ class MacVendorView(QWidget):
         layout.addLayout(input_layout)
 
     def append_console(self, text):
-        """
-        Append text to the console output with a newline and auto-scroll to the bottom.
-
-        Args:
-            text (str): Text to append to the console.
-        """
+        """Append text to the console output with a newline and auto-scroll to the bottom."""
         self.console_output.append(text + "\n")
         self.console_output.verticalScrollBar().setValue(
             self.console_output.verticalScrollBar().maximum()
@@ -90,7 +90,7 @@ class MacVendorView(QWidget):
         mac = self.input_mac.text().strip()
 
         # MAC Validation
-        if len(mac) < 6:
+        if len(mac) < 6 or len(mac) > 12:
             QMessageBox.warning(self, "Error", "Enter a valid MAC address.")
             return
 

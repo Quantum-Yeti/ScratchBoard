@@ -85,16 +85,12 @@ class NoteController(QObject):
 
     ### --- Helpers --- ###
     def on_search_changed(self, text):
-        """
-        Update the search filter and refresh results.
-        """
+        """Update the search filter and refresh results."""
         self.search_term = text
         QTimer.singleShot(0, self.refresh_notes)
 
     def on_category_changed(self, category):
-        """
-        Updates the active category filter from sidebar selection.
-        """
+        """Updates the active category filter from sidebar selection."""
         # Set None when showing all notes
         self.current_category = None if category == "All Categories" else category
         QTimer.singleShot(0, self.refresh_notes)
@@ -136,9 +132,7 @@ class NoteController(QObject):
         self._notify_change()
 
     def refresh_notes(self):
-        """
-        Queries and displays notes by filters on the notes list UI.
-        """
+        """Queries and displays notes by filters on the notes list UI."""
         notes = self.model.get_notes(
             category_name=self.current_category,
             search=self.search_term,

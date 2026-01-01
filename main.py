@@ -7,13 +7,10 @@ from PySide6.QtWidgets import (QApplication,
                                QHBoxLayout,
                                QWidget,
                                QStackedLayout,
-                               QMessageBox, QMenu)
+                               QMessageBox)
 from startup.startup_runner import run_startup
 from helpers.ui_helpers.update_window_title import update_window_title
-from ui.menus.context_menu import ModifyContextMenu
 from ui.menus.main_menu import MainMenuBar
-from ui.themes.menu_theme import menu_style
-from utils.global_context_menu import ContextMenuStyler
 from views.splash.splash_screen import SplashScreen
 from views.dashbooard.dashboard_view import DashboardView
 from views.sidebar.sidebar_widget import Sidebar
