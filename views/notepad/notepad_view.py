@@ -10,6 +10,7 @@ from PySide6.QtCore import Qt
 
 from ui.fonts.font_list import main_font_list
 from ui.themes.scrollbar_style import vertical_scrollbar_style
+from utils.custom_context_menu import ContextMenuUtility
 from utils.custom_q_edit import CustomQEdit
 from utils.resource_path import resource_path
 
@@ -54,6 +55,9 @@ class NotepadDialog(QDialog):
         self.text_edit.setStyleSheet("QTextEdit { font-size: 11pt; }")
 
         self.main_layout.addWidget(self.text_edit)
+
+        # Override context menu
+        self.custom_context_menu = ContextMenuUtility(self.text_edit)
 
     def _create_toolbar(self):
         toolbar = QHBoxLayout()
