@@ -10,7 +10,8 @@ from PySide6.QtWidgets import (QApplication,
                                QMessageBox, QMenu)
 from startup.startup_runner import run_startup
 from helpers.ui_helpers.update_window_title import update_window_title
-from ui.menus.menu_bar import MainMenuBar
+from ui.menus.context_menu import ModifyContextMenu
+from ui.menus.main_menu import MainMenuBar
 from ui.themes.menu_theme import menu_style
 from utils.global_context_menu import ContextMenuStyler
 from views.splash.splash_screen import SplashScreen
