@@ -6,7 +6,18 @@ from PySide6.QtGui import QIcon, Qt, QFont
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QComboBox, QLabel, QWidget, QHBoxLayout, QSpinBox, QCheckBox, \
     QLineEdit, QProgressBar, QPushButton, QApplication, QSizePolicy, QStackedWidget
 
+from utils.custom_context_menu import ContextMenuUtility
 from utils.resource_path import resource_path
+
+
+def load_wordlist():
+    path = resource_path("resources/wordlist.txt")
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return [w.strip() for w in f.readlines() if w.strip()]
+    except Exception:
+        return ["apple", "banana", "cloud", "river", "metal", "storm"]
+
 
 class PassGenWidget(QDialog):
     """
@@ -18,6 +29,7 @@ class PassGenWidget(QDialog):
         # Window setup
         self.setWindowTitle("Scratch Board: Password Generator")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
+        self.setFixedHeight(500)
         self.setMinimumWidth(420)
         self.setFont(QFont("Segoe UI", 11))
 
@@ -28,14 +40,19 @@ class PassGenWidget(QDialog):
 
         # Modes
         self.select_mode = QComboBox()
-        self.select_mode.addItems(["Quick Mode [char]", "Advanced Mode [words]"])
+        self.select_mode.addItems(["Quick Mode [word+number]", "Quick Mode [char]", "Advanced Mode [words]"])
         self.select_mode.currentIndexChanged.connect(self.update_visibility)
 
         # Mode selection
         layout.addWidget(QLabel("Select Mode:"))
         layout.addWidget(self.select_mode)
 
-        # Setup of random char option
+        # Setup of quick word+number option
+        quick_layout = QHBoxLayout()
+        self.quick_widget = QWidget()
+        self.quick_widget.setLayout(quick_layout)
+
+        # Setup of quick char option
         char_layout = QVBoxLayout()
         self.char_widget = QWidget()
         self.char_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
@@ -64,8 +81,6 @@ class PassGenWidget(QDialog):
         char_layout.addWidget(self.upper_char)
         char_layout.addWidget(self.include_num)
         char_layout.addWidget(self.include_special_char)
-
-        #layout.addWidget(self.char_widget)
 
         # Setup of random words option
         self.words = QWidget()
@@ -101,8 +116,9 @@ class PassGenWidget(QDialog):
         word_layout.addWidget(self.add_nums)
 
         self.stack = QStackedWidget()
-        self.stack.addWidget(self.char_widget)  # index 0 = Quick mode
+        self.stack.addWidget(self.char_widget)  # index 0 = Quick char mode
         self.stack.addWidget(self.words)  # index 1 = Advanced mode
+        self.stack.addWidget(self.quick_widget) # index 2 = very quick mode
         layout.addWidget(self.stack)
 
         #layout.addWidget(self.words)
@@ -111,6 +127,8 @@ class PassGenWidget(QDialog):
         self.output = QLineEdit()
         self.output.setReadOnly(True)
         layout.addWidget(self.output)
+
+        self.context_menu_helper = ContextMenuUtility(self.output)
 
         # Strength + entropy
         self.strength_label = QLabel("Strength: ---")
@@ -143,7 +161,7 @@ class PassGenWidget(QDialog):
         self.setLayout(layout)
 
         # Prepare wordlist
-        self.wordlist = self.load_wordlist()
+        self.wordlist = load_wordlist()
 
         self.update_visibility()
 
@@ -152,37 +170,47 @@ class PassGenWidget(QDialog):
         with open(style_path, "r") as f:
             self.setStyleSheet(f.read())
 
-        #self.upper_char.setStyleSheet(style)
-        #self.include_num.setStyleSheet(style)
-        #self.include_special_char.setStyleSheet(style)
-        #self.caps_words.setStyleSheet(style)
-        #self.add_nums.setStyleSheet(style)
-
     def update_visibility(self):
         mode = self.select_mode.currentText()
         if mode == "Quick Mode [char]":
             self.stack.setCurrentIndex(0)
+        elif mode == "Quick Mode [word+number]":
+            self.stack.setCurrentIndex(2)
         else:
             self.stack.setCurrentIndex(1)
-
-    def load_wordlist(self):
-        path = resource_path("resources/wordlist.txt")
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                return [w.strip() for w in f.readlines() if w.strip()]
-        except Exception:
-            return ["apple", "banana", "cloud", "river", "metal", "storm"]
 
     def generate(self):
         mode = self.select_mode.currentText()
 
         if mode == "Quick Mode [char]":
             password = self.generate_char_password()
+        elif mode == "Quick Mode [word+number]":
+            password = self.generate_word_number_password()
         else:
             password = self.generate_word_password()
 
         self.output.setText(password)
         QApplication.clipboard().setText(password)
+
+    def generate_word_number_password(self):
+        # Choose a random word from the wordlist
+        word = secrets.choice(self.wordlist)
+
+        # Choose a random number between 0 and 99
+        number = secrets.randbelow(100)
+
+        # Optionally capitalize the word
+        if self.caps_words.isChecked():
+            word = word.capitalize()
+
+        # Combine the word and number
+        password = f"{word}{number}"
+
+        # Update the strength bar based on the entropy (log2 of wordlist size * number of words)
+        entropy = math.log2(len(self.wordlist)) + math.log2(100)  # Adding log2(100) for the number range
+        self.update_strength_from_entropy(entropy)
+
+        return password
 
     def generate_char_password(self):
         charset = string.ascii_lowercase

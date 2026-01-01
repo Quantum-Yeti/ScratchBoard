@@ -2,6 +2,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout
 from pathlib import Path
+
+from utils.custom_context_menu import ContextMenuUtility
 from utils.resource_path import resource_path
 from ui.themes.dash_action_btn_style import dash_action_button_style
 from ui.themes.scrollbar_style import vertical_scrollbar_style
@@ -30,6 +32,8 @@ class ArmDialog(QDialog):
         self.arm_text.setReadOnly(True)
         self.arm_text.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         layout.addWidget(self.arm_text, stretch=1)
+
+        self.context_menu_helper = ContextMenuUtility(self.arm_text)
 
         # Calls the function to load the arm statement
         self.load_arm()

@@ -78,10 +78,18 @@ QSpinBox:focus {
     border: 1px solid #3575e2;
 }
 
-QSpinBox::up-button, QSpinBox::down-button {
+QSpinBox::up-button {
     width: 18px;
     border: none;
     background: transparent;
+    background-image: url('resources/icons/up_carrot.png');
+}
+
+QSpinBox::down-button {
+    width: 18px;
+    border: none;
+    background: transparent;
+    background-image: url('resources/icons/down_carrot.png');
 }
 
 QSpinBox::up-button:hover, QSpinBox::down-button:hover {

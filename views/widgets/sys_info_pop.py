@@ -9,6 +9,8 @@ from PySide6.QtWidgets import (
     QWidget, QLabel, QVBoxLayout, QHBoxLayout, QApplication
 )
 
+from utils.custom_context_menu import ContextMenuUtility
+
 
 class StatsWorker(QObject):
     system_signal = Signal(list)
