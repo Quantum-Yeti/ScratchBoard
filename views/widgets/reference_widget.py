@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLa
 from ui.themes.menu_theme import menu_style
 from ui.themes.reference_list_style import ref_list_style
 from ui.themes.scrollbar_style import vertical_scrollbar_style
+from utils.custom_context_menu import ContextMenuUtility
 from utils.resource_path import resource_path
 
 
@@ -39,10 +40,18 @@ class ReferenceWidget(QWidget):
         # Input for adding new references
         input_layout = QHBoxLayout()
         self.title_input = QLineEdit()
+        self.title_input.setToolTip("Enter a title for your link")
         self.title_input.setPlaceholderText("Title...")
 
+        # Override context menu for title
+        self.custom_context_menu = ContextMenuUtility(self.title_input)
+
         self.url_input = QLineEdit()
+        self.url_input.setToolTip("Enter a URL for your link")
         self.url_input.setPlaceholderText("URL (https://...)")
+
+        # Override context menus for url
+        self.custom_context_menu = ContextMenuUtility(self.url_input)
 
         self.add_button = QPushButton()
         self.add_button.setToolTip("Add")
