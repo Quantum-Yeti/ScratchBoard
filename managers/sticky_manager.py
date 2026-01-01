@@ -18,7 +18,7 @@ PASTEL_COLORS = [
     "#ADD8E6"   # Classic Light Blue
 ]
 
-class ScratchManager(QWidget):
+class StickyManager(QWidget):
     def __init__(self, model):
         super().__init__()
         self.model = model

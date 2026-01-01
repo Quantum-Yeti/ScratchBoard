@@ -7,7 +7,7 @@ import subprocess
 
 from helpers.ui_helpers.open_company_url import open_company_homepage
 from utils.resource_path import resource_path
-from managers.sticky_manager import ScratchManager
+from managers.sticky_manager import StickyManager
 from views.notepad.notepad_view import NotepadDialog
 
 
@@ -63,7 +63,7 @@ class Sidebar(QWidget):
     def __init__(self, model=None):
         """
         Initialization of the Sidebar widget.
-        :param model: Data model used by certain features such as the ScratchManager.
+        :param model: Data model used by certain features such as the StickyManager.
         """
         super().__init__()
         self._notepad = None
@@ -165,18 +165,18 @@ class Sidebar(QWidget):
         Open the Scratch Pad window.
         If a Scratch Pad instance is already open and visible, this method brings it
         to the front instead of creating a new one. Otherwise, it creates a new
-        ScratchManager window using the current model and displays it.
+        StickyManager window using the current model and displays it.
         Behavior:
             - Reuses an existing Scratch Pad if one is already open.
             - Ensures the Scratch Pad is raised and focused when reopened.
-            - Creates and shows a new ScratchManager instance if none exists.
+            - Creates and shows a new StickyManager instance if none exists.
         Returns:
             None
         """
         if hasattr(self, "_scratch_pad") and self._scratch_pad and self._scratch_pad.isVisible():
             self._scratch_pad.raise_()
             return
-        self._scratch_pad = ScratchManager(model=self.model)
+        self._scratch_pad = StickyManager(model=self.model)
         self._scratch_pad.show()
 
     def open_bat_file(self):
