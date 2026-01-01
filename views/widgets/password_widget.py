@@ -16,7 +16,7 @@ def load_wordlist():
         with open(path, "r", encoding="utf-8") as f:
             return [w.strip() for w in f.readlines() if w.strip()]
     except Exception:
-        return ["apple", "banana", "cloud", "river", "metal", "storm"]
+        return ["apple", "banana", "cloud", "river", "metal", "storm", "steamboat", "goose", "moose"]
 
 
 class PassGenWidget(QDialog):
@@ -29,7 +29,6 @@ class PassGenWidget(QDialog):
         # Window setup
         self.setWindowTitle("Scratch Board: Password Generator")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
-        self.setFixedHeight(500)
         self.setMinimumWidth(420)
         self.setFont(QFont("Segoe UI", 11))
 
@@ -40,6 +39,7 @@ class PassGenWidget(QDialog):
 
         # Modes
         self.select_mode = QComboBox()
+        self.select_mode.setStyleSheet("padding-top: 3px; padding-bottom: 3px;")
         self.select_mode.addItems(["Quick Mode [word+number]", "Quick Mode [char]", "Advanced Mode [words]"])
         self.select_mode.currentIndexChanged.connect(self.update_visibility)
 
@@ -108,7 +108,8 @@ class PassGenWidget(QDialog):
         sep_layout = QHBoxLayout()
         sep_layout.addWidget(QLabel("Separator:"))
         self.separator_box = QComboBox()
-        self.separator_box.addItems(["-", "_", "space", "none"])
+
+        self.separator_box.addItems(["hyphen", "underline", "space", "none"])
         self.separator_box.setCurrentText("none")
         sep_layout.addWidget(self.separator_box)
         word_layout.addLayout(sep_layout)
@@ -121,8 +122,6 @@ class PassGenWidget(QDialog):
         self.stack.addWidget(self.quick_widget) # index 2 = very quick mode
         layout.addWidget(self.stack)
 
-        #layout.addWidget(self.words)
-
         # Generated password output
         self.output = QLineEdit()
         self.output.setReadOnly(True)
@@ -130,7 +129,7 @@ class PassGenWidget(QDialog):
 
         self.context_menu_helper = ContextMenuUtility(self.output)
 
-        # Strength + entropy
+        # Strength + Entropy
         self.strength_label = QLabel("Strength: ---")
         self.strength_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.strength_label)
@@ -143,18 +142,21 @@ class PassGenWidget(QDialog):
         btn_layout = QHBoxLayout()
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        # Generate button
         self.generate_btn = QPushButton("Generate")
         self.generate_btn.setIcon(QIcon(resource_path("resources/icons/polybase.png")))
         self.generate_btn.clicked.connect(self.generate)
 
+        # Copy button
         self.copy_btn = QPushButton("Copy")
         self.copy_btn.setIcon(QIcon(resource_path("resources/icons/copy.png")))
         self.copy_btn.clicked.connect(self.copy_password)
 
+        # Add buttons to layout
         btn_layout.addWidget(self.generate_btn)
         btn_layout.addWidget(self.copy_btn)
 
-        # Add buttons to layout
+        # Add button layout to main layout
         layout.addLayout(btn_layout)
 
         # Add the layout initialization to layout
@@ -163,6 +165,7 @@ class PassGenWidget(QDialog):
         # Prepare wordlist
         self.wordlist = load_wordlist()
 
+        # Update visibility based on mode selected
         self.update_visibility()
 
         # Styling
@@ -174,10 +177,13 @@ class PassGenWidget(QDialog):
         mode = self.select_mode.currentText()
         if mode == "Quick Mode [char]":
             self.stack.setCurrentIndex(0)
+            self.setFixedHeight(500)
         elif mode == "Quick Mode [word+number]":
             self.stack.setCurrentIndex(2)
+            self.setFixedHeight(300)
         else:
             self.stack.setCurrentIndex(1)
+            self.setFixedHeight(500)
 
     def generate(self):
         mode = self.select_mode.currentText()
@@ -194,20 +200,17 @@ class PassGenWidget(QDialog):
 
     def generate_word_number_password(self):
         # Choose a random word from the wordlist
-        word = secrets.choice(self.wordlist)
+        first_word = secrets.choice(self.wordlist).capitalize()
+        second_word = secrets.choice(self.wordlist)
 
         # Choose a random number between 0 and 99
         number = secrets.randbelow(100)
 
-        # Optionally capitalize the word
-        if self.caps_words.isChecked():
-            word = word.capitalize()
-
         # Combine the word and number
-        password = f"{word}{number}"
+        password = f"{first_word}{second_word}{number}"
 
         # Update the strength bar based on the entropy (log2 of wordlist size * number of words)
-        entropy = math.log2(len(self.wordlist)) + math.log2(100)  # Adding log2(100) for the number range
+        entropy = (2 * math.log2(len(self.wordlist))) + math.log2(100)  # Adding log2(100) for the number range
         self.update_strength_from_entropy(entropy)
 
         return password
@@ -244,6 +247,10 @@ class PassGenWidget(QDialog):
             sep_char = " "
         elif sep == "none":
             sep_char = ""
+        elif sep == "underline":
+            sep_char = "_"
+        elif sep == "hyphen":
+            sep_char = "-"
         else:
             sep_char = sep
 
