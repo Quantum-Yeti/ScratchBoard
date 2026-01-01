@@ -1,6 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog, QVBoxLayout
 
+from utils.custom_context_menu import ContextMenuUtility
 from views.widgets.mac_widget import MacVendorView
 
 
@@ -10,16 +11,19 @@ class MacVendorPopup(QDialog):
         self.setWindowTitle("Scratch Board: MAC Vendor Query")
         self.resize(500, 400)
 
-        # Allow minimize / close independently
+        # Allow minimizing / close independently
         self.setWindowFlags(
             self.windowFlags() |
-            Qt.WindowMinimizeButtonHint |
-            Qt.WindowCloseButtonHint
+            Qt.WindowType.WindowMinimizeButtonHint |
+            Qt.WindowType.WindowCloseButtonHint
         )
-        self.setWindowModality(Qt.NonModal)  # Non-blocking
+        self.setWindowModality(Qt.WindowModality.NonModal)  # Non-blocking
 
         layout = QVBoxLayout(self)
 
         # Embed your existing widget inside the dialog
         self.mac_view = MacVendorView()
         layout.addWidget(self.mac_view)
+
+        # Override context menu
+        self.context_menu_helper = ContextMenuUtility(self.mac_view)
