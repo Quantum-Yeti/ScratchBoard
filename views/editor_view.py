@@ -8,11 +8,10 @@ from PySide6.QtGui import QIcon, QTextCursor, QKeySequence, QAction, QPixmap
 from PySide6.QtWidgets import (
     QDialog, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
     QTextBrowser, QLabel, QPushButton, QToolBar, QStackedWidget,
-    QScrollArea, QMessageBox, QGraphicsOpacityEffect, QComboBox, QSizePolicy
+    QMessageBox, QGraphicsOpacityEffect, QComboBox, QSizePolicy
 )
 
 from helpers.ui_helpers.image_pop import ImagePopup
-from models import note_model
 from models.note_model import NoteModel
 from ui.fonts.font_list import main_font_list
 from ui.themes.scrollbar_style import vertical_scrollbar_style
@@ -46,7 +45,7 @@ class EditorPanel(QDialog):
         top_row.addWidget(self.title_edit, stretch=2)
 
         self.add_tag = QLineEdit()
-        self.add_tag.setPlaceholderText("Add Tags: #tag1, #tag2...")
+        self.add_tag.setPlaceholderText("Tags: (e.g., tag1, tag2)")
         if tags:
             self.add_tag.setText(", ".join(tags))
         top_row.addWidget(self.add_tag, stretch=1)

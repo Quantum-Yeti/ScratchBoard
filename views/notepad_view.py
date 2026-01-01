@@ -13,163 +13,181 @@ from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.custom_q_edit import CustomQEdit
 from utils.resource_path import resource_path
 
+
 class NotepadDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        # Initialization pipeline
+        self._setup_window(parent)
+        self._build_ui()
+        self._connect_signals()
+
+    # Window setup
+    def _setup_window(self, parent):
         self.setWindowTitle("Scratch Board: Notepad")
-        #self.setModal(False)
         self.resize(800, 600)
 
-        # Allow to minimize and close
         self.setWindowFlags(
-            Qt.WindowType.Window | Qt.WindowType.WindowTitleHint | Qt.WindowType.WindowMinimizeButtonHint | Qt.WindowType.WindowMaximizeButtonHint | Qt.WindowType.WindowCloseButtonHint
+            Qt.WindowType.Window
+            | Qt.WindowType.WindowTitleHint
+            | Qt.WindowType.WindowMinimizeButtonHint
+            | Qt.WindowType.WindowMaximizeButtonHint
+            | Qt.WindowType.WindowCloseButtonHint
         )
         self.setWindowModality(Qt.WindowModality.NonModal)
-
         self.center_on_screen(parent)
 
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 10, 10, 10)
+    # UI construction
+    def _build_ui(self):
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(10, 10, 10, 10)
 
-        # Text edit area
+        self._create_text_edit()
+        self._create_toolbar()
+        self._create_bottom_bar()
+
+    def _create_text_edit(self):
         self.text_edit = CustomQEdit()
+        self.text_edit.setPlaceholderText("Start typing a plaintext note...")
         self.text_edit.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
-        self.text_edit.setStyleSheet("""
-            QTextEdit {
-                font-size: 10pt;
-            }
-        """)
-        self.text_edit.setPlaceholderText("Type your notes here...")
-        layout.addWidget(self.text_edit)
+        self.text_edit.setStyleSheet("QTextEdit { font-size: 11pt; }")
 
-        # Top toolbar: Font and search
-        toolbar_layout = QHBoxLayout()
-        layout.addLayout(toolbar_layout)
+        self.main_layout.addWidget(self.text_edit)
 
-        # Desired uniform height for controls
-        control_height = 28  # adjust as needed
+    def _create_toolbar(self):
+        toolbar = QHBoxLayout()
+        self.main_layout.addLayout(toolbar)
 
-        # Font family selector
+        control_height = 28
+
+        # Font selector
+        toolbar.addWidget(QLabel("Font:"))
         self.font_combo = QComboBox()
         self.font_combo.addItems(main_font_list)
         self.font_combo.setFixedHeight(control_height)
-        self.font_combo.currentTextChanged.connect(self.update_font)
-        font_label = QLabel("Font:")
-        font_label.setFixedHeight(control_height)
-        toolbar_layout.addWidget(font_label)
-        toolbar_layout.addWidget(self.font_combo)
+        toolbar.addWidget(self.font_combo)
 
-        # Font size selector
+        # Font size
+        toolbar.addWidget(QLabel("Size:"))
         self.font_size_spin = QSpinBox()
         self.font_size_spin.setRange(8, 48)
         self.font_size_spin.setValue(12)
         self.font_size_spin.setFixedHeight(control_height)
-        self.font_size_spin.valueChanged.connect(self.update_font)
-        size_label = QLabel("Size:")
-        size_label.setFixedHeight(control_height)
-        toolbar_layout.addWidget(size_label)
-        toolbar_layout.addWidget(self.font_size_spin)
+        toolbar.addWidget(self.font_size_spin)
 
-        toolbar_layout.addStretch()
+        toolbar.addStretch()
+
+        # Count Words + Characters Placeholder
+        self.count_label = QLabel("Words: 0 - Chars: 0")
+        self.count_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.count_label.setStyleSheet(
+            "QLabel { font-size: 10pt; font-family: Segoe UI; }"
+        )
+
+        toolbar.addWidget(self.count_label)
+
+    def _create_bottom_bar(self):
+        bottom = QHBoxLayout()
+        self.main_layout.addLayout(bottom)
+
+        buttons = QHBoxLayout()
+        bottom.addLayout(buttons)
+        buttons.addStretch()
+
+        self.open_btn = self._make_button("Open", "open.png")
+        self.open_btn.setToolTip("Open a plaintext note")
+
+        self.save_btn = self._make_button("Save", "save.png")
+        self.save_btn.setToolTip("Save the plaintext note")
+
+        self.clear_btn = self._make_button("Clear", "cancel.png")
+        self.clear_btn.setToolTip("Clear the notepad")
+
+        self.undo_btn = self._make_button("Undo", "undo.png")
+        self.undo_btn.setToolTip("Undo")
+
+        self.redo_btn = self._make_button("Redo", "redo.png")
+        self.redo_btn.setToolTip("Redo")
+
+        for btn in (
+            self.open_btn,
+            self.save_btn,
+            self.clear_btn,
+            self.undo_btn,
+            self.redo_btn,
+        ):
+            buttons.addWidget(btn)
+
+        # Buttons on left, search/find on right
+        buttons.addStretch(1)
 
         # Search field
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("Search...")
-        toolbar_layout.addWidget(self.search_input)
+        self.search_input.setPlaceholderText("Find...")
+        self.search_input.setMaximumWidth(150)
+        bottom.addWidget(self.search_input)
 
-        # Find/search button
-        search_btn = QPushButton("Find")
-        search_btn.setIcon(QIcon(resource_path("resources/icons/find.png")))
-        search_btn.clicked.connect(self.search_text)
-        toolbar_layout.addWidget(search_btn)
+        # Search/find button
+        self.search_btn = QPushButton("Find")
+        self.search_btn.setIcon(QIcon(resource_path("resources/icons/find.png")))
+        bottom.addWidget(self.search_btn)
 
+    @staticmethod
+    def _make_button(text, icon_name):
+        btn = QPushButton(text)
+        btn.setIcon(QIcon(resource_path(f"resources/icons/{icon_name}")))
+        return btn
 
-        # Bottom buttons
-        bottom_layout = QHBoxLayout()
-        layout.addLayout(bottom_layout)
+    # Signal connections
+    def _connect_signals(self):
+        self.font_combo.currentTextChanged.connect(self.update_font)
+        self.font_size_spin.valueChanged.connect(self.update_font)
 
-        btn_layout = QHBoxLayout()
-        open_btn = QPushButton("Open")
-        open_btn.setIcon(QIcon(resource_path("resources/icons/open.png")))
-        open_btn.clicked.connect(self.open_file)
-        btn_layout.addWidget(open_btn)
+        self.search_btn.clicked.connect(self.search_text)
 
-        save_btn = QPushButton("Save")
-        save_btn.setIcon(QIcon(resource_path("resources/icons/save.png")))
-        save_btn.clicked.connect(self.save_file)
-        btn_layout.addWidget(save_btn)
+        self.open_btn.clicked.connect(self.open_file)
+        self.save_btn.clicked.connect(self.save_file)
+        self.clear_btn.clicked.connect(self.text_edit.clear)
+        self.undo_btn.clicked.connect(self.text_edit.undo)
+        self.redo_btn.clicked.connect(self.text_edit.redo)
 
-        clear_btn = QPushButton("Clear")
-        clear_btn.setIcon(QIcon(resource_path("resources/icons/cancel.png")))
-        clear_btn.clicked.connect(self.text_edit.clear)
-        btn_layout.addWidget(clear_btn)
-
-        undo_btn = QPushButton("Undo")
-        undo_btn.setIcon(QIcon(resource_path("resources/icons/undo.png")))
-        undo_btn.clicked.connect(self.text_edit.undo)
-        btn_layout.addWidget(undo_btn)
-
-        redo_btn = QPushButton("Redo")
-        redo_btn.setIcon(QIcon(resource_path("resources/icons/redo.png")))
-        redo_btn.clicked.connect(self.text_edit.redo)
-        btn_layout.addWidget(redo_btn)
-
-        bottom_layout.addLayout(btn_layout)
-        btn_layout.addStretch()
-
-        # Word/char count
-        self.count_label = QLabel("Words: 0 - Chars: 0")
-        self.count_label.setStyleSheet("""
-            QLabel {
-                font-size: 10pt;
-                font-family: Segoe UI;
-            }
-        """)
-        self.count_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.text_edit.textChanged.connect(self.update_count)
-        bottom_layout.addWidget(self.count_label)
 
-    # Helper methods
+    ### --- Helpers --- ###
     def center_on_screen(self, parent=None):
-        """Centers the dialog on the parent window if available, else on the current screen."""
-        self.show()  # must show to get correct size
+        self.show()
         if parent:
-            parent_geom = parent.frameGeometry()
-            parent_center = parent_geom.center()
-            self.move(parent_center - self.rect().center())
+            self.move(parent.frameGeometry().center() - self.rect().center())
         else:
-            screen = QApplication.screenAt(QCursor.pos())
-            if not screen:
-                screen = QApplication.primaryScreen()
-            screen_geom = screen.availableGeometry()
-            self.move(screen_geom.center() - self.rect().center())
+            screen = QApplication.screenAt(QCursor.pos()) or QApplication.primaryScreen()
+            self.move(screen.availableGeometry().center() - self.rect().center())
 
     def update_font(self):
         font = QFont(self.font_combo.currentText(), self.font_size_spin.value())
         cursor = self.text_edit.textCursor()
 
         if cursor.hasSelection():
-            # Applies font change to only selected text
-            font_change = QTextCharFormat()
-            font_change.setFont(font)
-            cursor.mergeCharFormat(font_change)
+            fmt = QTextCharFormat()
+            fmt.setFont(font)
+            cursor.mergeCharFormat(fmt)
         else:
-            # Default to changing the entire text if nothing selected
             self.text_edit.setFont(font)
 
     def search_text(self):
         query = self.search_input.text()
-        if query:
-            cursor = self.text_edit.textCursor()
-            document = self.text_edit.document()
+        if not query:
+            return
 
-            found = document.find(query, cursor)
-            if found.isNull():
-                # Not found, start from top
-                cursor.movePosition(QTextCursor.MoveOperation.Start)
-                found = document.find(query, cursor)
-            if not found.isNull():
-                self.text_edit.setTextCursor(found)
+        cursor = self.text_edit.textCursor()
+        found = self.text_edit.document().find(query, cursor)
+
+        if found.isNull():
+            cursor.movePosition(QTextCursor.MoveOperation.Start)
+            found = self.text_edit.document().find(query, cursor)
+
+        if not found.isNull():
+            self.text_edit.setTextCursor(found)
 
     def open_file(self):
         path, _ = QFileDialog.getOpenFileName(
@@ -184,30 +202,17 @@ class NotepadDialog(QDialog):
         notepad_dir.mkdir(parents=True, exist_ok=True)
 
         path, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save File",
-            str(notepad_dir),  # 👈 default starting folder
+            self, "Save File", str(notepad_dir),
             "Text Files (*.txt);;All Files (*)"
         )
 
-        if not path:
-            return
-
-
-
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(self.text_edit.toPlainText())
+        if path:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(self.text_edit.toPlainText())
 
     def update_count(self):
         text = self.text_edit.toPlainText()
-
-        # Count words: split by any whitespace sequence
-        words = len([w for w in re.split(r'\s+', text.strip()) if w])
-
-        # Count characters excluding whitespace
+        words = len([w for w in re.split(r"\s+", text.strip()) if w])
         chars = len(text.replace(" ", "").replace("\n", ""))
 
         self.count_label.setText(f"Words: {words} - Chars: {chars}")
-
-
-
