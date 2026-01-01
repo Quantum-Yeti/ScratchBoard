@@ -132,16 +132,12 @@ shortcut_list = [
                 "action": "Open Modem Log Parser"
             },
             {
-                "shortcut": "Alt+P",
-                "action": "Opens Password Generator"
-            },
-            {
-                "shortcut": "Alt+C",
-                "action": "Open Calculator"
-            },
-            {
                 "shortcut": "Alt+Q",
                 "action": "Open Mac Vendor Query"
+            },
+{
+                "shortcut": "Alt+P",
+                "action": "Opens Password Generator"
             }
         ]
     },

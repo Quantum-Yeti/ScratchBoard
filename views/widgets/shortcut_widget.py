@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QSize
 
 from ui.menus.shortcuts_list import shortcut_list
+from utils.custom_context_menu import ContextMenuUtility
 from utils.resource_path import resource_path
 
 class ShortcutGuide(QDialog):
@@ -13,8 +14,8 @@ class ShortcutGuide(QDialog):
         super().__init__(parent)
 
         self.setWindowTitle("Scratch Board: Keyboard Shortcuts")
-        self.setWindowModality(Qt.ApplicationModal)
-        self.setFixedSize(650, 500)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.setFixedSize(750, 900)
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 12, 12, 12)
@@ -25,31 +26,31 @@ class ShortcutGuide(QDialog):
         icon_title_layout = QHBoxLayout(icon_title_widget)
         icon_title_layout.setSpacing(10)
         icon_title_layout.setContentsMargins(0, 0, 0, 0)
-        icon_title_layout.setAlignment(Qt.AlignCenter)
+        icon_title_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         image_label = QLabel()
         image_label.setPixmap(
             QPixmap(resource_path("resources/icons/keyboard.png")).scaled(64, 64)
         )
-        image_label.setAlignment(Qt.AlignVCenter)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
         title_label = QLabel("Keyboard Shortcuts")
         font = QFont("Segoe UI", 24)
         font.setBold(True)
         title_label.setFont(font)
-        title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
         title_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         icon_title_layout.addWidget(image_label)
         icon_title_layout.addWidget(title_label)
-        layout.addWidget(icon_title_widget, alignment=Qt.AlignCenter)
+        layout.addWidget(icon_title_widget, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Shortcut Table
         self.table = QTableWidget()
         self.table.setColumnCount(2)
         self.table.setHorizontalHeaderLabels(["Shortcut", "Action"])
-        self.table.horizontalHeaderItem(0).setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.table.horizontalHeaderItem(1).setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.table.horizontalHeaderItem(0).setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.table.horizontalHeaderItem(1).setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setShowGrid(False)
@@ -73,6 +74,9 @@ class ShortcutGuide(QDialog):
 
         self._populate_table()
         layout.addWidget(self.table)
+
+        # Override context menu
+        self.context_menu_helper = ContextMenuUtility(self.table)
 
         # Close Button
         close_btn = QPushButton("Close")
@@ -98,8 +102,8 @@ class ShortcutGuide(QDialog):
 
             # Category Header Row
             category_item = QTableWidgetItem(cat["category"])
-            category_item.setFlags(Qt.ItemIsEnabled)
-            category_item.setTextAlignment(Qt.AlignCenter)
+            category_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
+            category_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             category_item.setFont(QFont("Segoe UI", 12, QFont.Weight.Bold))
 
             # Span across both columns
@@ -110,10 +114,10 @@ class ShortcutGuide(QDialog):
             # Shortcut Rows
             for sc in cat["shortcuts"]:
                 shortcut_item = QTableWidgetItem(sc["shortcut"])
-                shortcut_item.setFlags(Qt.ItemIsEnabled)
+                shortcut_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
 
                 action_item = QTableWidgetItem(sc["action"])
-                action_item.setFlags(Qt.ItemIsEnabled)
+                action_item.setFlags(Qt.ItemFlag.ItemIsEnabled)
 
                 self.table.setItem(row, 0, shortcut_item)
                 self.table.setItem(row, 1, action_item)
