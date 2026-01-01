@@ -127,6 +127,7 @@ class PassGenWidget(QDialog):
         self.output.setReadOnly(True)
         layout.addWidget(self.output)
 
+        # Context menu style override
         self.context_menu_helper = ContextMenuUtility(self.output)
 
         # Strength + Entropy

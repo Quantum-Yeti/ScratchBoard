@@ -1,10 +1,11 @@
 from PySide6.QtGui import QIcon, QCursor, QPixmap
 from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton, QLabel, QHBoxLayout, QDialog, QApplication, QFrame, \
-    QSplitter, QSizePolicy
+    QSplitter, QSizePolicy, QMenu
 from helpers.parsers.log_parser_helper import ModemLogParser
 from PySide6.QtCore import Qt, QSize
 
 from ui.themes.scrollbar_style import vertical_scrollbar_style
+from utils.custom_context_menu import ContextMenuUtility
 from utils.resource_path import resource_path
 
 
@@ -28,12 +29,10 @@ class ModemLogParserView(QDialog):
         - Detailed log output with explanations
     """
     def __init__(self, parent=None):
-        """
-        Initialize the ModemLogParserView class.
-        """
+        """Initialize the ModemLogParserView class."""
         super().__init__(parent)  # important to pass parent
         self.setWindowTitle("Scratch Board: Modem Log Parser")
-        self.setWindowModality(Qt.ApplicationModal)  # makes it modal
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)  # makes it modal
 
         # Initialize the log parser
         self.parser = ModemLogParser()
@@ -65,12 +64,14 @@ class ModemLogParserView(QDialog):
         # Parse button
         parse_btn = QPushButton("Parse Logs")
         parse_btn.setIcon(QIcon(resource_path("resources/icons/query.png")))
+        parse_btn.setToolTip("Parse Logs")
         parse_btn.clicked.connect(self.parse_logs)
         header_row.addWidget(parse_btn)
 
         # Clear button
         clear_btn = QPushButton("Clear Logs")
         clear_btn.setIcon(QIcon(resource_path("resources/icons/clear.png")))
+        clear_btn.setToolTip("Clear Logs")
         clear_btn.clicked.connect(self.clear_logs)
         header_row.addWidget(clear_btn)
 
@@ -84,15 +85,18 @@ class ModemLogParserView(QDialog):
 
         # Summary output
         self.summary_label = QLabel("Copy and paste the modem log from your analytics tool to get results.")
-        self.summary_label.setAlignment(Qt.AlignLeft)
+        self.summary_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.summary_label.setStyleSheet("color: #00A3E0;")
         self.summary_label.setWordWrap(True)
         layout.addWidget(self.summary_label)
 
+        # Override context menu for summary
+        self.context_menu_helper = ContextMenuUtility(self.summary_label)
+
         divider = _make_divider()
         layout.addWidget(divider)
 
-        splitter = QSplitter(Qt.Horizontal)
+        splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Input field
@@ -102,13 +106,19 @@ class ModemLogParserView(QDialog):
         self.input.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
         self.input.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
+        # Override context menu for input
+        self.context_menu_helper = ContextMenuUtility(self.input)
+
         # Output field
         self.output_title = QLabel("Log Output:")
         self.output = QTextEdit()
         self.output.setPlaceholderText("Waiting for log to parse.")
         self.output.setReadOnly(True)
         self.output.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
-        self.output.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.output.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+        #Override context menu for output
+        self.context_menu_helper = ContextMenuUtility(self.output)
 
         # Add to splitter
         splitter.addWidget(self.input)
@@ -129,16 +139,6 @@ class ModemLogParserView(QDialog):
 
         self.center_on_screen(parent)
 
-        # Center the dialog on screen
-        #self.setGeometry(
-            #QStyle.alignedRect (
-                #Qt.LeftToRight,
-                #Qt.AlignCenter,
-                #self.size(),
-                #QApplication.primaryScreen().availableGeometry()
-            #)
-        #)
-
     def center_on_screen(self, parent=None):
         if parent:
             parent_geometry = parent.frameGeometry()
@@ -151,7 +151,6 @@ class ModemLogParserView(QDialog):
                 screen = QApplication.primaryScreen()
             screen_geometry = screen.availableGeometry()
             self.move(screen_geometry.center() - self.rect().center())
-
 
     def parse_logs(self):
         """
@@ -192,9 +191,7 @@ class ModemLogParserView(QDialog):
         self.output.setPlainText("\n".join(lines))
 
     def clear_logs(self):
-        """
-        Clear all input, summary, and output fields in the dialog.
-        """
+        """Clear all input, summary, and output fields in the dialog."""
         self.input.clear()
         self.output.clear()
         self.summary_label.clear()
