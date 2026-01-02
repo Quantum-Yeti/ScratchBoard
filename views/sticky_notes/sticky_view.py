@@ -4,6 +4,7 @@ from PySide6.QtCore import Qt, QTimer, QPoint, QSize
 from PySide6.QtGui import QColor, QIcon, QPixmap, QGuiApplication, QTextCursor, QTextCharFormat
 
 from helpers.ui_helpers.text_color_switcher import get_text_color
+from utils.custom_context_menu import ContextMenuUtility
 from utils.custom_q_edit import CustomQEdit
 from utils.resource_path import resource_path
 
@@ -104,6 +105,9 @@ class ScratchNote(QDialog):
         )
         self.text_edit.textChanged.connect(self.mark_dirty)
         parent_layout.addWidget(self.text_edit)
+
+        # Override context menu
+        self.custom_context_menu = ContextMenuUtility(self.text_edit)
 
         # Autosave every 2 seconds
         self.auto_save_timer = QTimer(self)
