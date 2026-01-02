@@ -37,6 +37,9 @@ The Software incorporates the following third-party resources:
 - **Google Material Icons**  
   - License: [Apache License 2.0](https://fonts.google.com/icons)  
   - Usage: Icons utilized in the application UI
+- **PySide6 (Qt for Python**  
+  - License: [LGPL v3](https://doc.qt.io/qtforpython-6/licenses.html)  
+  - Usage: UI framework
 
 ---
 
