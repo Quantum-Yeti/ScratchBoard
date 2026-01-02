@@ -90,8 +90,8 @@ python main.py
 
 ## License
 
-This software is provided for use for coworkers, personal viewing and evaluation only.  
-Forking, redistribution, modification, and commercial use are strictly prohibited unless approved by the author.  
+- This software is provided free to use for coworkers, personal viewing and evaluation only.  
+- Forking, redistribution, modification, and commercial use are strictly prohibited unless approved by the author.  
 
 See the [LICENSE](LICENSE.md) file for full terms.
 
