@@ -15,6 +15,7 @@ from helpers.ui_helpers.image_pop import ImagePopup
 from models.note_model import NoteModel
 from ui.fonts.font_list import main_font_list
 from ui.themes.scrollbar_style import vertical_scrollbar_style
+from utils.custom_context_menu import ContextMenuUtility
 from utils.custom_q_edit import CustomQEdit
 from utils.resource_path import resource_path
 from managers.editor_manager import EditorManager
@@ -78,6 +79,9 @@ class EditorPanel(QDialog):
         editor_layout.addWidget(self.content_edit, stretch=1)
         self.stack.addWidget(editor_page)
 
+        # Override context menu
+        self.custom_context_menu = ContextMenuUtility(self.content_edit)
+
         # Preview screen
         preview_page = QWidget()
         preview_layout = QVBoxLayout(preview_page)
@@ -96,6 +100,9 @@ class EditorPanel(QDialog):
         self._opacity.setOpacity(1)
         preview_layout.addWidget(self.preview)
         self.stack.addWidget(preview_page)
+
+        # Override context menu
+        self.custom_context_menu = ContextMenuUtility(self.preview)
 
         # Bottom row
         bottom = QHBoxLayout()
