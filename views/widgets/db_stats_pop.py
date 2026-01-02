@@ -67,7 +67,7 @@ def update_db_stats(model):
 
     for row, (label_text, value) in enumerate(stats):
         label = QLabel(label_text + ":")
-        label.setStyleSheet("color: #AAAAAA; font-weight: bold;")
+        label.setStyleSheet("color: #A8B9C8; font-weight: bold;")
         value_label = QLabel(str(value))
         value_label.setStyleSheet("color: #FFFFFF;")
         grid.addWidget(label, row, 0)

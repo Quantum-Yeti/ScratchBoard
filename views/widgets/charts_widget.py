@@ -13,12 +13,15 @@ from helpers.ui_helpers.chart_pastel_list import PASTEL_CHART_COLORS
 from domain.analytics.dashboard_stats import calculate_stats
 from ui.themes.dash_action_btn_style import dash_action_button_style
 from ui.themes.scrollbar_style import vertical_scrollbar_style
+from utils.custom_context_menu import ContextMenuUtility
 from utils.custom_q_edit import CustomQEdit
 from utils.resource_path import resource_path
 from views.widgets.arm_pop_widget import open_arm_pop
 from views.widgets.db_stats_pop import update_db_stats
 
 segoe = QFont("Segoe UI", 11)
+
+
 
 # Stacked bar chart
 def dash_left_stats(model):
