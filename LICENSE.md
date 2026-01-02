@@ -4,7 +4,7 @@
 
 ## **Scratch Board** - _A lightweight desktop productivity suite._
 
-**Copyright © 2025 Quantum-Yeti**  
+**Copyright © 2026 Quantum-Yeti**  
 All rights reserved.
 
 ---
