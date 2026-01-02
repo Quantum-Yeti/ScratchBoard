@@ -7,8 +7,8 @@
 ## Features
 
 ### Main Tools
-- **Scratch Notes:** Create colorful, draggable, and resizable sticky notes that auto-save.
-- **Quick Links/References:** Add and delete quick links to helpful online resources.
+- **Sticky Notes:** Create colorful, draggable, and resizable sticky notes that auto-save.
+- **Custom Links:** Add and delete quick links to helpful online resources/knowledge domain articles.
 - **Modem Log Parser:** Parse DOCSIS modem logs to troubleshoot connection issues.
 - **Execute Batch Files:** Quickly select and execute a windows batch file. 
 - **Notepad:** Fully integrated Notepad program similar to the Windows Notepad program. Allows saving, editing, and opening of plain-text files.
@@ -32,6 +32,12 @@
 - **Rich Text Formatting:** All notes can be formatted using rich-text features via toolbar buttons.
 - **Image Embedding:** All notes can store images using MarkDown syntax or the button in the toolbar.
 - **Keyboard Shortcuts:** All views and tools have keyboard shortcuts for quick, easy navigation.
+---
+
+## User Manual
+
+For detailed instructions and a comprehensive guide to using **Scratch Board**, please refer to the [User Manual](docs/Scratch%20Board%20End-User%20Manual.pdf).
+
 ---
 
 ## Screenshots
