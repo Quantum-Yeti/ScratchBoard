@@ -185,5 +185,34 @@
         color: black;
     }
 
+/* ==============================
+   TOOLTIP STYLING
+   ============================== */
+QToolTip {
+    background: #B0E0E6;
+    color: #FFFFFF;               /* Light text color */
+    border: 1px solid #000000;    /* Border color */
+    padding: 6px 12px;            /* Padding inside tooltip */
+    font-size: 14px;              /* Font size for tooltip text */
+    border-radius: 6px;           /* Rounded corners */
+}
+
+QPushButton::tooltip {
+    background-color: #B0E0E6;
+    color: #FFFFFF;               /* Light text color */
+    border: 1px solid #000000;    /* Border color */
+    padding: 6px 12px;            /* Padding inside tooltip */
+    font-size: 14px;              /* Font size for tooltip text */
+    border-radius: 6px;           /* Rounded corners */
+}
+
+QLineEdit::tooltip {
+    background-color: #B0E0E6;
+    color: #FFFFFF;               /* Light text color */
+    border: 1px solid #000000;    /* Border color */
+    padding: 6px 12px;            /* Padding inside tooltip */
+    font-size: 14px;              /* Font size for tooltip text */
+    border-radius: 6px;           /* Rounded corners */
+}
 
 
