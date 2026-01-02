@@ -90,7 +90,7 @@ python main.py
 
 ## License
 
-This software is provided for personal viewing and evaluation only.  
+This software is provided for use for coworkers, personal viewing and evaluation only.  
 Forking, redistribution, modification, and commercial use are strictly prohibited unless approved by the author.  
 
 See the [LICENSE](LICENSE.md) file for full terms.
@@ -107,5 +107,3 @@ This project uses the following third-party resources:
   - Provides the application's GUI framework
   - Licensed under the LGPL v3.  
   - License information: https://doc.qt.io/qtforpython-6/licenses.html
-  - A copy of the LGPL-3.0 license is provided in `LICENSES/LGPL-3.0.txt`.
-  - Qt and PySide6 are developed and maintained by The Qt Company and the Qt Project.
