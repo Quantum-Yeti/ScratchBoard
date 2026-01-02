@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel
 )
 
+from utils.custom_context_menu import ContextMenuUtility
 from utils.resource_path import resource_path
 
 
@@ -60,15 +61,22 @@ class ContactsManagerPanel(QDialog):
         self.name_input = self._add_labeled_input(
             "Name:", name, "Name", "Enter a name"
         )
+        self.custom_context_menu = ContextMenuUtility(self.name_input)
+
         self.phone_input = self._add_labeled_input(
             "Phone:", phone, "Phone", "Enter a phone number"
         )
+        self.custom_context_menu = ContextMenuUtility(self.phone_input)
+
         self.email_input = self._add_labeled_input(
             "Email:", email, "N/A", "Enter an email address"
         )
+        self.custom_context_menu = ContextMenuUtility(self.email_input)
+
         self.website_input = self._add_labeled_input(
             "Website:", website, "N/A", "Enter a website address"
         )
+        self.custom_context_menu = ContextMenuUtility(self.website_input)
 
     def _add_labeled_input(self, label, value, placeholder, tooltip):
         self.layout.addWidget(QLabel(label))
@@ -78,6 +86,7 @@ class ContactsManagerPanel(QDialog):
         line_edit.setToolTip(tooltip)
 
         self.layout.addWidget(line_edit)
+
         return line_edit
 
     def _add_action_buttons(self):
