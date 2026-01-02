@@ -29,7 +29,7 @@
 - Exported database files are automatically converted into a human-readable '.json' file, which allows for portability and use outside the program.
 
 ### Extras
-- **Basic Markdown Text Formatting:** All notes can be formatted using MarkDown syntax, or by using toolbar buttons.
+- **Rich Text Formatting:** All notes can be formatted using rich-text features via toolbar buttons.
 - **Image Embedding:** All notes can store images using MarkDown syntax or the button in the toolbar.
 - **Keyboard Shortcuts:** All views and tools have keyboard shortcuts for quick, easy navigation.
 ---
