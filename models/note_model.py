@@ -92,38 +92,6 @@ class NoteModel:
 
         self.conn.commit()
 
-        # --- CONTACTS TABLE MIGRATION ---
-        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='contacts'")
-        if cur.fetchone():
-            # Table exists → check column order
-            cur.execute("PRAGMA table_info(contacts)")
-            columns = [c[1] for c in cur.fetchall()]
-            expected_order = ["id", "category_id", "name", "phone", "email", "website", "created", "updated"]
-            if columns != expected_order:
-                print("[MIGRATION] Fixing contacts table column order...")
-                cur.execute("ALTER TABLE contacts RENAME TO contacts_old;")
-                cur.execute("""
-                    CREATE TABLE contacts (
-                        id TEXT PRIMARY KEY,
-                        category_id INTEGER,
-                        name TEXT NOT NULL,
-                        phone TEXT,
-                        email TEXT,
-                        website TEXT,
-                        created TEXT NOT NULL,
-                        updated TEXT NOT NULL,
-                        FOREIGN KEY(category_id) REFERENCES categories(id)
-                            ON DELETE SET NULL ON UPDATE CASCADE
-                    );
-                """)
-                cur.execute("""
-                    INSERT INTO contacts (id, category_id, name, phone, email, website, created, updated)
-                    SELECT id, category_id, name, phone, email, website, created, updated
-                    FROM contacts_old;
-                """)
-                cur.execute("DROP TABLE contacts_old;")
-                print("[MIGRATION] Contacts table fixed.")
-
         # Contacts table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS contacts (
@@ -310,7 +278,7 @@ class NoteModel:
         return True
 
     ### CONTACTS METHODS ###
-    def add_contact(self, category_name, name, phone=None, website=None, email=None):
+    def add_contact(self, category_name, name, phone=None, email=None, website=None):
         contact_id = str(uuid.uuid4())
         now = datetime.now().isoformat()
         category_id = self.add_category(category_name)
@@ -346,7 +314,7 @@ class NoteModel:
         """, (contact_id,))
         return cur.fetchone()
 
-    def edit_contact(self, contact_id, name=None, phone=None, website=None, email=None):
+    def edit_contact(self, contact_id, name=None, phone=None, email=None, website=None):
         contact = self.get_contact_by_id(contact_id)
         if not contact:
             return False
@@ -616,8 +584,8 @@ class NoteModel:
                 category_name=contact.get("category_name", "Contacts"),
                 name=contact["name"],
                 phone=contact.get("phone"),
-                website=contact.get("website"),
-                email=contact.get("email")
+                email=contact.get("email"),
+                website=contact.get("website")
             )
 
         # Import references

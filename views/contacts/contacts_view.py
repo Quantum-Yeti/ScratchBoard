@@ -29,7 +29,7 @@ class ContactsView(QWidget):
         self._build_layout()
         self._create_search_bar()
         self._create_contact_list()
-        self._create_header_row()  # Add header as first row in the list
+        self._create_header_row() # Add header as first row in the list
         self._create_floating_button()
 
     # UI construction
@@ -77,19 +77,19 @@ class ContactsView(QWidget):
         header_layout = QHBoxLayout(self.header_container)
         header_layout.setSpacing(self.COLUMN_SPACING)
         header_layout.setContentsMargins(self.LEFT_MARGIN, 0, self.RIGHT_MARGIN, 0)
-        header_layout.setDirection(QBoxLayout.LeftToRight)
+        header_layout.setDirection(QBoxLayout.Direction.LeftToRight)
 
         headers = [
             ("Name", 2),
-            ("Phone", 1),
-            ("Email", 3),
-            ("Website", 3),
+            ("Phone", 2),
+            ("Email", 2),
+            ("Website", 2),
         ]
 
         for text, stretch in headers:
             lbl = QLabel(f"<b>{text}</b>")
             lbl.setStyleSheet("color: #B0E0E6; font-size: 14px;")
-            lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            lbl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             header_layout.addWidget(lbl, stretch)
 
         self.header_container.setFixedHeight(30)
@@ -165,13 +165,13 @@ class ContactsView(QWidget):
         row_layout = QHBoxLayout()
         row_layout.setSpacing(self.COLUMN_SPACING)
         row_layout.setContentsMargins(self.LEFT_MARGIN, 0, self.RIGHT_MARGIN, 0)
-        row_layout.setDirection(QBoxLayout.LeftToRight)
+        row_layout.setDirection(QBoxLayout.Direction.LeftToRight)
 
         # Column order must match headers: Name, Phone, Email, Website
         row_layout.addWidget(self._make_label(contact["name"], bold=True), 2)
-        row_layout.addWidget(self._make_label(contact["phone"] or "N/A"), 1)
-        row_layout.addWidget(self._make_label(contact["email"]), 3)
-        row_layout.addWidget(self._make_website_label(contact["website"]), 3)
+        row_layout.addWidget(self._make_label(contact["phone"] or "N/A"), 2)
+        row_layout.addWidget(self._make_label(contact["email"]), 2)
+        row_layout.addWidget(self._make_website_label(contact["website"]), 2)
 
         row_widget = QWidget()
         row_widget.setObjectName("row")
