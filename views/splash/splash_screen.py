@@ -162,7 +162,7 @@ class SplashScreen(QWidget):
 
     # Progress Handling
     def set_progress(self, value: int, message: str = ""):
-        """Update progress bar and optional message."""
+        """Update progress bar and message."""
         self.progress.setValue(value)
         if message:
             self.message_label.setText(message)
