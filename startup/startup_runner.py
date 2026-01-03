@@ -1,19 +1,19 @@
 import time
 
 def run_startup(progress_callback):
-    """Run initialization steps with progress updates on splash screen."""
-    import time
-
+    progress_callback(0, "Starting...")
     steps = [
-        ("Initializing...", lambda: time.sleep(1)),
-        ("Loading models...", lambda: time.sleep(1)),
-        ("Loading controllers...", lambda: time.sleep(1)),
-        ("Loading resources...", lambda: time.sleep(1)),
-        ("Finishing...", lambda: time.sleep(1)),
+        (20, "Initializing...", 1),
+        (45, "Loading models...", 1),
+        (71, "Loading controllers...", 1),
+        (90, "Loading resources...", 1),
+        (100, "Enjoy!", 1),
     ]
+    last_progress = 0
+    for target, message, duration in steps:
+        increments = max(1, target - last_progress)
+        for p in range(last_progress + 1, target + 1):
+            progress_callback(p, message)
+            time.sleep(duration / increments)
+        last_progress = target
 
-    total = len(steps)
-    for i, (message, action) in enumerate(steps, start=1):
-        progress = int((i / total) * 100)
-        progress_callback(progress, message)  # Emit progress to splash screen
-        action()

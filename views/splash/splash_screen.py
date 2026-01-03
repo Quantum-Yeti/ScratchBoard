@@ -1,19 +1,14 @@
 from datetime import datetime
-
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QSpacerItem, QSizePolicy, QApplication
 from PySide6.QtGui import QPixmap, QPainterPath, QRegion
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtCore import Qt, QThread, Signal, QPropertyAnimation, QEasingCurve
 
 from startup.startup_runner import run_startup
 from utils.resource_path import resource_path
 
-def get_current_version():
-    """
-    Reads the current version from of the program from 'docs/version.txt'.
 
-    Returns:
-        str: The current version of the program or 'Unknown version' if it fails.
-    """
+def get_current_version() -> str:
+    """Read the current version from 'docs/version.txt'."""
     try:
         path = resource_path("docs/version.txt")
         with open(path, "r", encoding="utf-8") as f:
@@ -21,157 +16,161 @@ def get_current_version():
     except Exception as e:
         return f"Unknown version ({e})"
 
+
 class ProgressThread(QThread):
-    """
-    QThread subclass that runs a function in a separate thread and emit the progress bar updates.
-    """
+    """Thread to run startup tasks with progress updates."""
     progress = Signal(int, str)
 
     def __init__(self, func):
-        """
-        Initialize the thread with the progress function.
-        """
         super().__init__()
         self.func = func
 
     def run(self):
-        """
-        Execute the thread function, passing the progress bar signal's emit method as a callback.
-        """
         self.func(self.progress.emit)
 
+
 class SplashScreen(QWidget):
-    """
-    Splash screen widget class that includes an image, progress bar, message label, and copyright notice.
+    """Splash screen widget with image, progress bar, messages, and version/copyright info."""
 
-    Attributes:
-        vbox (QVBoxLayout): Main layout container.
-        label_image (QLabel): Displays the splash image.
-        progress (QProgressBar): Shows progress of start_helpers tasks.
-        message_label (QLabel): Displays optional progress messages.
-        copyright_label (QLabel): Displays copyright information.
-        worker (ProgressThread): Thread running start_helpers tasks.
-    """
     def __init__(self, image_path: str):
-        """
-        Initialize the splash screen widget.
-        """
         super().__init__()
-        self.setWindowFlags(Qt.SplashScreen | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.setWindowFlags(
+            Qt.WindowType.SplashScreen |
+            Qt.WindowType.WindowStaysOnTopHint |
+            Qt.WindowType.FramelessWindowHint
+        )
         self.setFixedSize(780, 600)
-        self.round_corner_window(radius=20)
-        self.setStyleSheet("""
-        QWidget {
-            border-radius: 20px;
-            background-color: #505050;
-        }    
-        """)
 
-        # Apply dark theme
-        self.apply_dark_theme()
+        # Apply rounded corners and background
+        self._apply_rounded_corners(radius=20)
+        self._apply_base_style()
 
-        # Main vertical layout
-        self.vbox = QVBoxLayout(self)
-        self.vbox.setContentsMargins(0, 12, 0, 0)
-        self.vbox.setSpacing(0)
+        # Main layout
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 12, 0, 0)
+        self.layout.setSpacing(0)
 
-        # Load and display splash screen background image
-        self.pixmap = QPixmap(image_path)
-        self.label_image = QLabel(self)
-        self.label_image.setPixmap(self.pixmap)
-        self.label_image.setAlignment(Qt.AlignCenter)
-        self.vbox.addWidget(self.label_image)
+        # Widgets
+        self._setup_image(image_path)
+        self.layout.addStretch(1)
+        self._add_spacer(height=8)
+        self._setup_progress_bar()
+        self._setup_message_label()
+        self._add_spacer(height=20)
+        self._setup_version_label()
+        self._setup_copyright_label()
 
-        # Stretchable space pushes progress bar and copyright to bottom
-        self.vbox.addStretch(1)
-
-        # Initialize Progress Bar
-        self.progress = QProgressBar(self)
-        self.progress.setMaximumWidth(self.pixmap.width())
-        self.progress.setMinimumWidth(500)
-        self.progress.setFixedHeight(30)
-        self.progress.setRange(0, 100)
-        self.progress.setTextVisible(True)
-        self.progress.setStyleSheet("""
-            QProgressBar {
-                font-size: 12px;
-                font-weight: bold;
-            }
-            
-        """)
-
-        self.vbox.addWidget(self.progress, alignment=Qt.AlignHCenter)
-
-        # Initialize message label reserved for progress bar text
-        self.message_label = QLabel("", self)
-        self.message_label.setAlignment(Qt.AlignCenter)
-        self.message_label.setStyleSheet("color: white; font-style: italic;")
-        self.vbox.addWidget(self.message_label)
-
-        # Spacer to add a vertical gap
-        spacer = QSpacerItem(0, 20, QSizePolicy.Minimum, QSizePolicy.Fixed)  # 10px vertical space
-        self.vbox.addItem(spacer)
-
-        # Initialize Version label
-        current_version = get_current_version()
-        self.version_label = QLabel(f"Version: {current_version}")
-        self.version_label.setAlignment(Qt.AlignCenter)
-        self.version_label.setStyleSheet("font-size: 14px; font-weight: bold;")
-        self.vbox.addWidget(self.version_label)
-
-        # Initialize copyright label with the current year
-        current_year = datetime.now().year
-        self.copyright_label = QLabel(self)
-        self.copyright_label.setText(f"\u00A9 {current_year} Quantum Yeti. All rights reserved.")
-        self.copyright_label.setAlignment(Qt.AlignCenter)
-        self.copyright_label.setStyleSheet("padding-bottom: 8px;")
-        self.vbox.addWidget(self.copyright_label)
-
-        self.setLayout(self.vbox)
+        self.setLayout(self.layout)
         self.show()
 
-        # Start the asynchronous worker thread to run start_helpers tasks
+        # Animation for smooth progress updates
+        self.progress_anim = QPropertyAnimation(self.progress, b"value", self)
+        self.progress_anim.setDuration(200)  # Duration per step in ms
+        self.progress_anim.setEasingCurve(QEasingCurve.OutCubic)
+
+        # Start the background startup thread
         self.worker = ProgressThread(run_startup)
         self.worker.progress.connect(self.set_progress)
         self.worker.start()
 
-    # Helper Methods
-    def apply_dark_theme(self):
-        """
-        Method to load the main_theme style from the resource path.
-        Throws an exception if the theme cannot be loaded.
-        """
+    # Widget Setup Methods
+    def _setup_image(self, image_path: str):
+        pixmap = QPixmap(image_path)
+        self.pixmap = pixmap
+        self.label_image = QLabel(self)
+        self.label_image.setPixmap(pixmap)
+        self.label_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.layout.addWidget(self.label_image)
+
+    def _setup_progress_bar(self):
+        self.progress = QProgressBar(self)
+        self.progress.setMaximumWidth(self.pixmap.width())
+        self.progress.setMinimumWidth(500)
+        self.progress.setFixedHeight(15)  # Thinner modern bar
+        self.progress.setValue(0)
+        self.progress.setRange(0, 100)
+        self.progress.setTextVisible(True)
+        self.progress.setStyleSheet("""
+            QProgressBar {
+                font-size: 10px;
+                font-weight: bold;
+                border: 1px solid #000;
+                border-radius: 6px;
+                background-color: #505050;
+                text-align: center;
+                color: white;
+            }
+            QProgressBar::chunk {
+                border-radius: 6px;
+                background-color: #00AAE6;
+                box-shadow: 0px 0px 6px rgba(0, 191, 255, 0.6);
+            }
+        """)
+        self.layout.addWidget(self.progress, alignment=Qt.AlignmentFlag.AlignHCenter)
+
+    def _setup_message_label(self):
+        self.message_label = QLabel("", self)
+        self.message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.message_label.setStyleSheet("color: white; font-style: italic;")
+        self.layout.addWidget(self.message_label)
+
+    def _setup_version_label(self):
+        version = get_current_version()
+        self.version_label = QLabel(f"Version: {version}")
+        self.version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.version_label.setStyleSheet("font-size: 14px; font-weight: bold;")
+        self.layout.addWidget(self.version_label)
+
+    def _setup_copyright_label(self):
+        current_year = datetime.now().year
+        self.copyright_label = QLabel(
+            f"\u00A9 {current_year} Quantum Yeti. All rights reserved."
+        )
+        self.copyright_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.copyright_label.setStyleSheet("padding-bottom: 8px;")
+        self.layout.addWidget(self.copyright_label)
+
+    def _add_spacer(self, height: int = 10):
+        spacer = QSpacerItem(0, height, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.layout.addItem(spacer)
+
+    # Style Methods
+    def _apply_base_style(self):
+        """Base widget style including dark background."""
+        self.setStyleSheet("""
+            QWidget {
+                border-radius: 20px;
+                background-color: #505050;
+            }
+        """)
+        self._apply_dark_theme()
+
+    def _apply_dark_theme(self):
+        """Load custom QSS theme if available."""
         try:
-            with open(resource_path("ui/themes/main_theme.qss"), "r") as f:
+            theme_path = resource_path("ui/themes/main_theme.qss")
+            with open(theme_path, "r") as f:
                 self.setStyleSheet(f.read())
         except Exception as e:
-            print(f" Failed to load {resource_path('ui/themes/main_theme.qss')}: {e}")
+            print(f"Failed to load {theme_path}: {e}")
 
-    def round_corner_window(self, radius=20):
+    def _apply_rounded_corners(self, radius: int = 20):
         path = QPainterPath()
         path.addRoundedRect(self.rect(), radius, radius)
         region = QRegion(path.toFillPolygon().toPolygon())
         self.setMask(region)
 
+    # Progress Handling
     def set_progress(self, value: int, message: str = ""):
-        """
-        Update the progress bar value and display the step message.
-        """
+        """Update progress bar and optional message."""
         self.progress.setValue(value)
         if message:
             self.message_label.setText(message)
-
         QApplication.processEvents()
-
         if value >= 100:
             QThread.msleep(300)
             self.finish()
 
-        # Force UI to update immediately
-        self.repaint()
-
     def finish(self):
-        """
-        Finish and close the splash screen.
-        """
+        """Close the splash screen."""
         self.close()
