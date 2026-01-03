@@ -86,13 +86,13 @@ class SplashScreen(QWidget):
         self.progress = QProgressBar(self)
         self.progress.setMaximumWidth(self.pixmap.width())
         self.progress.setMinimumWidth(500)
-        self.progress.setFixedHeight(15)  # Thinner modern bar
+        self.progress.setFixedHeight(18)  # Thinner modern bar
         self.progress.setValue(0)
         self.progress.setRange(0, 100)
         self.progress.setTextVisible(True)
         self.progress.setStyleSheet("""
             QProgressBar {
-                font-size: 10px;
+                font-size: 12px;
                 font-weight: bold;
                 border: 1px solid #000;
                 border-radius: 6px;
