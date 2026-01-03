@@ -42,6 +42,7 @@ class ArmDialog(QDialog):
         try:
             with open("sb_data/notepad/arm_statement.txt", "r", encoding="utf-8") as f:
                 self.arm_text.setPlainText(f.read())
+
         except FileNotFoundError:
             self.arm_text.setPlainText("[No ARM statement found]")
 

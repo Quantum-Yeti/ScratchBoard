@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QPixmap, Qt
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QGridLayout, QLabel
 
 from utils.resource_path import resource_path
@@ -11,6 +11,7 @@ def update_db_stats(model):
     db_dialog = QDialog()
     db_dialog.setWindowTitle("Scratch Board: Database Stats")
     db_dialog.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
+    db_dialog.setWindowModality(Qt.WindowModality.WindowModal)
     db_dialog.setMinimumSize(400, 300)
     db_dialog.setStyleSheet("""
         QDialog {
@@ -18,6 +19,7 @@ def update_db_stats(model):
         }
         QLabel {
             font-weight: bold;
+            background-color: #1E1E1E;
         }
     """)
 
@@ -65,13 +67,31 @@ def update_db_stats(model):
         ("Images", f"{num_images} (Total {format_size(images_size)})")
     ]
 
+    icon_paths = {
+        "Notes": resource_path("resources/icons/notes.png"),
+        "Categories": resource_path("resources/icons/category.png"),
+        "Tags": resource_path("resources/icons/tag.png"),
+        "DB Size": resource_path("resources/icons/db_pop.png"),
+        "Images": resource_path("resources/icons/image_example.png")
+    }
+
     for row, (label_text, value) in enumerate(stats):
+        icon_label = QLabel()
+        icon_pix = QPixmap(icon_paths.get(label_text, ""))  # fallback to empty
+        if not icon_pix.isNull():
+            icon_label.setPixmap(
+                icon_pix.scaled(32, 32, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        grid.addWidget(icon_label, row, 0)
+
+        # Stat label
         label = QLabel(label_text + ":")
         label.setStyleSheet("color: #A8B9C8; font-weight: bold;")
+        grid.addWidget(label, row, 1)
+
+        # Value label
         value_label = QLabel(str(value))
         value_label.setStyleSheet("color: #FFFFFF;")
-        grid.addWidget(label, row, 0)
-        grid.addWidget(value_label, row, 1)
+        grid.addWidget(value_label, row, 2)
 
     db_layout.addLayout(grid)
 
