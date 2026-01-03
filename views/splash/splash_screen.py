@@ -39,7 +39,7 @@ class SplashScreen(QWidget):
             Qt.WindowType.WindowStaysOnTopHint |
             Qt.WindowType.FramelessWindowHint
         )
-        self.setFixedSize(780, 600)
+        self.setFixedSize(780, 680)
 
         # Apply rounded corners and background
         self._apply_rounded_corners(radius=20)
@@ -53,7 +53,7 @@ class SplashScreen(QWidget):
         # Widgets
         self._setup_image(image_path)
         self.layout.addStretch(1)
-        self._add_spacer(height=8)
+        self._add_spacer(height=20)
         self._setup_progress_bar()
         self._setup_message_label()
         self._add_spacer(height=20)
@@ -86,7 +86,7 @@ class SplashScreen(QWidget):
         self.progress = QProgressBar(self)
         self.progress.setMaximumWidth(self.pixmap.width())
         self.progress.setMinimumWidth(500)
-        self.progress.setFixedHeight(18)  # Thinner modern bar
+        self.progress.setFixedHeight(18)
         self.progress.setValue(0)
         self.progress.setRange(0, 100)
         self.progress.setTextVisible(True)
