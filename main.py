@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f"Scratch Board")
-        self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
+        self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut_main.ico")))
         self.setGeometry(100, 100, 1280, 900)
 
         # Initialize dynamic window titles
