@@ -111,7 +111,7 @@ class SplashScreen(QWidget):
     def _setup_message_label(self):
         self.message_label = QLabel("", self)
         self.message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.message_label.setStyleSheet("color: white; font-style: italic;")
+        self.message_label.setStyleSheet("color: white; font-style: italic; margin: 10px;")
         self.layout.addWidget(self.message_label)
 
     def _setup_version_label(self):
