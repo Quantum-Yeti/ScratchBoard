@@ -53,6 +53,7 @@ class SplashScreen(QWidget):
         # Widgets
         self._setup_image(image_path)
         self.layout.addStretch(1)
+        self._setup_description_label()
         self._add_spacer(height=20)
         self._setup_progress_bar()
         self._setup_message_label()
@@ -66,7 +67,7 @@ class SplashScreen(QWidget):
         # Animation for smooth progress updates
         self.progress_anim = QPropertyAnimation(self.progress, b"value", self)
         self.progress_anim.setDuration(200)  # Duration per step in ms
-        self.progress_anim.setEasingCurve(QEasingCurve.OutCubic)
+        self.progress_anim.setEasingCurve(QEasingCurve.Type.OutCubic)
 
         # Start the background startup thread
         self.worker = ProgressThread(run_startup)
@@ -81,6 +82,13 @@ class SplashScreen(QWidget):
         self.label_image.setPixmap(pixmap)
         self.label_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.label_image)
+
+    def _setup_description_label(self):
+        self.description_label = QLabel(self)
+        self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.description_label.setText("A lightweight desktop productivity app")
+        self.description_label.setStyleSheet("font-size: 16px; color: #fff; font-weight: bold; font-style: italic; margin-top: 4px;")
+        self.layout.addWidget(self.description_label)
 
     def _setup_progress_bar(self):
         self.progress = QProgressBar(self)
@@ -127,7 +135,7 @@ class SplashScreen(QWidget):
             f"\u00A9 {current_year} Quantum Yeti. All rights reserved."
         )
         self.copyright_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.copyright_label.setStyleSheet("padding-bottom: 8px;")
+        self.copyright_label.setStyleSheet("padding-bottom: 8px; font-size: 14px; font-weight: bold;")
         self.layout.addWidget(self.copyright_label)
 
     def _add_spacer(self, height: int = 10):
@@ -146,13 +154,13 @@ class SplashScreen(QWidget):
         self._apply_dark_theme()
 
     def _apply_dark_theme(self):
-        """Load custom QSS theme if available."""
+        """Load custom QSS theme if not print stacktrace."""
         try:
             theme_path = resource_path("ui/themes/main_theme.qss")
             with open(theme_path, "r") as f:
                 self.setStyleSheet(f.read())
         except Exception as e:
-            print(f"Failed to load {theme_path}: {e}")
+            print(f"Failed to load theme: {e}")
 
     def _apply_rounded_corners(self, radius: int = 20):
         path = QPainterPath()

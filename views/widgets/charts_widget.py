@@ -20,6 +20,18 @@ from views.widgets.db_stats_pop import update_db_stats
 
 segoe = QFont("Segoe UI", 11)
 
+def apply_tooltip_style(widget):
+    widget.setStyleSheet(widget.styleSheet() + """
+    QToolTip {
+        background-color: #222;
+        color: #eee;
+        border: 1px solid #555;
+        padding: 6px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+    """)
+
 # Stacked bar chart
 def dash_left_stats(model):
     """
@@ -52,19 +64,22 @@ def dash_left_stats(model):
     save_btn.setToolTip("Save your ARM statement (or a quick note).")
     save_btn.setStyleSheet(dash_action_button_style)
     save_btn.setIcon(save_icon)
+    apply_tooltip_style(save_btn)
 
     pop_icon = QIcon(resource_path("resources/icons/pop_arm.png"))
     pop_btn = QPushButton("Pop Arm")
     pop_btn.setToolTip("Pop your ARM statement open.")
     pop_btn.setStyleSheet(dash_action_button_style)
     pop_btn.setIcon(pop_icon)
+    apply_tooltip_style(pop_btn)
     pop_btn.clicked.connect(open_arm_pop)
 
     db_btn_icon = QIcon(resource_path("resources/icons/db_pop.png"))
     db_stats_btn = QPushButton("DB Stats")
-    db_stats_btn.setToolTip("Check your database stats and remember to backup often with File > Export > OneDrive upload.")
+    db_stats_btn.setToolTip("Check your database stats.")
     db_stats_btn.setStyleSheet(dash_action_button_style)
     db_stats_btn.setIcon(db_btn_icon)
+    apply_tooltip_style(db_stats_btn)
     db_stats_btn.clicked.connect(lambda: update_db_stats(model))
 
     email_btn_icon = QIcon(resource_path("resources/icons/email_pop.png"))
@@ -72,6 +87,7 @@ def dash_left_stats(model):
     email_btn.setToolTip("Check your email.")
     email_btn.setStyleSheet(dash_action_button_style)
     email_btn.setIcon(email_btn_icon)
+    apply_tooltip_style(email_btn)
     email_btn.clicked.connect(lambda: webbrowser.open("https://outlook.com"))
 
     # Add buttons to button layout
