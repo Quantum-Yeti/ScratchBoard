@@ -100,7 +100,7 @@ class ContactsController(QObject):
 
         :param contact_id: Unique contact ID.
         """
-        self.model.edit_contact(contact_id, name, phone, website, email)
+        self.model.edit_contact(contact_id, name, phone, email, website)
         self._notify_change()
 
     def delete_contact(self, contact_id):

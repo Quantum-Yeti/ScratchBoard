@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget, QScrollArea, QVBoxLayout, QHBoxLayout,
-    QLineEdit, QLabel, QSizePolicy, QFrame
+    QLineEdit, QLabel, QSizePolicy, QFrame, QBoxLayout
 )
 from PySide6.QtCore import Qt, QEvent, Signal
 
@@ -77,6 +77,7 @@ class ContactsView(QWidget):
         header_layout = QHBoxLayout(self.header_container)
         header_layout.setSpacing(self.COLUMN_SPACING)
         header_layout.setContentsMargins(self.LEFT_MARGIN, 0, self.RIGHT_MARGIN, 0)
+        header_layout.setDirection(QBoxLayout.LeftToRight)
 
         headers = [
             ("Name", 2),
@@ -164,11 +165,13 @@ class ContactsView(QWidget):
         row_layout = QHBoxLayout()
         row_layout.setSpacing(self.COLUMN_SPACING)
         row_layout.setContentsMargins(self.LEFT_MARGIN, 0, self.RIGHT_MARGIN, 0)
+        row_layout.setDirection(QBoxLayout.LeftToRight)
 
+        # Column order must match headers: Name, Phone, Email, Website
         row_layout.addWidget(self._make_label(contact["name"], bold=True), 2)
         row_layout.addWidget(self._make_label(contact["phone"] or "N/A"), 1)
-        row_layout.addWidget(self._make_email_label(contact["website"]), 3)
-        row_layout.addWidget(self._make_website_label(contact["email"]), 3)
+        row_layout.addWidget(self._make_label(contact["email"]), 3)
+        row_layout.addWidget(self._make_website_label(contact["website"]), 3)
 
         row_widget = QWidget()
         row_widget.setObjectName("row")
@@ -188,10 +191,12 @@ class ContactsView(QWidget):
             }
         """)
 
+        # Optional double-click handler
         if on_click:
             def handler(event, c=contact):
                 if event.type() == QEvent.Type.MouseButtonDblClick:
                     on_click(c)
+
             row_widget.mouseDoubleClickEvent = handler
 
         return row_widget
@@ -207,22 +212,19 @@ class ContactsView(QWidget):
 
     @staticmethod
     def _make_email_label(email):
-        lbl = QLabel()
+        lbl = QLabel(email or "N/A")
         lbl.setOpenExternalLinks(False)
         lbl.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         lbl.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         lbl.setStyleSheet("color: #B0E0E6")
-        lbl.setText(
-            f'<a href="{email}" style="color:#B0E0E6;text-decoration:none;">{email}</a>' if email else "N/A")
         return lbl
 
     @staticmethod
     def _make_website_label(website):
-        lbl = QLabel()
+        lbl = QLabel(website or "N/A")
         lbl.setOpenExternalLinks(True)
         lbl.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         lbl.setStyleSheet("color: #B0E0E6")
-        lbl.setText(f'<a href="{website}" style="color:#B0E0E6;text-decoration:none;">{website}</a>' if website else "N/A")
         return lbl
 
     # Filtering

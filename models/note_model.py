@@ -92,6 +92,38 @@ class NoteModel:
 
         self.conn.commit()
 
+        # --- CONTACTS TABLE MIGRATION ---
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='contacts'")
+        if cur.fetchone():
+            # Table exists → check column order
+            cur.execute("PRAGMA table_info(contacts)")
+            columns = [c[1] for c in cur.fetchall()]
+            expected_order = ["id", "category_id", "name", "phone", "email", "website", "created", "updated"]
+            if columns != expected_order:
+                print("[MIGRATION] Fixing contacts table column order...")
+                cur.execute("ALTER TABLE contacts RENAME TO contacts_old;")
+                cur.execute("""
+                    CREATE TABLE contacts (
+                        id TEXT PRIMARY KEY,
+                        category_id INTEGER,
+                        name TEXT NOT NULL,
+                        phone TEXT,
+                        email TEXT,
+                        website TEXT,
+                        created TEXT NOT NULL,
+                        updated TEXT NOT NULL,
+                        FOREIGN KEY(category_id) REFERENCES categories(id)
+                            ON DELETE SET NULL ON UPDATE CASCADE
+                    );
+                """)
+                cur.execute("""
+                    INSERT INTO contacts (id, category_id, name, phone, email, website, created, updated)
+                    SELECT id, category_id, name, phone, email, website, created, updated
+                    FROM contacts_old;
+                """)
+                cur.execute("DROP TABLE contacts_old;")
+                print("[MIGRATION] Contacts table fixed.")
+
         # Contacts table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS contacts (
@@ -99,8 +131,8 @@ class NoteModel:
                 category_id INTEGER,
                 name TEXT NOT NULL,
                 phone TEXT,
-                website TEXT,
                 email TEXT,
+                website TEXT,
                 created TEXT NOT NULL,
                 updated TEXT NOT NULL,
                 FOREIGN KEY(category_id) REFERENCES categories(id)
@@ -283,9 +315,9 @@ class NoteModel:
         now = datetime.now().isoformat()
         category_id = self.add_category(category_name)
         self.conn.execute("""
-            INSERT INTO contacts (id, category_id, name, phone, website, email, created, updated)
+            INSERT INTO contacts (id, category_id, name, phone, email, website, created, updated)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (contact_id, category_id, name, phone, website, email, now, now))
+        """, (contact_id, category_id, name, phone, email, website, now, now))
         self.conn.commit()
         return contact_id
 
@@ -326,12 +358,12 @@ class NoteModel:
         if phone is not None:
             fields.append("phone=?")
             params.append(phone)
-        if website is not None:
-            fields.append("website=?")
-            params.append(website)
         if email is not None:
             fields.append("email=?")
             params.append(email)
+        if website is not None:
+            fields.append("website=?")
+            params.append(website)
 
         fields.append("updated=?")
         params.append(datetime.now().isoformat())
