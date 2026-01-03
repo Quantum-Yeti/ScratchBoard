@@ -17,7 +17,7 @@ VSVersionInfo(
         [StringStruct('CompanyName', 'Quantum Yeti'),
          StringStruct('FileDescription', 'Scratch Board - lightweight desktop productivity app'),
          StringStruct('ProductName', 'Scratch Board'),
-         StringStruct('ProductVersion', '2.1.2']),
+         StringStruct('ProductVersion', '2.1.2'),
          StringStruct('FileVersion', '2.1.2'),
          StringStruct('InternalName', 'scratchboard'),
          StringStruct('OriginalFilename', 'scratchboard.exe'),
