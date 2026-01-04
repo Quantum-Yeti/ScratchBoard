@@ -406,6 +406,24 @@ class NoteModel:
         notes.sort(key=lambda n: n["created"], reverse=True)
         return notes[0]
 
+    def get_contacts_up_to(self, target_date):
+        cur = self.conn.cursor()
+        cur.execute("""
+            SELECT COUNT(*) AS count
+            FROM contacts
+            WHERE date(created) <= ?
+        """, (target_date.isoformat(),))
+        return cur.fetchone()["count"]
+
+    def get_references_up_to(self, target_date):
+        cur = self.conn.cursor()
+        cur.execute("""
+            SELECT COUNT(*) AS count
+            FROM reference_links
+            WHERE date(created) <= ?
+        """, (target_date.isoformat(),))
+        return cur.fetchone()["count"]
+
     def close(self):
         self.conn.close()
 

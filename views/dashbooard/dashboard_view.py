@@ -4,7 +4,7 @@ from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
 
 from helpers.ui_helpers.create_widget_title import create_section_title
-from views.widgets.charts_widget import dash_left_stats, create_multi_line_chart
+from views.widgets.arm_chart_widget import dashboard_left_panel, create_multi_line_chart
 from views.widgets.stats_widget import StatsWidget
 from views.widgets.mac_widget import MacVendorView
 from views.widgets.reference_widget import ReferenceWidget
@@ -52,9 +52,9 @@ class DashboardView(QWidget):
         charts_layout = QHBoxLayout()
         content_layout.addLayout(charts_layout, stretch=3)
 
-        self.dash_arm = dash_left_stats(self.model)
+        self.dash_arm = dashboard_left_panel(self.model)
 
-        self.stacked_dash_panel = dash_left_stats(self.model)
+        self.stacked_dash_panel = dashboard_left_panel(self.model)
         charts_layout.addWidget(self.stacked_dash_panel, stretch=1)
 
         self.multi_line_chart = create_multi_line_chart(self.model)
@@ -155,7 +155,7 @@ class DashboardView(QWidget):
             self.multi_line_view.chart().removeAllSeries()
 
         # --- Create new charts ---
-        self.dash_arm = dash_left_stats(self.model)
+        self.dash_arm = dashboard_left_panel(self.model)
         self.multi_line_chart = create_multi_line_chart(self.model)
 
         # --- Replace charts in QChartView ---

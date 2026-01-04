@@ -4,10 +4,10 @@ from pathlib import Path
 
 from PySide6.QtCharts import QChart, QSplineSeries, QValueAxis, \
     QCategoryAxis
-from PySide6.QtGui import QColor, QFont, QIcon
+from PySide6.QtGui import QColor, QFont, QIcon, QCursor
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, \
-    QHBoxLayout, QSizePolicy, QMessageBox
+    QHBoxLayout, QSizePolicy, QMessageBox, QToolTip
 
 from helpers.ui_helpers.chart_pastel_list import PASTEL_CHART_COLORS
 from domain.analytics.dashboard_stats import calculate_stats
@@ -18,8 +18,10 @@ from utils.resource_path import resource_path
 from views.widgets.arm_pop_widget import open_arm_pop
 from views.widgets.db_stats_pop import update_db_stats
 
+# Set font for dashboard stats
 segoe = QFont("Segoe UI", 11)
 
+### --- Apply Tooltip Style Override --- ###
 def apply_tooltip_style(widget):
     widget.setStyleSheet(widget.styleSheet() + """
     QToolTip {
@@ -32,17 +34,24 @@ def apply_tooltip_style(widget):
     }
     """)
 
-# Stacked bar chart
-def dash_left_stats(model):
+### --- Stacked bar chart --- ###
+def dashboard_left_panel(model):
     """
-    Dashboard left of multi-line chart stats:
-    - ARM statement input + save button
-    - Database stats (auto-refreshable)
+    Create the left-side dashboard panel.
 
-    Returns a QWidget with attached update methods for live refresh.
+    Provides an editable ARM statement area with save and pop-out actions,
+    along with quick-access buttons for database statistics and email.
+    The returned widget exposes update hooks for dynamic refresh.
+
+    Args:
+        model (NoteModel): Data model used for database statistics.
+
+    Returns:
+        QWidget: A configured dashboard panel widget.
     """
     panel = QWidget()
     panel.setStyleSheet("background-color: #2C2C2C;")
+    apply_tooltip_style(panel)
     panel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
     layout = QVBoxLayout(panel)
@@ -52,6 +61,14 @@ def dash_left_stats(model):
     arm_text = CustomQEdit()
     arm_text.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
     arm_text.setPlaceholderText("Type your ARM statement (or a quick note) here then click save; it auto-loads after saving.")
+    arm_text.setStyleSheet(f"""
+        QTextEdit {{
+            padding: 10px;   
+        }}
+        QScrollBar:vertical {{
+            {vertical_scrollbar_style}
+        }}
+    """)
     layout.addWidget(arm_text, stretch=1)
 
     # Horizontal layout for buttons
@@ -107,7 +124,7 @@ def dash_left_stats(model):
 
             # Success message
             msg = QMessageBox()
-            msg.setIcon(QMessageBox.Information)
+            msg.setIcon(QMessageBox.Icon.Information)
             msg.setWindowTitle("Success")
             msg.setText("ARM statement saved successfully!")
             msg.setStandardButtons(QMessageBox.StandardButton.Ok)
@@ -116,7 +133,7 @@ def dash_left_stats(model):
         except Exception as e:
             # Error message if something goes wrong
             msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
+            msg.setIcon(QMessageBox.Icon.Critical)
             msg.setWindowTitle("Error")
             msg.setText(f"Failed to save ARM statement: {str(e)}")
             msg.setStandardButtons(QMessageBox.StandardButton.Ok)
@@ -137,34 +154,22 @@ def dash_left_stats(model):
     # Return the left panel layout and buttons
     return panel
 
-# Multi-line chart
+###--- Multi-line chart ---###
 def create_multi_line_chart(model, days_back=14):
     """
-    Creates a multi-line chart showing note activity trends over time.
+    Build a multi-line time-series chart of daily model statistics.
 
-    Each line represents a different statistic calculated from the model,
-    matching the dashboard stat cards. Stats include total notes, notes added
-    today, notes this month, average words per note, longest note, and shortest note.
+    The chart plots selected statistics (e.g., contacts and reference links)
+    for each day in the past `days_back` range. Values are recalculated per day
+    by temporarily overriding the model's target date.
 
-    Parameters:
-        model (NoteModel): The model instance used to calculate stats.
-        days_back (int, optional): Number of past days to include in the chart.
-                                   Defaults to 7.
+    Args:
+        model (NoteModel): Data model used to compute daily statistics.
+        days_back (int): Number of past days to include in the chart.
 
     Returns:
-        QChart: A Qt QChart object configured as a multi-line chart.
-                - X-axis represents days (from `days_back` to today).
-                - Y-axis represents the statistic values.
-                - Each line is color-coded and labeled according to the stat.
-                - Includes a legend with visible markers and a title.
-                - Uses a pastel color palette for lines and OpenGL for rendering.
-
-    Notes:
-        - Only every 5th date is labeled on the X-axis to prevent clutter and its actual visibility is set to false.
-        - Y-axis minimum is set to -1 to avoid lines visually dipping below 0.
-        - Stats are recalculated for each day by temporarily overriding
-          the date in the model.
-        - Chart background is hidden and animations are enabled.
+        QChart: A styled Qt chart with one line per statistic, a hidden date
+        axis, dynamic Y-axis scaling, and an auto-generated legend.
     """
     chart = QChart()
     chart.setFont(segoe)
@@ -172,7 +177,7 @@ def create_multi_line_chart(model, days_back=14):
     chart.legend().setFont(segoe)
     chart.setAnimationOptions(QChart.AnimationOption.SeriesAnimations)
     chart.setBackgroundVisible(False)
-    chart.setTitle("Note Activity Trends")
+    chart.setTitle("Activity Trends")
     chart.setTitleBrush(QColor("white"))
 
     # Time range
@@ -181,12 +186,15 @@ def create_multi_line_chart(model, days_back=14):
 
     # Stats to plot
     stat_keys = [
-        ("daily_notes", "Daily Notes"),
-        ("daily_words", "Daily Words"),
-        ("rolling_notes", "Avg Notes/Day"),
+        #("daily_notes", "Daily Notes"),
+        #("daily_words", "Daily Words"),
+        #("rolling_notes", "Avg Notes/Day"),
         ("rolling_words", "Avg Words/Day"),
-        ("total_ratio", "Note Ratio"),
+        #("total_ratio", "Note Ratio"),
         ("cumulative_wave", "Words/Week"),
+        #("category_entropy_norm", "Balance"),
+        ("contacts", "Contacts"),
+        ("links", "Links")
     ]
 
     # Precompute stats for each day from the model
@@ -215,10 +223,24 @@ def create_multi_line_chart(model, days_back=14):
         series.setPen(pen)
 
         for i, stats in enumerate(daily_stats):
-            val = stats.get(key, 0)
+            val = int(round(stats.get(key, 0))) # round to a whole number
             series.append(i, val)
             max_value = max(max_value, val)
             min_value = min(min_value, val)
+
+        def create_tooltip(series_name=name):
+            def show_tooltip(point, state):
+                if state:  # mouse over
+                    QToolTip.showText(
+                        QCursor.pos(),
+                        f"{series_name}\nValue: {int(round(point.y()))}\nDay: {dates[int(point.x())].strftime('%b %d')}"
+                    )
+                else:
+                    QToolTip.hideText()
+
+            return show_tooltip
+
+        series.hovered.connect(create_tooltip())
 
         chart.addSeries(series)
 

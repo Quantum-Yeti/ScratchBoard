@@ -1,16 +1,21 @@
 import math
 from datetime import datetime
 
+
 def calculate_stats(model):
     """
     Returns a dict of dashboard statistics calculated relative to a target date.
-    - Now respects `override_date_for_stats` for charting over time.
+    Respects `override_date_for_stats` for charting over time.
     """
 
-    # Use date override for charts; default to today
-    date_override = getattr(model, "override_date_for_stats", None)
-    target_date = date_override or datetime.now().date()
+    ### --- Target date ---###
+    target_date = getattr(model, "override_date_for_stats", None) or datetime.now().date()
 
+    ### --- Contacts / References ---###
+    num_contacts = model.get_contacts_up_to(target_date) # number of contacts
+    num_links = model.get_references_up_to(target_date) # number of custom links
+
+    ### --- Collect notes ---###
     categories = model.get_all_categories()
     all_notes = [
         note
@@ -18,98 +23,124 @@ def calculate_stats(model):
         for note in model.get_notes(category_name=category)
     ]
 
-    # --- Cumulative total notes up to target date ---
-    total_notes = sum(
-        1 for n in all_notes
-        if datetime.fromisoformat(n["created"]).date() <= target_date
-    )
+    ### --- Pre-filtered note views ---###
+    notes_up_to_date = []
+    notes_today = []
 
-    # --- Notes this month relative to target_date ---
+    for n in all_notes:
+        created_date = datetime.fromisoformat(n["created"]).date()
+
+        if created_date <= target_date:
+            notes_up_to_date.append(n)
+
+        if created_date == target_date:
+            notes_today.append(n)
+
+    ### --- Note counts ---###
+    total_notes = len(notes_up_to_date)
+    notes_today_count = len(notes_today)
+
     notes_this_month = sum(
-        1 for n in all_notes
+        1 for n in notes_up_to_date
         if datetime.fromisoformat(n["created"]).year == target_date.year
-           and datetime.fromisoformat(n["created"]).month == target_date.month
+        and datetime.fromisoformat(n["created"]).month == target_date.month
     )
 
-    # --- Notes today (or target_date) ---
-    notes_today = sum(
-        1 for n in all_notes
-        if datetime.fromisoformat(n["created"]).date() == target_date
-    )
+    ### --- Category distribution & entropy --- ###
+    category_counts = {}
 
-    # --- Word count statistics for notes up to target date ---
+    for category in categories:
+        category_counts[category] = sum(
+            1 for n in notes_up_to_date
+            if "category" in n and n["category"] == category
+        )
+
+    total_categorized = sum(category_counts.values())
+
+    category_entropy = 0.0
+
+    if total_categorized > 0:
+        for count in category_counts.values():
+            if count > 0:
+                p = count / total_categorized
+                category_entropy -= p * math.log(p)
+
+    # Normalize entropy to 0–1 range (optional but recommended)
+    max_entropy = math.log(len(category_counts)) if len(category_counts) > 1 else 1
+    category_entropy_norm = category_entropy / max_entropy
+
+    ### --- Word statistics ---###
     word_counts = [
         len(n["content"].split())
-        for n in all_notes
-        if n["content"] and datetime.fromisoformat(n["created"]).date() <= target_date
+        for n in notes_up_to_date
+        if n["content"]
     ]
-    avg_words = round(sum(word_counts) / len(word_counts), 1) if word_counts else 0
-    longest_note = max(word_counts) if word_counts else 0
-    shortest_note = min(word_counts) if word_counts else 0
 
-    # --- Daily words added on target_date ---
+    avg_words = round(sum(word_counts) / len(word_counts), 1) if word_counts else 0
+    longest_note = max(word_counts, default=0)
+    shortest_note = min(word_counts, default=0)
+
     daily_words = sum(
         len(n["content"].split())
-        for n in all_notes
-        if datetime.fromisoformat(n["created"]).date() == target_date
+        for n in notes_today
+        if n["content"]
     )
 
-    # --- Daily edits ---
+    ### --- Daily edits ---###
     daily_edits = sum(
         1
-        for n in all_notes
-        if "modified" in n and datetime.fromisoformat(n["modified"]).date() == target_date
+        for n in notes_today
+        if "modified" in n
+        and datetime.fromisoformat(n["modified"]).date() == target_date
     )
 
-    # --- Rolling words/notes over the last 7 days ---
+    ### --- Rolling 7-day stats ---###
     rolling_days = 7
+
     rolling_notes = sum(
         1
-        for n in all_notes
+        for n in notes_up_to_date
         if 0 <= (target_date - datetime.fromisoformat(n["created"]).date()).days < rolling_days
-    ) / rolling_days  # average per day
+    ) / rolling_days
 
-    rolling_words = sum(
-        len(n["content"].split())
-        for n in all_notes
+    rolling_notes_in_window = [
+        n for n in notes_up_to_date
         if 0 <= (target_date - datetime.fromisoformat(n["created"]).date()).days < rolling_days
-    ) / rolling_days  # average words/day
+    ]
 
-    # --- Ratio of today's notes / cumulative total ---
-    total_ratio = notes_today / max(1, total_notes)
+    if rolling_notes_in_window:
+        rolling_words = sum(len(n["content"].split()) for n in rolling_notes_in_window if n["content"]) \
+                        / len(rolling_notes_in_window)  # mean words per note
+    else:
+        rolling_words = 0
 
-    # --- Notes per category ---
+    ### --- Derived ratios ---###
+    total_ratio = notes_today_count / max(1, total_notes)
     notes_per_category = total_notes / max(1, len(categories))
-
-    # --- Words per note ---
     words_per_note = sum(word_counts) / max(1, total_notes)
 
-    # --- Words this week (last 7 days) ---
+    ### --- Weekly & cumulative --- ###
     words_this_week = sum(
         len(n["content"].split())
-        for n in all_notes
+        for n in notes_up_to_date
         if 0 <= (target_date - datetime.fromisoformat(n["created"]).date()).days < 7
+        and n["content"]
     )
 
-    # --- Cumulative words wave for chart (sine normalized) ---
-    cumulative_words = sum(
-        len(n["content"].split())
-        for n in all_notes
-        if datetime.fromisoformat(n["created"]).date() <= target_date
-    )
+    cumulative_words = sum(word_counts)
     cumulative_wave = math.sin(cumulative_words / 100.0)
 
     return {
-        # Dashboard stats
+        # Dashboard
         "total": total_notes,
         "monthly": notes_this_month,
         "avg_words": avg_words,
         "longest_note": longest_note,
         "shortest_note": shortest_note,
-        "today": notes_today,
+        "today": notes_today_count,
 
-        # Multi-line chart stats
-        "daily_notes": notes_today,
+        # Chart stats
+        "daily_notes": notes_today_count,
         "daily_words": daily_words,
         "daily_edits": daily_edits,
         "total_ratio": total_ratio,
@@ -119,4 +150,8 @@ def calculate_stats(model):
         "words_per_note": words_per_note,
         "words_this_week": words_this_week,
         "cumulative_wave": cumulative_wave,
+        "category_entropy": round(category_entropy, 4),
+        "category_entropy_norm": round(category_entropy_norm, 4),
+        "contacts": num_contacts,
+        "links": num_links,
     }
