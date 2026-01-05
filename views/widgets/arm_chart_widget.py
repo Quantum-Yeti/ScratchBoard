@@ -25,12 +25,13 @@ segoe = QFont("Segoe UI", 11)
 def apply_tooltip_style(widget):
     widget.setStyleSheet(widget.styleSheet() + """
     QToolTip {
-        background-color: #222;
-        color: #eee;
+        background-color: #E6EEf6;
+        color: #1F2A33;
         border: 1px solid #555;
         padding: 6px;
         border-radius: 4px;
         font-size: 12px;
+        font-weight: bold;
     }
     """)
 
@@ -112,6 +113,18 @@ def dashboard_left_panel(model):
     button_layout.addWidget(pop_btn)
     button_layout.addWidget(db_stats_btn)
     button_layout.addWidget(email_btn)
+
+    # Set mouse cursor shape for buttons
+    def set_btn_cursor(*buttons: QPushButton):
+        for btn in buttons:
+            btn.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    set_btn_cursor(
+        save_btn,
+        pop_btn,
+        db_stats_btn,
+        email_btn
+    )
 
     # Add button layout to main layout
     layout.addLayout(button_layout)
@@ -237,7 +250,6 @@ def create_multi_line_chart(model, days_back=14):
                     )
                 else:
                     QToolTip.hideText()
-
             return show_tooltip
 
         series.hovered.connect(create_tooltip())

@@ -1,7 +1,7 @@
 import sys
 
 from PySide6.QtCore import QSharedMemory
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, Qt
 from PySide6.QtWidgets import (QApplication,
                                QMainWindow,
                                QHBoxLayout,
@@ -181,8 +181,6 @@ def main():
     splash = SplashScreen(resource_path("resources/icons/astronaut_splash.png"))
     run_startup(splash.set_progress)
 
-
-
     # Initialize and display the main application window
     window = MainWindow()
 
@@ -195,6 +193,6 @@ def main():
     # Execute the Qt application loop and terminate the program when the window is closed
     sys.exit(app.exec())
 
-
+# Run the program
 if __name__ == "__main__":
     main()

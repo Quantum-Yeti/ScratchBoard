@@ -2,7 +2,7 @@ from PySide6 import QtCore
 from PySide6.QtCore import QUrl, QSize
 from PySide6.QtGui import QDesktopServices, Qt, QAction, QIcon
 from PySide6.QtWidgets import QListWidgetItem, QVBoxLayout, QListWidget, QHBoxLayout, QLineEdit, QPushButton, QWidget, \
-    QMenu, QMessageBox, QSizePolicy
+    QMenu, QMessageBox, QSizePolicy, QApplication
 
 from ui.themes.menu_theme import menu_style
 from ui.themes.reference_list_style import ref_list_style
@@ -43,13 +43,12 @@ class ReferenceWidget(QWidget):
         self.title_input.setToolTip("Enter a title for your link")
         self.title_input.setPlaceholderText("Title...")
 
-        # Override context menu for title
-        self.custom_context_menu = ContextMenuUtility(self.title_input)
-
         self.url_input = QLineEdit()
         self.url_input.setToolTip("Enter a URL for your link")
         self.url_input.setPlaceholderText("URL (https://...)")
 
+        # Override context menu for title
+        self.custom_context_menu = ContextMenuUtility(self.title_input)
         # Override context menus for url
         self.custom_context_menu = ContextMenuUtility(self.url_input)
 
@@ -110,18 +109,12 @@ class ReferenceWidget(QWidget):
         self.title_input.clear()
         self.url_input.clear()
 
-    def show_context_menu(self, pos):
-        item = self.list_widget.itemAt(pos)
-        if item:
-            menu = QMenu()
-            menu.setStyleSheet(menu_style)
-            delete_action = QAction("Delete", self)
-            delete_action.setToolTip("Delete")
-            delete_action.setIcon(QIcon(resource_path("resources/icons/delete.png")))
-
-            delete_action.triggered.connect(lambda: self.delete_reference(item))
-            menu.addAction(delete_action)
-            menu.exec(self.list_widget.mapToGlobal(pos))
+    @staticmethod
+    def copy_link(item):
+        url = item.data(Qt.ItemDataRole.UserRole)
+        if url:
+            clipboard = QApplication.clipboard()
+            clipboard.setText(url)
 
     def delete_reference(self, item):
         ref_id = item.data(Qt.ItemDataRole.UserRole + 1)  # store the ref_id separately when loading
@@ -139,4 +132,25 @@ class ReferenceWidget(QWidget):
         self.list_widget.blockSignals(True)
         self.load_references()
         self.list_widget.blockSignals(False)
+
+    def show_context_menu(self, pos):
+        item = self.list_widget.itemAt(pos)
+        if item:
+            menu = QMenu()
+            menu.setStyleSheet(menu_style)
+
+            copy_action = QAction("Copy", self)
+            copy_action.setToolTip("Copy this link")
+            copy_action.setIcon(QIcon(resource_path("resources/icons/copy.png")))
+
+            delete_action = QAction("Delete", self)
+            delete_action.setToolTip("Delete this link")
+            delete_action.setIcon(QIcon(resource_path("resources/icons/delete.png")))
+
+            copy_action.triggered.connect(lambda: self.copy_link(item))
+            delete_action.triggered.connect(lambda: self.delete_reference(item))
+
+            menu.addAction(copy_action)
+            menu.addAction(delete_action)
+            menu.exec(self.list_widget.mapToGlobal(pos))
 
