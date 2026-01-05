@@ -628,8 +628,8 @@ class NoteModel:
     def nuke_everything(self):
         try:
             self.conn.close()
-        except Exception:
-            pass
+        except sqlite3.Error as e:
+            print("Warning: failed to close database:", e)
 
         # Remove sb_data directory
         sb_data = Path("sb_data")

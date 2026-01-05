@@ -74,7 +74,7 @@ class NoteController(QObject):
             note_id=note["id"],
             title=note["title"],
             content=note["content"],
-            save_callback=lambda t, c, tags=None: self.save_edit(note["id"], t, c, tags),
+            save_callback=lambda t, c, new_tags=None: self.save_edit(note["id"], t, c, new_tags),
             delete_callback=lambda nid=note["id"]: self.delete_note(nid),
             tags=tags
         )
@@ -102,14 +102,14 @@ class NoteController(QObject):
         Open an empty editor dialog to create a new note.
         Prevents saving an empty note.
         """
-        def save_cb(title, content, tags=None):
+        def save_cb(title, content, new_tags=None):
             # Validation to avoid saving blank notes
             if not title.strip() and not content.strip():
                 QMessageBox.warning(self.view, "Empty Note", "Cannot save an empty note")
                 return
 
             # If no category selected, go to default view
-            self.model.add_note(self.current_category or "Notes", title, content, tags=tags)
+            self.model.add_note(self.current_category or "Notes", title, content, tags=new_tags)
             self._notify_change()  # triggers refresh and dashboard update
 
         EditorPanel(self.view, None, "New Note", "", save_cb).exec()
