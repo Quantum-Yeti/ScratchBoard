@@ -2,6 +2,8 @@ import json
 
 from PySide6.QtCore import QTimer, Signal, QObject
 from PySide6.QtWidgets import QMessageBox
+
+from managers.editor_manager import EditorManager
 from views.editor.editor_view import EditorPanel
 
 class NoteController(QObject):
@@ -115,6 +117,18 @@ class NoteController(QObject):
     def save_edit(self, note_id, title, content, tags=None):
         """Save modification to an existing note."""
         self.model.edit_note(note_id, title=title, content=content, tags=tags)
+
+        # Clean up orphaned images
+        all_notes_html = [
+            note["content"]
+            for note in self.model.get_notes(
+                category_name=None,
+                search="",
+                order_by="updated DESC"
+            )
+        ]
+        EditorManager.cleanup_orphaned_images(all_notes_html)
+
         self._notify_change()
 
     def delete_note(self, note_id):
@@ -129,6 +143,18 @@ class NoteController(QObject):
             return # Ensures no operation if record is already gone
 
         self.model.delete_note(note_id)
+
+        # Cleanup orphaned images
+        all_notes_html = [
+            note["content"]
+            for note in self.model.get_notes(
+                category_name=None,
+                search="",
+                order_by="updated DESC"
+            )
+        ]
+        EditorManager.cleanup_orphaned_images(all_notes_html)
+
         self._notify_change()
 
     def refresh_notes(self):

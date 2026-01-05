@@ -65,8 +65,41 @@ class EditorManager:
         shutil.copy(path, dst)
 
         # Insert the image as HTML
-        cursor.insertHtml(f'<img src="{dst.as_posix()}" style="max-width:250px; height:auto;">')
+        cursor.insertHtml(f'<img src="{dst.as_posix()}" style="max-width:350px; height:auto;">')
         return True
+
+    @staticmethod
+    def _extract_image_paths(html: str) -> set[Path]:
+        """
+        Extract all image src paths from HTML.
+        """
+        matches = re.findall(r'<img\s+[^>]*src="([^"]+)"', html)
+        return {Path(m).resolve() for m in matches}
+
+    @classmethod
+    def cleanup_orphaned_images(cls, all_notes_html: list[str]):
+        """
+        Deletes images in IMAGE_DIR that are no longer referenced by any note.
+        """
+        if not cls.IMAGE_DIR.exists():
+            return
+
+        # Collect all image paths still in use
+        used_images: set[Path] = set()
+
+        for html in all_notes_html:
+            used_images |= cls._extract_image_paths(html)
+
+        # Normalize paths
+        used_images = {p.resolve() for p in used_images}
+
+        # Delete unreferenced files
+        for img in cls.IMAGE_DIR.iterdir():
+            if img.is_file() and img.resolve() not in used_images:
+                try:
+                    img.unlink()
+                except Exception as e:
+                    print(f"[Image cleanup] Failed to delete {img}: {e}")
 
     @staticmethod
     def count_words_and_chars(source) -> tuple[int, int]:
@@ -194,3 +227,5 @@ class EditorManager:
             cursor.mergeCharFormat(fmt)
         else:
             cursor.insertText(url, fmt)
+
+
