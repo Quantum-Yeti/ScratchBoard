@@ -1,5 +1,5 @@
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QSizePolicy
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QSizePolicy, QApplication
 from PySide6.QtCore import Qt, QSize
 from views.sticky_notes.sticky_view import ScratchNote
 from utils.resource_path import resource_path
@@ -39,6 +39,8 @@ class StickyManager(QWidget):
         # Load existing notes on startup
         self.load_existing_notes()
 
+        self._window_stick_to_side()
+
     def _initialize_buttons(self):
         """Set up the action buttons."""
         self.new_btn = self._create_button("Add Sticky Note", "resources/icons/sticky_note_btn.png", self.new_note)
@@ -58,6 +60,17 @@ class StickyManager(QWidget):
         button.setMaximumWidth(200)
         button.setMaximumHeight(60)
         return button
+
+    def _window_stick_to_side(self):
+        screen_geometry = QApplication.primaryScreen().availableGeometry()
+        screen_width = screen_geometry.width()
+        screen_height = screen_geometry.height()
+        window_width = self.width()
+        window_height = self.height()
+
+        x = screen_width - window_width - 10
+        y = 50
+        self.move(x, y)
 
     def load_existing_notes(self):
         """Load all sticky notes from the DB and open them automatically."""

@@ -5,6 +5,9 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QF
 from PySide6.QtCore import Signal, QSize, Qt, QUrl
 import subprocess
 
+from qdarkstyle import example
+
+from helpers.ui_helpers.logo_btn_url_action import LogoButton
 from helpers.ui_helpers.open_company_url import open_company_homepage
 from utils.resource_path import resource_path
 from managers.sticky_manager import StickyManager
@@ -146,8 +149,11 @@ class Sidebar(QWidget):
         # Get logged-in user
         username = getpass.getuser()
 
-        logo_btn = QPushButton(f"{username}")
-        logo_btn.setToolTip(f"Welcome, {username}: Open the company homepage in your default browser")
+        logo_btn = LogoButton(
+            f"{username}",
+            settings_key="user_logo_url",
+            default_url="https://google.com"
+        )
         logo_btn.setIcon(QIcon(resource_path("resources/icons/agent_yellow.png")))
         logo_btn.setIconSize(QSize(32, 32))
         logo_btn.setFlat(True)
