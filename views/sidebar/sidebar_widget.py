@@ -146,9 +146,10 @@ class Sidebar(QWidget):
         bat_btn.clicked.connect(self.open_bat_file)
         #layout.addWidget(bat_btn)
 
-        # Get logged-in user
+        # Get logged-in user for logo_btn
         username = getpass.getuser()
 
+        # Create the logo_btn
         logo_btn = LogoButton(
             f"{username}",
             settings_key="user_logo_url",

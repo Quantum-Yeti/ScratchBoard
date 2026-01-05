@@ -1,19 +1,15 @@
 # Get company website
 import webbrowser
 
-from utils.resource_path import resource_path
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices
 
+def open_company_homepage(url: str | None) -> None:
+    """
+    Open the company homepage URL in the default browser.
 
-def get_company_homepage():
-        try:
-            with open(resource_path("resources/user_site.txt"), "r") as f:
-                url = f.read().strip()
-                return url
-        except Exception as e:
-            print("Failed to load website.")
-            return None
-
-def open_company_homepage():
-    url = get_company_homepage()
+    Args:
+        url (str | None): The URL to open. Does nothing if None or empty.
+    """
     if url:
-        webbrowser.open(url, new=1)
+        QDesktopServices.openUrl(QUrl(url))
