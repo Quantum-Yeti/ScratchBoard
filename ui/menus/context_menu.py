@@ -10,7 +10,7 @@ class ModifyContextMenu(QTextEdit):
         # Apply a stylesheet to the menu
         menu.setStyleSheet(menu_style)
 
-        for action in menu.actions():
+        for action in list(menu.actions()):
             if not action.isEnabled():
                 menu.removeAction(action)
             else:

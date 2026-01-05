@@ -11,6 +11,7 @@ from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, \
 
 from helpers.ui_helpers.chart_pastel_list import PASTEL_CHART_COLORS
 from domain.analytics.dashboard_stats import calculate_stats
+from ui.menus.context_menu import ModifyContextMenu
 from ui.themes.dash_action_btn_style import dash_action_button_style
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.custom_q_edit import CustomQEdit
@@ -25,8 +26,8 @@ segoe = QFont("Segoe UI", 11)
 def apply_tooltip_style(widget):
     widget.setStyleSheet(widget.styleSheet() + """
     QToolTip {
-        background-color: #E6EEf6;
-        color: #1F2A33;
+        background-color: #222;
+        color: #eee;
         border: 1px solid #555;
         padding: 6px;
         border-radius: 4px;
@@ -34,6 +35,12 @@ def apply_tooltip_style(widget):
         font-weight: bold;
     }
     """)
+
+# Subclass CustomQEdit just to override the context menu
+class ArmTextEdit(CustomQEdit, ModifyContextMenu):
+    def contextMenuEvent(self, event):
+        ModifyContextMenu.contextMenuEvent(self, event)
+
 
 ### --- Stacked bar chart --- ###
 def dashboard_left_panel(model):
@@ -59,7 +66,7 @@ def dashboard_left_panel(model):
     layout.setSpacing(8)
     layout.setContentsMargins(0, 0, 0, 0)
 
-    arm_text = CustomQEdit()
+    arm_text = ArmTextEdit()
     arm_text.verticalScrollBar().setStyleSheet(vertical_scrollbar_style)
     arm_text.setPlaceholderText("Type your ARM statement (or a quick note) here then click save; it auto-loads after saving.")
     arm_text.setStyleSheet(f"""
