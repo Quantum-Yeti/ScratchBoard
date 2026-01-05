@@ -39,6 +39,8 @@ class NoteCard(QFrame):
             on_double_click (callable): Callback function invoked when the card is double-clicked.
         """
         super().__init__()
+        #self.compact_mode = False
+
         self.note = note
         self.on_double_click = on_double_click
         self.setObjectName("NoteCard")
@@ -209,4 +211,20 @@ class NoteCard(QFrame):
                     return True
 
         return super().eventFilter(obj, event)
+
+    def set_compact_mode(self, compact: bool):
+        """Hide content if compact, show content if not."""
+        if self.compact_mode == compact:
+            return  # no change
+        self.compact_mode = compact
+        self.content_view.setVisible(not compact)
+
+    #def resizeEvent(self, event):
+        #super().resizeEvent(event)
+        # Threshold in pixels (adjust as needed)
+        #if self.height() < 150:
+            #self.set_compact_mode(True)
+        #else:
+            #self.set_compact_mode(False)
+
 

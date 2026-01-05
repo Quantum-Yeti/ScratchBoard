@@ -159,15 +159,17 @@ class AsteroidsWidget(QWidget):
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Space:
             if not self.game_running:
-                # Start or restart the game
+                # Start the game if not running
                 self.start_game()
             else:
                 # Shoot bullet if game is running
                 self.bullets.append(self.ship.shoot())
         elif e.key() == Qt.Key_Escape:
+            # Pause/unpause toggle
             if self.game_running:
-                # Stop the game
                 self.stop_game()
+            else:
+                self.start_game()
         else:
             self.keys.add(e.key())
 
@@ -254,6 +256,17 @@ class AsteroidsWidget(QWidget):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
         p.setRenderHint(QPainter.SmoothPixmapTransform)
+
+        if not self.game_running:
+            p.setPen(Qt.white)
+            font = p.font()
+            font.setPointSize(36)
+            font.setBold(True)
+            p.setFont(font)
+            text = "Press SPACE to Begin/Continue\nESC to Pause"
+            rect = self.rect()
+            p.drawText(rect, Qt.AlignmentFlag.AlignCenter, text)
+            return
 
         # Ship
         p.save()
