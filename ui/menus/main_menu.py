@@ -413,6 +413,7 @@ class MainMenuBar(QMenuBar):
         # Wire the help menu
         self.shortcut_action.triggered.connect(self._open_shortcuts)
         self.repo_action.triggered.connect(self._open_repo)
+
         self.about_action.triggered.connect(lambda: AboutWidget().exec())
 
         # Hidden Easter egg games
