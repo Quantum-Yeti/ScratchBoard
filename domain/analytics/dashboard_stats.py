@@ -1,10 +1,10 @@
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def calculate_stats(model):
     """
-    Returns a dict of dashboard statistics calculated relative to a target date.
+    Returns a dict of statistics for the multi-line chart calculated relative to a target date.
     Respects `override_date_for_stats` for charting over time.
     """
 
@@ -12,8 +12,8 @@ def calculate_stats(model):
     target_date = getattr(model, "override_date_for_stats", None) or datetime.now().date()
 
     ### --- Contacts / References ---###
-    num_contacts = model.get_contacts_up_to(target_date) # number of contacts
-    num_links = model.get_references_up_to(target_date) # number of custom links
+    num_contacts = model.get_contacts_up_to(target_date)  # number of contacts
+    num_links = model.get_references_up_to(target_date)  # number of custom links
 
     ### --- Collect notes ---###
     categories = model.get_all_categories()
@@ -26,6 +26,7 @@ def calculate_stats(model):
     ### --- Pre-filtered note views ---###
     notes_up_to_date = []
     notes_today = []
+    notes_yesterday = []
 
     for n in all_notes:
         created_date = datetime.fromisoformat(n["created"]).date()
@@ -36,15 +37,27 @@ def calculate_stats(model):
         if created_date == target_date:
             notes_today.append(n)
 
+        elif created_date == target_date - timedelta(days=1):
+            notes_yesterday.append(n)
+
     ### --- Note counts ---###
     total_notes = len(notes_up_to_date)
     notes_today_count = len(notes_today)
+    notes_yesterday_count = len(notes_yesterday)
 
     notes_this_month = sum(
         1 for n in notes_up_to_date
         if datetime.fromisoformat(n["created"]).year == target_date.year
         and datetime.fromisoformat(n["created"]).month == target_date.month
     )
+
+    if notes_yesterday_count > 0:
+        daily_notes_growth = (notes_today_count - notes_yesterday_count) / notes_yesterday_count * 100
+    else:
+        daily_notes_growth = 0  # If there were no notes yesterday, set growth to 0
+
+    # Ensure that `daily_notes_growth` is not negative
+    daily_notes_growth = max(0, daily_notes_growth)
 
     ### --- Category distribution & entropy --- ###
     category_counts = {}
@@ -114,6 +127,10 @@ def calculate_stats(model):
     else:
         rolling_words = 0
 
+    # Ensure `rolling_notes` and `rolling_words` are not negative
+    rolling_notes = max(0, rolling_notes)
+    rolling_words = max(0, rolling_words)
+
     ### --- Derived ratios ---###
     total_ratio = notes_today_count / max(1, total_notes)
     notes_per_category = total_notes / max(1, len(categories))
@@ -130,6 +147,7 @@ def calculate_stats(model):
     cumulative_words = sum(word_counts)
     cumulative_wave = math.sin(cumulative_words / 100.0)
 
+    # Return stats with safeguards to ensure no negative values
     return {
         # Dashboard
         "total": total_notes,
@@ -141,6 +159,7 @@ def calculate_stats(model):
 
         # Chart stats
         "daily_notes": notes_today_count,
+        "daily_notes_growth": round(daily_notes_growth, 2),
         "daily_words": daily_words,
         "daily_edits": daily_edits,
         "total_ratio": total_ratio,

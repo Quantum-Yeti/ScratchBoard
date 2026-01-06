@@ -9,11 +9,11 @@ class StatCard(QWidget):
     def __init__(self, title, value="0"):
         super().__init__()
         self._value = 0
-        self._display_value = QLabel(value, alignment=Qt.AlignCenter)
+        self._display_value = QLabel(value, alignment=Qt.AlignmentFlag.AlignCenter)
         layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignCenter)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        title_label = QLabel(title, alignment=Qt.AlignCenter)
+        title_label = QLabel(title, alignment=Qt.AlignmentFlag.AlignCenter)
         title_label.setStyleSheet("font-size: 13px; font-weight: bold; color: #fff;")
         self._display_value.setStyleSheet("font-size: 22px; font-weight: bold; color: #4c8caf;")
 
