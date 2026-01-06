@@ -2,113 +2,113 @@ docsis_signals = [
     {
         "name": "Downstream Power (dBmV)",
         "range": "-8 to +10",
-        "symptoms": "Too low: intermittent downstream lock\nToo high: distortion, retrains",
-        "explanation": "Represents the power at the modem for downstream channels. Out-of-range values indicate coax, splitter, or amplifier issues.",
-        "steps": "Check coax connections, splitters, inspect taps or amplifiers."
+        "symptoms": "Too low: intermittent downstream lock, instability\nToo high: signal distortion, retrains, poor quality",
+        "explanation": "Represents the power level of the downstream channels at the modem. Power levels outside the optimal range can indicate issues with coaxial cables, splitters, or amplifiers.",
+        "steps": "Check the coaxial connections, ensure splitters are functioning properly, and inspect taps or amplifiers for faults."
     },
     {
         "name": "Downstream SNR (dB)",
-        "range": ">= 35",
-        "symptoms": "Low SNR leads to sync loss or packet errors",
-        "explanation": "Signal-to-noise ratio measures quality of downstream signal. Low SNR usually indicates noise on the line or weak signal.",
-        "steps": "Check connectors, avoid long coax runs, replace damaged cables, check network noise sources."
+        "range": ">= 35 dB",
+        "symptoms": "Low SNR leads to sync loss, frequent packet errors, or poor throughput",
+        "explanation": "The Signal-to-Noise Ratio (SNR) represents the quality of the downstream signal. Low SNR indicates either weak signal strength or noise interference on the line.",
+        "steps": "Inspect the cable connectors, avoid long coaxial runs, replace any damaged cables, and check for noise sources in the network."
     },
     {
         "name": "Upstream Power (dBmV)",
-        "range": "+35 to +50",
-        "symptoms": "Too low: cannot reach CMTS\nToo high: line faults or amplifier issues",
-        "explanation": "Power transmitted from modem to CMTS. Out-of-range values affect connectivity.",
-        "steps": "Inspect splitter, check line condition, adjust amplifier if available."
+        "range": "+35 to +50 dBmV",
+        "symptoms": "Too low: the modem cannot reach the CMTS (Cable Modem Termination System)\nToo high: potential line faults or amplifier overdrive",
+        "explanation": "Represents the power level of the signal transmitted from the modem to the CMTS. Out-of-range values can cause connectivity issues or signal quality problems.",
+        "steps": "Inspect the coaxial cable, check for damaged splitters, and verify the functionality of amplifiers or line splitters."
     },
     {
         "name": "Upstream SNR (dB)",
         "range": ">= 30 dB",
-        "symptoms": "Low upstream SNR causes ranging failures and T3/T4 timeouts",
-        "explanation": "Indicates how clean the upstream signal appears to the CMTS.",
-        "steps": "Check for loose connectors, damaged coax, ingress noise sources, and splitters."
+        "symptoms": "Low upstream SNR causes T3/T4 timeouts, ranging failures, and poor upload performance",
+        "explanation": "The upstream SNR shows the quality of the upstream signal received by the CMTS. Low values can indicate interference or weak signal transmission from the modem.",
+        "steps": "Check for loose connectors, damaged cables, or sources of interference such as poor-quality splitters or amplifiers."
     },
     {
         "name": "CMTS Receive Power (dBmV)",
-        "range": "-2 to +2 (ideal)",
-        "symptoms": "Too low: modem signal not reaching CMTS\nToo high: distortion at CMTS",
-        "explanation": "The power level the CMTS receives from the modem.",
-        "steps": "Inspect coax, splitters, excessive attenuation, or upstream amplifiers."
+        "range": "-2 to +2 dBmV (ideal)",
+        "symptoms": "Too low: modem signal not properly reaching CMTS\nToo high: potential distortion at the CMTS, signal degradation",
+        "explanation": "Represents the power level the CMTS receives from the modem. Inadequate or excessive power can lead to communication issues.",
+        "steps": "Inspect coaxial cables, check for excessive signal attenuation, and adjust upstream amplifiers if applicable."
     },
     {
         "name": "CMTS SNR (dB)",
         "range": ">= 30 dB",
-        "symptoms": "Low CMTS SNR causes intermittent upstream loss and high errors",
-        "explanation": "Shows how clean the modem’s upstream signal is when received at the CMTS.",
-        "steps": "Check for ingress, damaged coax, loose connectors, upstream noise sources."
+        "symptoms": "Low CMTS SNR results in intermittent upstream loss, high packet errors, and connectivity problems",
+        "explanation": "This represents how clean the upstream signal is when received at the CMTS. Low values typically point to network interference or weak signal quality.",
+        "steps": "Inspect for ingress (external signal interference), damaged coax, and poor-quality connectors."
     },
     {
         "name": "Network Utilization",
         "range": "< 80% recommended",
-        "symptoms": "High utilization causes congestion, latency, slow speeds",
-        "explanation": "Represents load on upstream/downstream channels.",
-        "steps": "Check upstream noise, ISP congestion, or provisioning problems."
+        "symptoms": "High utilization can lead to congestion, increased latency, and decreased throughput",
+        "explanation": "Network utilization represents the load on the upstream and downstream channels. Utilization above 80% may cause performance degradation.",
+        "steps": "Check for upstream network congestion, investigate potential ISP throttling, or look for provisioning issues that may be affecting bandwidth."
     },
     {
         "name": "Correctable Codewords (Downstream)",
         "range": "Low to moderate",
-        "symptoms": "High numbers indicate noisy channel",
-        "explanation": "Errors corrected by FEC. Lots of correctables indicate noise.",
-        "steps": "Inspect coax and connectors, reduce interference, check splitters, monitor trends."
+        "symptoms": "High values suggest noisy channels or signal instability",
+        "explanation": "Correctable codewords indicate errors that have been fixed by Forward Error Correction (FEC). A high number of correctables suggests interference or poor signal quality.",
+        "steps": "Inspect coaxial cables and connectors, reduce interference sources, check splitters for functionality, and monitor trends over time."
     },
     {
         "name": "Uncorrectable Codewords (Downstream)",
-        "range": "Very low",
-        "symptoms": "High numbers cause packet loss and service degradation",
-        "explanation": "Errors that FEC cannot fix. Indicates severe noise or signal impairment.",
-        "steps": "Replace damaged cables and check connectors."
+        "range": "Very low, ideally zero",
+        "symptoms": "High numbers result in packet loss, service degradation, and unreliable connectivity",
+        "explanation": "Uncorrectable codewords represent errors that cannot be fixed by FEC. A high number of uncorrectables indicates severe signal impairment or noise on the line.",
+        "steps": "Replace damaged cables, inspect connectors, and reduce any noise or interference sources in the network."
     },
     {
         "name": "Upstream Correctable Codewords",
-        "range": "Low",
-        "symptoms": "Rising numbers indicate upstream noise or ingress",
-        "explanation": "Correctable errors on the modem’s upstream transmissions.",
-        "steps": "Check coax, tighten connectors, eliminate noise sources."
+        "range": "Low to moderate",
+        "symptoms": "Increasing numbers point to upstream noise or interference",
+        "explanation": "Indicates correctable errors on the upstream signal transmitted by the modem. A rising count suggests poor signal quality or interference.",
+        "steps": "Tighten connectors, check the upstream cable for damage, and eliminate potential ingress or noise sources."
     },
     {
         "name": "Upstream Uncorrectable Codewords",
         "range": "Near zero",
-        "symptoms": "High values cause upstream packet loss and T3/T4 timeouts",
-        "explanation": "Uncorrectable upstream errors indicate serious ingress or return path issues.",
-        "steps": "Inspect upstream path, replace faulty connectors, remove noise sources."
+        "symptoms": "High values indicate upstream packet loss, T3/T4 timeouts, and severe connection issues",
+        "explanation": "Uncorrectable upstream errors indicate critical issues with the upstream signal, often caused by ingress or return path problems.",
+        "steps": "Inspect the upstream path, replace faulty connectors, and remove noise sources in the upstream signal chain."
     },
     {
         "name": "T3 Timeout",
         "range": "N/A",
-        "symptoms": "Upstream lost intermittently",
-        "explanation": "Modem is not hearing CMTS for upstream. Usually noise or line problem.",
-        "steps": "Check coax, splitters, noise sources, or plant issues."
+        "symptoms": "Intermittent loss of upstream communication",
+        "explanation": "A T3 timeout occurs when the modem fails to receive a response from the CMTS in a timely manner. Often due to network noise or physical issues with the coaxial line.",
+        "steps": "Check coaxial cables, splitters, and any potential sources of noise. Look for issues within the cable plant or line network."
     },
     {
         "name": "T4 Timeout",
         "range": "N/A",
-        "symptoms": "Modem loses upstream completely",
-        "explanation": "Modem fails to range upstream. Often service outage or severe noise.",
-        "steps": "Check upstream connectivity, inspect coax, requires a Technician."
+        "symptoms": "Complete loss of upstream communication",
+        "explanation": "A T4 timeout occurs when the modem fails to synchronize with the upstream channel. Often a sign of a severe service outage or excessive noise.",
+        "steps": "Inspect upstream connectivity, check coaxial cables, and consider a technician visit for further diagnostics."
     },
     {
         "name": "DHCP / IP Issues",
-        "range": "Modem obtains IP",
-        "symptoms": "Modem cannot get IP, no internet",
-        "explanation": "Indicates provisioning or upstream communication problem.",
-        "steps": "Restart modem, check cabling, verify CMTS reachable."
+        "range": "Modem obtains IP address",
+        "symptoms": "Modem cannot acquire an IP address from the DHCP server, resulting in no internet access",
+        "explanation": "Indicates a provisioning issue, or that the modem cannot communicate with the CMTS to obtain a valid IP address.",
+        "steps": "Restart the modem, check the coaxial cable, verify that the CMTS is reachable, and ensure no issues with the ISP's DHCP server."
     },
     {
         "name": "MER (Modulation Error Ratio)",
         "range": "≥ 35 dB (DOCSIS 3.0), ≥ 30 dB (DOCSIS 3.1)",
-        "symptoms": "Low → errors, poor signal quality",
-        "explanation": "Measures modulation quality on downstream channels.",
-        "steps": "Check cabling, connectors, and interference sources."
+        "symptoms": "Low MER leads to errors, poor signal quality, and frequent retrains",
+        "explanation": "MER measures the quality of modulation on the downstream channels. A low MER value indicates issues with the signal integrity, leading to possible retransmissions and packet loss.",
+        "steps": "Check cabling, connectors, and sources of interference (e.g., electrical devices or other cables nearby)."
     },
     {
         "name": "Channel Bonding / Frequency",
         "range": "Varies by ISP",
-        "symptoms": "Channels drop or fail to bond",
-        "explanation": "Shows channel tuning and frequency stability.",
-        "steps": "Inspect coax, splitters, or contact ISP for channel issues."
+        "symptoms": "Channels drop, fail to bond, or experience poor synchronization",
+        "explanation": "This refers to the stability and bonding of multiple channels on both upstream and downstream. Bonding issues can affect overall speed and signal integrity.",
+        "steps": "Inspect coaxial cables, check splitters for proper function, and consult with the ISP for any known channel issues or outages."
     },
 ]
