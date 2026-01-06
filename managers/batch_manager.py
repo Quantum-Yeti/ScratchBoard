@@ -3,13 +3,18 @@ import subprocess
 import psutil
 
 PROTECTED_PROCESSES = {
-    "explorer.exe",
-    "wininit.exe",
-    "winlogon.exe",
-    "csrss.exe",
-    "services.exe",
-    "lsass.exe",
-    "system"
+    "explorer.exe",    # Windows shell
+    "wininit.exe",     # Windows initialization
+    "winlogon.exe",    # Handles logins
+    "csrss.exe",       # Client/server runtime
+    "services.exe",    # Service Control Manager
+    "lsass.exe",       # Local Security Authority
+    "system",          # Kernel/system process
+    "smss.exe",        # Session manager
+    "dwm.exe",         # Desktop Window Manager
+    "taskhostw.exe",   # Task host
+    "svchost.exe",     # Host process for services
+    "spoolsv.exe"      # Print spooler (if you want to protect printing)
 }
 
 class BatchManager:
