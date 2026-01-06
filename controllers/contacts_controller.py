@@ -1,3 +1,5 @@
+import re
+
 from PySide6.QtCore import QObject, QTimer
 from PySide6.QtWidgets import QMessageBox
 from managers.contacts_manager import ContactsManagerPanel  # Create similar to EditorPanel for contacts
@@ -79,12 +81,19 @@ class ContactsController(QObject):
         Validates that a name and email were entered before saving.
         """
         def save_cb(name, phone, email, website):
-            # Prevents empty name and email
+            # Prevents empty name
             if not name.strip():
-                QMessageBox.warning(self.view, "Empty Contact", "Name cannot be empty")
+                QMessageBox.warning(self.view, "Empty Contact", "Contact name cannot be empty")
                 return
+
+            # Prevents empty phone number
             if not phone.strip():
-                QMessageBox.warning(self.view, "Empty Contact", "Email cannot be empty")
+                QMessageBox.warning(self.view, "Empty Phone Number", "Phone number cannot be empty")
+                return
+
+            # Validate phone number format
+            if not self.is_valid_phone(phone):
+                QMessageBox.warning(self.view, "Invalid Phone Number", "Please enter a valid phone number")
                 return
 
             # Default to the main contacts category for all contacts if no category selected
@@ -97,8 +106,6 @@ class ContactsController(QObject):
     def save_edit(self, contact_id, name, phone, email, website):
         """
         Save a modification to an existing contact.
-
-        :param contact_id: Unique contact ID.
         """
         self.model.edit_contact(contact_id, name, phone, email, website)
         self._notify_change()
@@ -113,12 +120,12 @@ class ContactsController(QObject):
             self.view,
             "Delete Contact",
             "Are you sure you want to delete this contact?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
         )
 
         # Only delete on confirmation
-        if warning == QMessageBox.Yes:
+        if warning == QMessageBox.StandardButton.Yes:
             self.model.delete_contact(contact_id)
             self._notify_change()
 
@@ -128,3 +135,18 @@ class ContactsController(QObject):
         """
         contacts = self.model.get_contacts(category_name=self.current_category)
         self.view.populate_contacts(contacts, self.on_contact_click)
+
+    @staticmethod
+    def is_valid_phone(phone):
+        """
+        Validate phone number format using a regular expression.
+
+        Args:
+            phone (str): The phone number to validate.
+
+        Returns:
+            bool: True if the phone number matches the valid pattern, else False.
+        """
+        # Example regex for phone numbers (basic validation, can be extended)
+        phone_pattern = r"^\+?(\d{1,3})?[-.\s]?(\(?\d{1,4}\)?[-.\s]?)?(\d{1,4})[-.\s]?\d{1,4}[-.\s]?\d{1,9}$"
+        return bool(re.match(phone_pattern, phone))
