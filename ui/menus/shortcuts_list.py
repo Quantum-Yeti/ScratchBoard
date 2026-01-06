@@ -84,7 +84,7 @@ shortcut_list = [
                 "action": "Bandwidth Requirements Chart"
             },
             {
-                "shortcut": "Alt+R",
+                "shortcut": "Ctrl+Y",
                 "action": "Internet Protocol Chart"
             },
             {
@@ -96,7 +96,7 @@ shortcut_list = [
                 "action": "Gaming Info Chart"
             },
             {
-                "shortcut": "Alt+D",
+                "shortcut": "Ctrl+I",
                 "action": "Storage Info Chart"
             }
         ]
@@ -107,7 +107,7 @@ shortcut_list = [
         [
             {
                 "shortcut": "F11",
-                "action": "Open Scratch Pad (sticky notes)"
+                "action": "Open sticky notes"
             },
             {
                 "shortcut": "F12",

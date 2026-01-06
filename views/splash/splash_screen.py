@@ -87,7 +87,7 @@ class SplashScreen(QWidget):
         self.description_label = QLabel(self)
         self.description_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.description_label.setText("A lightweight desktop productivity app")
-        self.description_label.setStyleSheet("font-size: 16px; color: #fff; font-weight: bold; font-style: italic; margin-top: 4px;")
+        self.description_label.setStyleSheet("font-size: 16px; color: #fff; font-weight: bold; font-style: italic; margin-top: 16px;")
         self.layout.addWidget(self.description_label)
 
     def _setup_progress_bar(self):

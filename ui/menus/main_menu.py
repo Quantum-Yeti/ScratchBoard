@@ -5,6 +5,7 @@ import webbrowser
 from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap, QShortcut, QKeySequence
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
+from managers.batch_manager import BatchManager
 from services.sync_service import sync_db
 from models.note_model import NoteModel
 from ui.themes.menu_theme import menu_style
@@ -19,6 +20,7 @@ from views.info_widgets.ethernet_widget import EthernetReference
 from views.info_widgets.speed_widget import InternetSpeedRequirements
 from views.info_widgets.storage_widget import DiskStorageChart
 from views.info_widgets.voip_widget import VoIPReference
+from views.widgets.batch_pop_widget import BatchPopup
 from views.widgets.calc_widget import SimpleCalcView
 from views.widgets.log_widget import ModemLogParserView
 from views.notepad.notepad_view import NotepadDialog
@@ -88,10 +90,13 @@ class MainMenuBar(QMenuBar):
         self.scratch_action = None
         self.notepad_action = None
         self.bat_action = None
+        self.batch_man_action = None
+        self._batch_manager = None
         self.modem_action = None
         self.pwd_action = None
         self.calc_action = None
         self.mac_action = None
+        self._mac_popup = None
         self.ref_pop_action = None
 
         # Views Menu
@@ -149,7 +154,7 @@ class MainMenuBar(QMenuBar):
 
         self.sync_action = QAction("Sync Notes", self)
         self.sync_action.setShortcut("Alt+S")
-        self.sync_action.setIcon(QIcon(resource_path("resources/icons/sync.png")))
+        self.sync_action.setIcon(QIcon(resource_path("resources/icons/sync_white.png")))
         file_menu.addAction(self.sync_action)
 
         file_menu.addSeparator()
@@ -258,12 +263,12 @@ class MainMenuBar(QMenuBar):
 
         self.protocol_action = QAction("Protocol Chart", self)
         self.protocol_action.setIcon(QIcon(resource_path("resources/icons/server.png")))
-        self.protocol_action.setShortcut("Alt+R")
+        self.protocol_action.setShortcut("Ctrl+Y")
         charts_menu.addAction(self.protocol_action)
 
         self.storage_action = QAction("Storage Info Chart", self)
         self.storage_action.setIcon(QIcon(resource_path("resources/icons/storage_white.png")))
-        self.storage_action.setShortcut("Alt+D")
+        self.storage_action.setShortcut("Ctrl+I")
         charts_menu.addAction(self.storage_action)
 
         self.voip_action = QAction("VoIP Info Chart", self)
@@ -283,7 +288,7 @@ class MainMenuBar(QMenuBar):
         tools_menu = AdjustMenu("Tools", 240, self)
         self.addMenu(tools_menu)
 
-        self.scratch_action = QAction("Scratch Pad", self)
+        self.scratch_action = QAction("Sticky Notes", self)
         self.scratch_action.setIcon(QIcon(resource_path("resources/icons/stickynote.png")))
         self.scratch_action.setShortcut("F11")
         tools_menu.addAction(self.scratch_action)
@@ -297,6 +302,11 @@ class MainMenuBar(QMenuBar):
         self.bat_action.setIcon(QIcon(resource_path("resources/icons/run.png")))
         self.bat_action.setShortcut("Alt+B")
         tools_menu.addAction(self.bat_action)
+
+        self.batch_man_action = QAction("Batch Manager", self)
+        self.batch_man_action.setIcon(QIcon(resource_path("resources/icons/execute_purple.png")))
+        self.batch_man_action.setShortcut("")
+        tools_menu.addAction(self.batch_man_action)
 
         self.calc_action = QAction("Calculator", self)
         self.calc_action.setIcon(QIcon(resource_path("resources/icons/calculator.png")))
@@ -404,6 +414,7 @@ class MainMenuBar(QMenuBar):
         self.scratch_action.triggered.connect(self.sidebar.open_scratch_pad)  # open the scratch notes
         self.notepad_action.triggered.connect(self._open_notepad)
         self.bat_action.triggered.connect(self.sidebar.open_bat_file)  # run a batch file
+        self.batch_man_action.triggered.connect(self.open_batch_manager)
         self.modem_action.triggered.connect(self._open_modem_parser)
         self.pwd_action.triggered.connect(self._open_pw_gen)
         self.calc_action.triggered.connect(self._open_calc)
@@ -485,8 +496,10 @@ class MainMenuBar(QMenuBar):
         calc.exec()
 
     def _open_mac(self):
-        mac = MacVendorPopup(self.parent())
-        mac.show()
+        if not hasattr(self, '_mac_popup') or self._mac_popup is None:
+            self._mac_popup = MacVendorPopup(self.parent())
+        self._mac_popup.show()
+        self._mac_popup.raise_()
 
     def _open_ref(self):
         self.reference_popup = ReferencePopup(self.note_model, self)
@@ -501,6 +514,13 @@ class MainMenuBar(QMenuBar):
     def run_update(self):
         """Run the batch file to update the application."""
         run_update_batch_file(self)
+
+    def open_batch_manager(self):
+        # Use self. to keep a reference
+        if not hasattr(self, '_batch_manager') or self._batch_manager is None:
+            self._batch_manager = BatchPopup(self.parent())
+        self._batch_manager.show()
+        self._batch_manager.raise_()
 
     def _export_notes(self):
         if not self.note_model:
@@ -543,18 +563,21 @@ class MainMenuBar(QMenuBar):
 
         # Loads a skull icon
         skull_icon = QPixmap(resource_path("resources/icons/skull.png"))
-        skull_icon = skull_icon.scaled(72, 72)
+        skull_icon = skull_icon.scaled(78, 78)
 
         # Danger Popup with icon
         confirm = QMessageBox(self)
         confirm.setWindowTitle("Scratch Board: Delete Database")
         confirm.setText(
-            "This action will permanently delete the entire database.\n"
+            "Warning: This action will permanently delete all data!"
         )
         confirm.setIconPixmap(skull_icon)
         confirm.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         confirm.setDefaultButton(QMessageBox.StandardButton.No)
-        confirm.setDetailedText("This action is permanent. Please back up your database before continuing.")
+        confirm.setDetailedText("This action is permanent. Please back up your database before continuing.\n"+
+                                    "-Export: File -> Export Notes\n"+
+                                    "-Import: File -> Import Notes"
+                                )
         confirm.setEscapeButton(QMessageBox.StandardButton.No)  # ESC cancels
 
         response = confirm.exec()
