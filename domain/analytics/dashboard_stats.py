@@ -78,7 +78,7 @@ def calculate_stats(model):
                 p = count / total_categorized
                 category_entropy -= p * math.log(p)
 
-    # Normalize entropy to 0–1 range (optional but recommended)
+    # Normalize entropy to 0–1 range
     max_entropy = math.log(len(category_counts)) if len(category_counts) > 1 else 1
     category_entropy_norm = category_entropy / max_entropy
 

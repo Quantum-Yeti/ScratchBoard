@@ -416,12 +416,22 @@ class NoteModel:
         return cur.fetchone()["count"]
 
     def get_references_up_to(self, target_date):
+        """
+            Returns the count of references (links) created up to the target_date.
+            Ensures the date comparison is only on the date portion.
+            """
         cur = self.conn.cursor()
+        # Ensure that target_date is in 'YYYY-MM-DD' format for comparison
+        target_date_str = target_date.strftime('%Y-%m-%d')
+
+        # Use DATE() function to ensure comparison is done on date part only (ignoring time)
         cur.execute("""
-            SELECT COUNT(*) AS count
-            FROM reference_links
-            WHERE date(created) <= ?
-        """, (target_date.isoformat(),))
+                SELECT COUNT(*) AS count
+                FROM reference_links
+                WHERE DATE(created) <= ?
+            """, (target_date_str,))
+
+        # Fetch the count of references
         return cur.fetchone()["count"]
 
     def close(self):
