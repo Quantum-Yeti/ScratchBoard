@@ -1,6 +1,17 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All **_notable_** changes to this project will be documented in this file.
+
+## [2.2.0] – 2026-01-06
+
+### Features
+- **Batch Manager:** Added a batch manager screen to perform various functions such as terminating a process.
+
+### Enhancements
+- **Multi-Line Chart:** New statistics to display visually.
+- **Info Charts:** Info charts include more information and are more readable.
+
+**Full Changelog**: https://github.com/Quantum-Yeti/ScratchBoard/compare/v2.1.2...v2.2.0
 
 ## [2.1.1] – 2026-01-01
 
