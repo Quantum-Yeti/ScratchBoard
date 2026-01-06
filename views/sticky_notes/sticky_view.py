@@ -355,9 +355,10 @@ class ScratchNote(QDialog):
         return QPoint(x, y)
 
     # Misc
-    def get_display_title(self):
+    @staticmethod
+    def get_display_title():
         """Return display title."""
-        return "Scratch Note (Sticky Note)"
+        return "Sticky Note"
 
     def closeEvent(self, event):
         """Make sure note is autosaved on close."""
