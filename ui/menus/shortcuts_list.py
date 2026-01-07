@@ -118,6 +118,10 @@ shortcut_list = [
                 "action": "Run a *.bat file"
             },
             {
+                "shortcut": "Alt+M",
+                "action": "Open Batch Processing Manager"
+            },
+            {
                 "shortcut": "Alt+C",
                 "action": "Open Calculator"
 
