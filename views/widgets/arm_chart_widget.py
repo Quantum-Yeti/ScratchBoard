@@ -207,15 +207,16 @@ def create_multi_line_chart(model, days_back=14):
     # Stats to plot
     stat_keys = [
         #("daily_notes", "Daily Notes"),
-        ("daily_notes_growth", "Daily Notes Growth"),
-        #("daily_words", "Daily Words"),
+        #("notes_per_category", "Notes per Category"),
+        ("daily_notes_growth", "Note Growth/Day"),
+        ("daily_words", "Daily Words"),
         ("rolling_notes", "Avg Notes/Day"),
         ("rolling_words", "Avg Words/Day"),
-        #("total_ratio", "Note Ratio"),
-        ("cumulative_wave", "Words/Week"),
+        ("total_ratio", "Note Ratio"),
+        ("cumulative_wave", "Note Wave"),
         #("category_entropy_norm", "Balance"),
-        ("contacts", "Contacts"),
-        ("links", "Links")
+        #("contacts", "Contacts"),
+        #("links", "Links")
     ]
 
     # Precompute stats for each day from the model
