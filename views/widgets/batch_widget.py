@@ -1,241 +1,209 @@
+from PySide6.QtWidgets import (
+    QVBoxLayout, QHBoxLayout, QLabel,
+    QComboBox, QPushButton, QTextEdit, QMessageBox, QGridLayout, QFrame, QDialog
+)
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QPushButton, QTextEdit, QMessageBox, QWidget
-import subprocess
-import psutil
+from PySide6.QtCore import QThread, QSize
+
 from managers.batch_manager import BatchManager
-from ui.themes.scrollbar_style import vertical_scrollbar_style
+from helpers.ui_helpers.batch_worker import BatchWorker
 from utils.resource_path import resource_path
+from ui.themes.scrollbar_style import vertical_scrollbar_style
 
 
-class BatchWidget(QWidget):
+class BatchWidget(QDialog):
 
-    def __init__(self, model=None, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.model = model
 
-        # Vertical box layout
-        layout = QVBoxLayout(self)
+        self.setWindowTitle("Scratch Board: Batch Manager")
+        self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
 
-        # Process selector layout
-        proc_layout = QHBoxLayout()
-        proc_layout.addWidget(QLabel("Select Process:"))
+        self._threads = []
 
-        self.process_combo = QComboBox()
-        self.process_combo.setStyleSheet(vertical_scrollbar_style +
-                                         "QComboBox QAbstractItemView {background-color: #222;}"
-                                         )
-        proc_layout.addWidget(self.process_combo)
-
-        # Refresh task list
-        refresh_btn = QPushButton()
-        refresh_btn.setIcon(QIcon(resource_path("resources/icons/refresh_green.png")))
-        refresh_btn.setFixedWidth(30)
-        refresh_btn.clicked.connect(self.refresh_processes)
-        proc_layout.addWidget(refresh_btn)
-
-        layout.addLayout(proc_layout)
-
-        # Execute tasks buttons
-        self.kill_btn = QPushButton("Stop Process -> terminate a process from the list")
-        self.kill_btn.setIcon(QIcon(resource_path("resources/icons/stop.png")))
-        self.kill_btn.clicked.connect(self.on_kill_clicked)
-        layout.addWidget(self.kill_btn)
-
-        self.kill_restart_btn = QPushButton("Stop/Restart Process -> terminate a process from the list then restart it")
-        self.kill_restart_btn.setIcon(QIcon(resource_path("resources/icons/start.png")))
-        self.kill_restart_btn.clicked.connect(self.on_kill_restart_clicked)
-        layout.addWidget(self.kill_restart_btn)
-
-        self.kill_children_btn = QPushButton("Stop Child Processes -> terminate spawned child processes")
-        self.kill_children_btn.setIcon(QIcon(resource_path("resources/icons/stop_two.png")))
-        self.kill_children_btn.clicked.connect(self.on_kill_child_processes_clicked)
-        layout.addWidget(self.kill_children_btn)
-
-        self.suspend_btn = QPushButton("Suspend Process -> pause a process")
-        self.suspend_btn.setIcon(QIcon(resource_path("resources/icons/pause.png")))
-        self.suspend_btn.clicked.connect(self.on_suspend_clicked)
-        layout.addWidget(self.suspend_btn)
-
-        self.resume_btn = QPushButton("Resume Process -> resume a process")
-        self.resume_btn.setIcon(QIcon(resource_path("resources/icons/resume.png")))
-        self.resume_btn.clicked.connect(self.on_resume_clicked)
-        layout.addWidget(self.resume_btn)
-
-        self.open_folder_btn = QPushButton("Open Executable Folder -> open the folder path to the process")
-        self.open_folder_btn.setIcon(QIcon(resource_path("resources/icons/open_folder.png")))
-        self.open_folder_btn.clicked.connect(self.on_open_folder_clicked)
-        layout.addWidget(self.open_folder_btn)
-
-        # Output
-        self.output = QTextEdit()
-        self.output.setReadOnly(True)
-        layout.addWidget(self.output)
-
+        self._build_ui()
         self.refresh_processes()
 
-    # Helper methods
+    # Build UI
+    def _build_ui(self):
+        layout = QVBoxLayout(self)
+
+        top = QHBoxLayout()
+        top.addWidget(QLabel("Select Process:"))
+
+        self.process_combo = QComboBox()
+        self.process_combo.setStyleSheet(
+            vertical_scrollbar_style +
+            """
+            QComboBox {
+                border: 1px solid #1E90FF;          
+                padding: 2px 5px;            
+                background-color: #111;      
+                color: #fff;                 
+            }
+            QComboBox QAbstractItemView {
+                background-color: #111;
+                selection-background-color: #1E90FF;
+                color: #fff;
+            }
+            """
+        )
+        top.addWidget(self.process_combo)
+
+        refresh = QPushButton()
+        refresh.setIcon(QIcon(resource_path("resources/icons/refresh_green.png")))
+        refresh.setFixedWidth(30)
+        refresh.clicked.connect(self.refresh_processes)
+        top.addWidget(refresh)
+
+        layout.addLayout(top)
+
+        # Button grid 3x3
+        button_grid = QGridLayout()
+        button_grid.setSpacing(8)
+
+        buttons = [
+            ("Stop Process", "stop.png", self.kill),
+            ("Stop && Restart", "start.png", self.kill_restart),
+            ("Stop Children", "stop_two.png", self.kill_children),
+            ("Suspend Process", "pause.png", self.suspend),
+            ("Resume Process", "resume.png", self.resume),
+            ("Open Exe Folder", "open_folder.png", self.open_folder),
+        ]
+
+        for index, (text, icon, handler) in enumerate(buttons):
+            row = index // 3
+            col = index % 3
+            btn = QPushButton(text)
+            btn.setIcon(QIcon(resource_path(f"resources/icons/{icon}")))
+            btn.setIconSize(QSize(22, 22))
+            btn.setStyleSheet("text-align: center;")
+            btn.clicked.connect(handler)
+            button_grid.addWidget(btn, row, col)
+
+        layout.addLayout(button_grid)
+
+        # Separator
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator)
+
+        # Output box
+        self.output = QTextEdit(readOnly=True)
+        self.output.setStyleSheet("font-size: 12px;")
+        layout.addWidget(self.output)
+
+    @staticmethod
+    def _add_button(layout, text, icon, handler):
+        btn = QPushButton(text)
+        btn.setIcon(QIcon(resource_path(f"resources/icons/{icon}")))
+        btn.clicked.connect(handler)
+        layout.addWidget(btn)
+
+    # Thread helpers
+    def run_threaded(self, fn, *args) -> None:
+        thread = QThread()
+        worker = BatchWorker(fn, *args)
+
+        worker.moveToThread(thread)
+
+        thread.started.connect(worker.run)
+        worker.finished.connect(self.on_success)
+        worker.error.connect(self.on_error)
+
+        worker.finished.connect(thread.quit)
+        worker.error.connect(thread.quit)
+
+        worker.finished.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+
+        # important: keep references
+        self._threads.append((thread, worker))
+
+        # cleanup safely
+        def cleanup():
+            try:
+                self._threads.remove((thread, worker))
+            except ValueError:
+                pass
+
+        thread.finished.connect(cleanup)
+
+        thread.start()
+
+    # Thread slots
+    def on_success(self, msg):
+        self.output.setPlainText(msg)
+        self.refresh_processes()
+
+    def on_error(self, msg):
+        self.output.setPlainText(f"❌ {msg}")
+
+    # Logic
     def refresh_processes(self):
-        """List all running processes in the combo box."""
         self.process_combo.clear()
         for name, pid in BatchManager.list_processes():
             self.process_combo.addItem(f"{name} (PID {pid})", pid)
 
-    def on_kill_clicked(self):
-        """Kill the selected process."""
-        pid = self.process_combo.currentData()
-        label = self.process_combo.currentText()
+    def _selected_pid(self):
+        return self.process_combo.currentData()
 
-        if pid is None:
-            return
-
-        name = label.split(" (")[0]
-
-        if BatchManager.is_protected(name):
-            QMessageBox.critical(self, "Blocked", f"{name} is a protected system process.")
-            return
-
-        confirm = QMessageBox.question(self, "Confirm", f"Terminate process:\n\n{label} ?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        if confirm != QMessageBox.StandardButton.Yes:
-            return
-
-        try:
-            BatchManager.kill_pid(pid)
-            self.output.setPlainText(f"✔ Successfully terminated {label}")
-            self.refresh_processes()
-        except Exception as e:
-            self.output.setPlainText(str(e))
-
-    def on_kill_restart_clicked(self):
-        """Kill and restart the selected process using its executable path."""
-        pid = self.process_combo.currentData()
-        label = self.process_combo.currentText()
-
-        if pid is None:
-            return
-
-        name = label.split(" (")[0]
-
-        if BatchManager.is_protected(name):
-            QMessageBox.critical(
-                self,
-                "Blocked",
-                f"{name} is a protected system process and cannot be restarted."
-            )
-            return
-
-        confirm = QMessageBox.question(
-            self,
-            "Confirm",
-            f"Terminate and restart process:\n\n{label} ?",
+    def _confirm(self, text):
+        return QMessageBox.question(
+            self, "Confirm", text,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-        if confirm != QMessageBox.StandardButton.Yes:
-            return
+        ) == QMessageBox.StandardButton.Yes
 
-        try:
-            # Get process executable path
-            proc = psutil.Process(pid)
-            exe_path = proc.exe()  # full path to the exe
+    def _blocked(self, name):
+        QMessageBox.critical(self, "Blocked", f"{name} is protected.")
 
-            # Kill process
-            BatchManager.kill_pid(pid)
-
-            # Restart process
-            subprocess.Popen([exe_path])
-
-            self.output.setPlainText(f"✔ Successfully terminated and restarted {label}")
-            self.refresh_processes()
-
-        except psutil.NoSuchProcess:
-            self.output.setPlainText("Process no longer exists.")
-            self.refresh_processes()
-        except Exception as e:
-            self.output.setPlainText(f"Failed to restart: {e}")
-
-    def on_kill_child_processes_clicked(self):
-        """Terminate all child processes of the selected process."""
-        pid = self.process_combo.currentData()
-        label = self.process_combo.currentText()
-
-        if pid is None:
-            return
-
-        name = label.split(" (")[0]
-
+    # Action functions
+    def kill(self) -> None:
+        pid = self._selected_pid()
+        if not pid:
+            return None
+        name = self.process_combo.currentText().split(" (")[0]
         if BatchManager.is_protected(name):
-            QMessageBox.critical(
-                self,
-                "Blocked",
-                f"{name} is a protected system process; children cannot be terminated."
-            )
-            return
+            self._blocked(name)
+            return None
+        if self._confirm(f"Terminate {name}?"):
+            self.output.setPlainText("Working...")
+            self.run_threaded(BatchManager.kill_pid, pid)
 
-        confirm = QMessageBox.question(
-            self,
-            "Confirm",
-            f"Terminate all child processes of:\n\n{label} ?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-        )
-        if confirm != QMessageBox.StandardButton.Yes:
-            return
+        return None
 
-        try:
-            proc = psutil.Process(pid)
-            children = proc.children(recursive=True)
-
-            if not children:
-                self.output.setPlainText("No child processes found.")
-                return
-
-            for child in children:
-                child.terminate()  # Send terminate signal
-            gone, alive = psutil.wait_procs(children, timeout=3)
-
-            self.output.setPlainText(
-                f"✔ Terminated {len(gone)} child process(es) of {label}."
-            )
-            self.refresh_processes()
-
-        except psutil.NoSuchProcess:
-            self.output.setPlainText("Process no longer exists.")
-            self.refresh_processes()
-        except Exception as e:
-            self.output.setPlainText(f"Failed to terminate children: {e}")
-
-    def on_suspend_clicked(self):
-        """Suspend the selected process."""
-        pid = self.process_combo.currentData()
+    def kill_restart(self) -> None:
+        pid = self._selected_pid()
         if not pid:
-            return
-        try:
-            proc = psutil.Process(pid)
-            proc.suspend()
-            self.output.setPlainText(f"✔ Suspended {proc.name()} (PID {pid})")
-        except Exception as e:
-            self.output.setPlainText(f"Failed to suspend process: {e}")
+            return None
+        name = self.process_combo.currentText().split(" (")[0]
+        if BatchManager.is_protected(name):
+            self._blocked(name)
+            return None
+        if self._confirm(f"Restart {name}?"):
+            self.output.setPlainText("Working...")
+            self.run_threaded(BatchManager.kill_and_restart, pid)
 
-    def on_resume_clicked(self):
-        """Resume the selected process."""
-        pid = self.process_combo.currentData()
-        if not pid:
-            return
-        try:
-            proc = psutil.Process(pid)
-            proc.resume()
-            self.output.setPlainText(f"✔ Resumed {proc.name()} (PID {pid})")
-        except Exception as e:
-            self.output.setPlainText(f"Failed to resume process: {e}")
+        return None
 
-    def on_open_folder_clicked(self):
-        """Open the folder of the executable."""
-        pid = self.process_combo.currentData()
-        if not pid:
-            return
-        try:
-            proc = psutil.Process(pid)
-            exe_path = proc.exe()
-            folder_path = str(exe_path.rsplit("\\", 1)[0])
-            subprocess.Popen(f'explorer "{folder_path}"')
-            self.output.setPlainText(f"✔ Opened folder: {folder_path}")
-        except Exception as e:
-            self.output.setPlainText(f"Failed to open folder: {e}")
+    def kill_children(self):
+        pid = self._selected_pid()
+        if pid:
+            self.output.setPlainText("Working...")
+            self.run_threaded(BatchManager.kill_children, pid)
+
+    def suspend(self):
+        pid = self._selected_pid()
+        if pid:
+            self.run_threaded(BatchManager.suspend, pid)
+
+    def resume(self):
+        pid = self._selected_pid()
+        if pid:
+            self.run_threaded(BatchManager.resume, pid)
+
+    def open_folder(self):
+        pid = self._selected_pid()
+        if pid:
+            self.run_threaded(BatchManager.open_folder, pid)

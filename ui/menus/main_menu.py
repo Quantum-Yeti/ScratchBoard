@@ -516,7 +516,7 @@ class MainMenuBar(QMenuBar):
         run_update_batch_file(self)
 
     def open_batch_manager(self):
-        # Use self. to keep a reference
+        # Uses self. to keep a reference
         if not hasattr(self, '_batch_manager') or self._batch_manager is None:
             self._batch_manager = BatchPopup(self.parent())
         self._batch_manager.show()

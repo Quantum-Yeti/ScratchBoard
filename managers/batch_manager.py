@@ -1,21 +1,21 @@
 import subprocess
-
 import psutil
 
 PROTECTED_PROCESSES = {
-    "explorer.exe",    # Windows shell
-    "wininit.exe",     # Windows initialization
-    "winlogon.exe",    # Handles logins
-    "csrss.exe",       # Client/server runtime
-    "services.exe",    # Service Control Manager
-    "lsass.exe",       # Local Security Authority
-    "system",          # Kernel/system process
-    "smss.exe",        # Session manager
-    "dwm.exe",         # Desktop Window Manager
-    "taskhostw.exe",   # Task host
-    "svchost.exe",     # Host process for services
-    "spoolsv.exe"      # Print spooler (if you want to protect printing)
+    "explorer.exe",
+    "wininit.exe",
+    "winlogon.exe",
+    "csrss.exe",
+    "services.exe",
+    "lsass.exe",
+    "system",
+    "smss.exe",
+    "dwm.exe",
+    "taskhostw.exe",
+    "svchost.exe",
+    "spoolsv.exe"
 }
+
 
 class BatchManager:
 
@@ -24,10 +24,10 @@ class BatchManager:
         processes = []
         for proc in psutil.process_iter(["pid", "name"]):
             try:
-                name = proc.info["name"]
-                pid = proc.info["pid"]
-                if name:
-                    processes.append((name.lower(), pid))
+                if proc.info["name"]:
+                    processes.append(
+                        (proc.info["name"].lower(), proc.info["pid"])
+                    )
             except psutil.NoSuchProcess:
                 pass
         return sorted(processes)
@@ -44,3 +44,43 @@ class BatchManager:
             capture_output=True,
             text=True
         )
+        return f"✔ Terminated PID {pid}"
+
+    @staticmethod
+    def kill_and_restart(pid: int):
+        proc = psutil.Process(pid)
+        exe = proc.exe()
+        subprocess.run(["taskkill", "/PID", str(pid), "/F"], check=True)
+        subprocess.Popen([exe])
+        return f"✔ Restarted {exe}"
+
+    @staticmethod
+    def kill_children(pid: int):
+        proc = psutil.Process(pid)
+        children = proc.children(recursive=True)
+
+        if not children:
+            return "No child processes found."
+
+        for child in children:
+            child.terminate()
+
+        gone, alive = psutil.wait_procs(children, timeout=3)
+        return f"✔ Terminated {len(gone)} child process(es)"
+
+    @staticmethod
+    def suspend(pid: int):
+        psutil.Process(pid).suspend()
+        return f"✔ Suspended PID {pid}"
+
+    @staticmethod
+    def resume(pid: int):
+        psutil.Process(pid).resume()
+        return f"✔ Resumed PID {pid}"
+
+    @staticmethod
+    def open_folder(pid: int):
+        exe = psutil.Process(pid).exe()
+        folder = exe.rsplit("\\", 1)[0]
+        subprocess.Popen(f'explorer "{folder}"')
+        return f"✔ Opened {folder}"
