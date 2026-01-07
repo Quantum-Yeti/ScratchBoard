@@ -155,14 +155,14 @@ class EditorManager:
     @staticmethod
     def bullet_list(cursor: QTextCursor):
         block_fmt = QTextBlockFormat()
-        block_fmt.setIndent(1)
+        #block_fmt.setIndent(0)
         cursor.mergeBlockFormat(block_fmt)
         cursor.insertList(QTextListFormat.Style.ListDisc)
 
     @staticmethod
     def numbered_list(cursor: QTextCursor):
         block_fmt = QTextBlockFormat()
-        block_fmt.setIndent(1)
+        #block_fmt.setIndent(0)
         cursor.mergeBlockFormat(block_fmt)
         cursor.insertList(QTextListFormat.Style.ListDecimal)
 

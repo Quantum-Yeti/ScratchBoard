@@ -411,7 +411,7 @@ class MainMenuBar(QMenuBar):
         self.ideas_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Ideas"))
 
         # Wire the tools
-        self.scratch_action.triggered.connect(self.sidebar.open_scratch_pad)  # open the scratch notes
+        self.scratch_action.triggered.connect(self.sidebar.open_scratch_pad)  # open the sticky notes
         self.notepad_action.triggered.connect(self._open_notepad)
         self.bat_action.triggered.connect(self.sidebar.open_bat_file)  # run a batch file
         self.batch_man_action.triggered.connect(self.open_batch_manager)
