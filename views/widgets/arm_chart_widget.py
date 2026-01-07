@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, \
     QHBoxLayout, QSizePolicy, QMessageBox, QToolTip
 
 from helpers.ui_helpers.chart_pastel_list import PASTEL_CHART_COLORS
-from domain.analytics.dashboard_stats import calculate_stats
+from domain.analytics.calc_note_stats import calculate_stats
 from ui.menus.context_menu import ModifyContextMenu
 from ui.themes.dash_action_btn_style import dash_action_button_style
 from ui.themes.scrollbar_style import vertical_scrollbar_style

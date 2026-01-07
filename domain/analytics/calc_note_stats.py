@@ -128,7 +128,7 @@ def calculate_stats(model):
         rolling_words = 0
 
     # Ensure `rolling_notes` and `rolling_words` are not negative
-    rolling_notes = max(0, rolling_notes)
+    rolling_notes = max(0, int(rolling_notes))
     rolling_words = max(0, rolling_words)
 
     ### --- Derived ratios ---###
