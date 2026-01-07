@@ -304,7 +304,7 @@ class MainMenuBar(QMenuBar):
         tools_menu.addAction(self.bat_action)
 
         self.batch_man_action = QAction("Batch Manager", self)
-        self.batch_man_action.setIcon(QIcon(resource_path("resources/icons/execute_purple.png")))
+        self.batch_man_action.setIcon(QIcon(resource_path("resources/icons/automation.png")))
         self.batch_man_action.setShortcut("Alt+M")
         tools_menu.addAction(self.batch_man_action)
 

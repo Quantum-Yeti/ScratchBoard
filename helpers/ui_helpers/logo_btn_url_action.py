@@ -37,13 +37,30 @@ class LogoButton(QPushButton):
         if event.button() == Qt.MouseButton.LeftButton:
             if self.url:
                 QDesktopServices.openUrl(QUrl(self.url))
+
         elif event.button() == Qt.MouseButton.RightButton:
-            new_url, ok = QInputDialog.getText(
-                self, "Change Link", "Enter new URL:", text=self.url
-            )
-            if ok and new_url:
-                self.url = new_url
-                self.settings.setValue(self.settings_key, self.url)  # save persistently
-                self._update_tooltip()
+            # Create a non-static input dialog
+            dialog = QInputDialog(self)
+            dialog.setWindowTitle("Change Button Link")
+            dialog.setLabelText("Enter a new URL:")
+            dialog.setTextValue(self.url)
+
+            # Adjust size of the popup dialog
+            dialog.resize(300, 100)
+
+            # Position the dialog to the right of the button
+            pos = self.mapToGlobal(self.rect().topRight())
+            pos.setX(pos.x() + 20)
+            pos.setY(pos.y() - 100)
+            dialog.move(pos)
+
+            # Show dialog modally at this position
+            if dialog.exec():  # returns True if OK pressed
+                new_url = dialog.textValue()
+                if new_url:
+                    self.url = new_url
+                    self.settings.setValue(self.settings_key, self.url)
+                    self._update_tooltip()
+
         else:
             super().mousePressEvent(event)

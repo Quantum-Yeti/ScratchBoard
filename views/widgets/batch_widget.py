@@ -16,9 +16,6 @@ class BatchWidget(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setWindowTitle("Scratch Board: Batch Manager")
-        self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
-
         self._threads = []
 
         self._build_ui()
