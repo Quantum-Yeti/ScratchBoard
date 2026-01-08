@@ -7,6 +7,7 @@ from PySide6.QtCore import QThread, QSize
 
 from managers.batch_manager import BatchManager
 from helpers.ui_helpers.batch_worker import BatchWorker
+from utils.custom_context_menu import ContextMenuUtility
 from utils.resource_path import resource_path
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 
@@ -90,6 +91,9 @@ class BatchWidget(QDialog):
         self.output = QTextEdit(readOnly=True)
         self.output.setStyleSheet("font-size: 12px;")
         layout.addWidget(self.output)
+
+        # Override context menu
+        self.context_menu = ContextMenuUtility(self.output)
 
     @staticmethod
     def _add_button(layout, text, icon, handler):
