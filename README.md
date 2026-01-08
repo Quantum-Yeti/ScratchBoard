@@ -61,8 +61,15 @@ For detailed instructions and a comprehensive guide to using **Scratch Board**, 
 ### Password Generator
 ![PasswordGenerator](screenshots/passgen.png)
 
+## Installation (End-Users)
 
-## Installation
+- Go to ![Releases](https://github.com/quantum-yeti/scratchboard/releases)
+- Under assets download the latest 'ScratchBoard.exe' file
+- Drag it from your 'downloads' folder to your desktop
+- First run might prompt Windows nag screen therefore click more info -> run anyway
+- Enjoy!
+
+## Installation (Build from Source)
 
 Clone the repository:
 ```bash
