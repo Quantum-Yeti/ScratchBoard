@@ -11,6 +11,9 @@ All **_notable_** changes to this project will be documented in this file.
 - **Multi-Line Chart:** New statistics to display visually.
 - **Info Charts:** Info charts include more information and are more readable.
 
+### UI Fix
+- **Button Sizing:** Fixes button sizes for the custom links and mac query dashboard widgets.
+
 **Full Changelog**: https://github.com/Quantum-Yeti/ScratchBoard/compare/v2.1.2...v2.2.0
 
 ## [2.1.1] – 2026-01-01
