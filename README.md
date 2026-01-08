@@ -1,6 +1,6 @@
 # Scratch Board
 
-**Scratch Board** is a lightweight desktop productivity app that combines note-taking, scratch notes (sticky notes), a MAC vendor lookup, and much more. Designed for capturing quick notes and playful exploration, it keeps your ideas organized while adding a touch of fun.
+**Scratch Board** is a lightweight desktop productivity app that combines note-taking, sticky notes, a MAC vendor lookup, and MUCH more. Designed for capturing quick notes and playful exploration, it keeps your ideas organized while adding a touch of fun.
 
 ---
 
@@ -25,13 +25,14 @@
 ### Local Database Storage
 - Scratch Board uses a lightweight local SQLite database to securely store user-generated information such as scratch notes, contacts, categorized notes, and more.
 - Database files are created automatically and can be exported or imported.
-- The database file 'notes.db' is stored in the 'sb_data' folder within the program directory.
+- The database file 'notes.db' is stored in the 'sb_data' folder within a program directory created on startup if it does not yet exist. It is suggested to keep this folder next to 'ScratchBoard.exe' on your desktop.
 - Exported database files are automatically converted into a human-readable '.json' file, which allows for portability and use outside the program.
 
 ### Extras
 - **Rich Text Formatting:** All notes can be formatted using rich-text features via toolbar buttons.
-- **Image Embedding:** All notes can store images using MarkDown syntax or the button in the toolbar.
+- **Image Embedding:** All notes can store images using the button in the note editing toolbar.
 - **Keyboard Shortcuts:** All views and tools have keyboard shortcuts for quick, easy navigation.
+- **Easter-Egg:** Press 'Ctrl+Shift+A' to play a game if there is down-time.
 ---
 
 ## User Manual
