@@ -97,12 +97,12 @@ class Ship:
 
         if self.hit_cooldown > 0:
             self.hit_cooldown -= DT
-        if Qt.Key_Left in keys:
+        if Qt.Key.Key_Left in keys:
             self.angle -= ROT_SPEED * DT
-        if Qt.Key_Right in keys:
+        if Qt.Key.Key_Right in keys:
             self.angle += ROT_SPEED * DT
 
-        if Qt.Key_Up in keys:
+        if Qt.Key.Key_Up in keys:
             forward = QPointF(math.cos(self.angle), math.sin(self.angle))
             self.vel += forward * THRUST * DT
 
@@ -125,7 +125,7 @@ class AsteroidsWidget(QWidget):
         self.setWindowTitle("Scratch Board: Asteroids")
         self.setWindowIcon(QIcon(resource_path("resources/icons/astronaut.ico")))
         self.setFixedSize(WIDTH, HEIGHT)
-        self.setFocusPolicy(Qt.StrongFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
         self.ship = Ship(QPointF(WIDTH/2, HEIGHT/2), QPointF(), -math.pi/2)
         self.bullets: list[Bullet] = []
@@ -152,19 +152,19 @@ class AsteroidsWidget(QWidget):
         # Scale once for performance
         self.ship_image = self.ship_image.scaled(
             40, 40,
-            Qt.KeepAspectRatio,
-            Qt.SmoothTransformation
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
         )
 
     def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Space:
+        if e.key() == Qt.Key.Key_Space:
             if not self.game_running:
                 # Start the game if not running
                 self.start_game()
             else:
                 # Shoot bullet if game is running
                 self.bullets.append(self.ship.shoot())
-        elif e.key() == Qt.Key_Escape:
+        elif e.key() == Qt.Key.Key_Escape:
             # Pause/unpause toggle
             if self.game_running:
                 self.stop_game()
@@ -247,15 +247,15 @@ class AsteroidsWidget(QWidget):
             if vec_length(self.ship.pos - a.pos) < a.size:
                 if self.ship.hit_cooldown <= 0:
                     self.ship.vel = -self.ship.vel * 0.5
-                    self.score -= 10
+                    self.score -= 50
                     self.ship.hit_cooldown = 1.0  # 1 second invincibility
                 break
 
     # Paint the event
     def paintEvent(self, e):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
-        p.setRenderHint(QPainter.SmoothPixmapTransform)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
 
         if not self.game_running:
             p.setPen(Qt.white)
@@ -263,7 +263,7 @@ class AsteroidsWidget(QWidget):
             font.setPointSize(36)
             font.setBold(True)
             p.setFont(font)
-            text = "Press SPACE to Begin/Continue\nESC to Pause"
+            text = "Press SPACE to Begin/Restart\n\nPress ESC to stop"
             rect = self.rect()
             p.drawText(rect, Qt.AlignmentFlag.AlignCenter, text)
             return
