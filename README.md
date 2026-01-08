@@ -37,7 +37,7 @@
 
 ## User Manual
 
-For detailed instructions and a comprehensive guide to using **Scratch Board**, please refer to the [User Manual](docs/Scratch%20Board%20End-User%20Manual.pdf).
+For detailed instructions and a comprehensive guide to using **Scratch Board**, please refer to the [User Manual](docs/ScratchBoardEnd-UserManual.pdf).
 
 ---
 
