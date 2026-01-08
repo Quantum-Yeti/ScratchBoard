@@ -58,17 +58,19 @@ class MacVendorView(QWidget):
         mac_query_btn = QPushButton()
         mac_query_btn.setToolTip("Query")
         mac_query_btn.setIcon(QIcon(resource_path("resources/icons/db_search.png")))
-        mac_query_btn.setMaximumSize(75, 30)
-        mac_query_btn.setIconSize(QSize(20, 20))
+        mac_query_btn.setFixedSize(32, 32)
+        mac_query_btn.setIconSize(QSize(24, 24))
+        mac_query_btn.setStyleSheet("text-align: center;")
         mac_query_btn.clicked.connect(self.lookup_mac)
         input_layout.addWidget(mac_query_btn)
 
         # Clear button
         clear_btn = QPushButton()
         clear_btn.setToolTip("Clear")
-        clear_btn.setIcon(QIcon(resource_path("resources/icons/cancel_blue.png")))
-        clear_btn.setMaximumSize(75, 30)
+        clear_btn.setIcon(QIcon(resource_path("resources/icons/cancel_blue_two.png")))
+        clear_btn.setFixedSize(32, 32)
         clear_btn.setIconSize(QSize(24, 24))
+        clear_btn.setStyleSheet("text-align: center;")
         clear_btn.clicked.connect(self.clear_btn)
         input_layout.addWidget(clear_btn)
 

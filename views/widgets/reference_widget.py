@@ -55,7 +55,9 @@ class ReferenceWidget(QWidget):
         self.add_button = QPushButton()
         self.add_button.setToolTip("Add")
         self.add_button.setIcon(QIcon(resource_path("resources/icons/add_circle.png")))
-        self.add_button.setIconSize(QSize(18, 18))
+        self.add_button.setFixedSize(32, 32)
+        self.add_button.setIconSize(QSize(24, 24))
+        self.add_button.setStyleSheet("text-align: center;")
         self.add_button.clicked.connect(self.add_reference)
 
         input_layout.addWidget(self.title_input)
