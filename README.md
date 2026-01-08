@@ -54,6 +54,9 @@ For detailed instructions and a comprehensive guide to using **Scratch Board**, 
 ### Scratch Notes
 ![ScratchNotes](screenshots/scratchnotes.png)
 
+### Mac Vendor Query
+![MacQuery](screenshots/macquery.png)
+
 ### Password Generator
 ![PasswordGenerator](screenshots/passgen.png)
 
