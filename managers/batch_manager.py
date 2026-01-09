@@ -22,14 +22,23 @@ class BatchManager:
     @staticmethod
     def list_processes():
         processes = []
-        for proc in psutil.process_iter(["pid", "name"]):
+        for proc in psutil.process_iter(["pid", "name", "exe"]):
             try:
-                if proc.info["name"]:
-                    processes.append(
-                        (proc.info["name"].lower(), proc.info["pid"])
-                    )
+                name = proc.info["name"]
+                exe = proc.info["exe"]
+                if not name or not exe:
+                    continue # Skip processes with no name or no executable
+
+                if name.lower() in PROTECTED_PROCESSES:
+                    continue # skip critical os processes
+
+
+                processes.append(
+                    (proc.info["name"].lower(), proc.info["pid"])
+                )
+
             except psutil.NoSuchProcess:
-                pass
+                pass # skip processes that can not be accessed
         return sorted(processes)
 
     @staticmethod
