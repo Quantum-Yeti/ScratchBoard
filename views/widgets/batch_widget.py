@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QHBoxLayout, QLabel,
     QComboBox, QPushButton, QTextEdit, QMessageBox, QGridLayout, QFrame, QDialog
 )
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QFont
 from PySide6.QtCore import QThread, QSize
 
 from managers.batch_manager import BatchManager
@@ -35,9 +35,9 @@ class BatchWidget(QDialog):
             """
             QComboBox {
                 border: 1px solid #1E90FF;          
-                padding: 2px 5px;            
+                padding: 4px 8px;            
                 background-color: #111;      
-                color: #fff;                 
+                color: #fff;            
             }
             QComboBox QAbstractItemView {
                 background-color: #111;
@@ -46,11 +46,15 @@ class BatchWidget(QDialog):
             }
             """
         )
+        font = self.process_combo.font()
+        font.setPointSize(13)
+        self.process_combo.setFont(font)
         top.addWidget(self.process_combo)
 
         refresh = QPushButton()
         refresh.setIcon(QIcon(resource_path("resources/icons/refresh_green.png")))
-        refresh.setFixedWidth(30)
+        refresh.setStyleSheet("text-align: center;")
+        refresh.setFixedSize(30, 30)
         refresh.clicked.connect(self.refresh_processes)
         top.addWidget(refresh)
 
