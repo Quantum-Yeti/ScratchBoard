@@ -1,6 +1,32 @@
-# Changelog
+# Scratch Board Changelog
 
 All **_notable_** changes to this project will be documented in this file.
+
+## [2.1.1] – 2026-01-01
+
+### Fixed
+- **Keyboard Shortcuts:**  
+  - Removed duplicate keyboard shortcuts in `shortcuts_list.py` to avoid conflicts.
+
+### Improved
+- **UI/UX Refinements:**  
+  - Refined various UI components across the app, including in `charts_widget.py` and `mac_widget.py`, to enhance consistency and visual appeal.  
+  - Implemented tooltip style refinement for better user feedback.  
+  - Improved sticky note manager window size for better usability.
+
+### Refactored
+- **Context Menu Overhaul:**  
+  - Overridden and refined context menus in multiple modules, including `contacts_manager.py`, `sticky_view.py`, `notepad_view.py`, and more, to ensure consistent behavior and functionality across the app.  
+  - Improved context menu action patterns in `custom_context_menu.py`.
+
+- **Code Clean-Up:**  
+  - Cleaned up and encapsulated code in `contacts_view.py`, `contacts_manager.py`, `sticky_manager.py`, and `notepad_view.py` for better readability and maintainability.
+
+### Features
+- **Password Widget Quick Mode:**  
+  - Implemented a new "quick mode" for password generation in `password_widget.py`, allowing for faster creation of strong passwords (word+number).
+
+**Full Changelog**: https://github.com/Quantum-Yeti/ScratchBoard/compare/v2.1.0...v2.1.1
 
 ## [2.2.0] – 2026-01-06
 
