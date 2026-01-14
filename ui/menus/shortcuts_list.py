@@ -1,3 +1,5 @@
+# List of dictionaries for display in the keyboard shortcuts dialog.
+
 shortcut_list = [
     {
         "category": "File Menu",

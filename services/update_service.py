@@ -12,7 +12,7 @@ def get_current_version():
 
 
 def get_latest_release():
-    """Fetch the latest GitHub release tag."""
+    """Deprecated: Fetch the latest GitHub release tag."""
     url = "https://api.github.com/repos/Quantum-Yeti/ScratchBoard/releases/latest"
     try:
         res = requests.get(url, timeout=5)

@@ -3,6 +3,9 @@ import csv
 from utils.resource_path import resource_path
 
 class OUILookup:
+    """
+    Helper utility class that parses the included IEEE OUI csv file.
+    """
     def __init__(self, csv_path="resources/ieee_oui.csv"):
         self.csv_path = resource_path(csv_path)
         if not os.path.exists(self.csv_path):

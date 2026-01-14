@@ -15,7 +15,7 @@ def save_qimage(image) -> str | None:
     """Save an image from clipboard-drag data and return markdown path."""
     dst = ensure_image_dir()
 
-    # Using a timestamp avoids collisions
+    # Note to self - Using a timestamp avoids collisions
     fname = dst / f"dropped_{os.times()[4]}.png"
     pm = QPixmap.fromImage(image) if hasattr(image, "save") else image
     pm.save(str(fname), "PNG")
