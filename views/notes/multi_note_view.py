@@ -3,12 +3,13 @@ import random
 
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QWidget, QScrollArea, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QHBoxLayout, \
-    QPushButton, QSizePolicy
-from PySide6.QtCore import Qt, QSize, QThread, Signal
+    QPushButton, QSizePolicy, QCompleter
+from PySide6.QtCore import Qt, QSize, QThread, Signal, QStringListModel
 
 from helpers.ui_helpers.empty_messages import empty_messages
 from helpers.ui_helpers.floating_action import FloatingButton
 from helpers.ui_helpers.image_pop import ImagePopup
+from models.note_model import NoteModel
 from ui.themes.floating_action_style import floating_btn_style
 from ui.themes.scrollbar_style import vertical_scrollbar_style
 from utils.resource_path import resource_path
@@ -69,6 +70,7 @@ class MainNotesView(QWidget):
         super().__init__()
 
         # Track thread and state
+        self.note_model = NoteModel()
         self._thread = None
         self._last_click = None
         self._last_notes = None
@@ -82,9 +84,21 @@ class MainNotesView(QWidget):
         # Top control bar (Search + View Toggle)
         controls_layout = QHBoxLayout()
 
+        # Create a QStringListModel to feed to QCompleter
+        self.completer_model = QStringListModel()
+
+        # Create the completer
+        self.completer = QCompleter()
+        self.completer.setModel(self.completer_model)
+        self.completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search notes…")
+        self.search_input.setCompleter(self.completer)  # attach completer
         controls_layout.addWidget(self.search_input)
+
+        self.search_input.textChanged.connect(self.on_text_changed)
 
         # Toggle button for grid and list view
         self.toggle_view_btn = QPushButton()
@@ -298,4 +312,13 @@ class MainNotesView(QWidget):
         # Re-populate if notes loaded
         if hasattr(self, "_last_notes") and hasattr(self, "_last_click"):
             self.populate_notes(self._last_notes, self._last_click)
+
+    # Trie-based Suggestions
+    def on_text_changed(self, text):
+        suggestions = self.note_model.autocomplete(text)
+        self.completer_model.setStringList(suggestions)
+        if suggestions:
+            self.completer.complete(self.search_input.rect())
+
+
 

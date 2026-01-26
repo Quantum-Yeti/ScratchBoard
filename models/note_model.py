@@ -8,6 +8,7 @@ from datetime import datetime
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 
+from domain.autocomplete.note_index import NoteIndex
 from utils.image_io import save_file_drop
 
 PASTEL_COLORS = ["#FFEBEE", "#FFF3E0", "#E8F5E9", "#E3F2FD", "#F3E5F5"]
@@ -37,6 +38,10 @@ class NoteModel:
         # Enable dictionary access to rows
         self.conn.row_factory = sqlite3.Row
         self._setup_db()
+
+        # Initialize the Trie algo for autocomplete
+        self.index = NoteIndex()
+        self._build_autocomplete_index()
 
     def _setup_db(self):
         """
@@ -172,6 +177,13 @@ class NoteModel:
             VALUES (?, ?, ?, ?)
         """, (note_id, title, content, tags_json))
 
+        self.index.index_note(
+            note_id=note_id,
+            title=title,
+            content=content,
+            tags=tags
+        )
+
         self.conn.commit()
         return note_id
 
@@ -267,12 +279,23 @@ class NoteModel:
             WHERE id = ?
         """, (note_id,))
 
+        self.index.remove_note(note_id)
+
+        self.index.index_note(
+            note_id=note_id,
+            title=title or note["title"],
+            content=content or note["content"],
+            tags=tags or note["tags"]
+        )
+
         self.conn.commit()
         return True
 
     def delete_note(self, note_id):
         self.conn.execute("DELETE FROM notes_fts WHERE note_id=?", (note_id,))
         self.conn.execute("DELETE FROM notes WHERE id=?", (note_id,))
+
+        self.index.remove_note(note_id)
 
         self.conn.commit()
         return True
@@ -436,6 +459,50 @@ class NoteModel:
 
     def close(self):
         self.conn.close()
+
+    def _build_autocomplete_index(self):
+        """
+        Build Trie + inverted index from all existing notes.
+        """
+        cur = self.conn.cursor()
+        cur.execute("SELECT id, title, content, tags FROM notes")
+
+        for row in cur.fetchall():
+            tags = row["tags"]
+            if tags:
+                try:
+                    tags = json.loads(tags)
+                except json.JSONDecodeError:
+                    tags = [tags]
+
+            self.index.index_note(
+                note_id=row["id"],
+                title=row["title"],
+                content=row["content"],
+                tags=tags
+            )
+
+    def autocomplete(self, prefix: str, limit: int = 10) -> list[str]:
+        return self.index.autocomplete(prefix, limit)
+
+    def search_by_prefix(self, prefix: str):
+        """
+        Autocomplete → resolve to notes
+        """
+        results = []
+        seen = set()
+
+        for word in self.index.autocomplete(prefix):
+            for note_id in self.index.notes_for_word(word):
+                if note_id in seen:
+                    continue
+                seen.add(note_id)
+
+                note = self.get_note_by_id(note_id)
+                if note:
+                    results.append(note)
+
+        return results
 
     # Import / Export Database
     def export_to_zip(self, zip_path: str):
