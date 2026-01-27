@@ -6,6 +6,7 @@ from PySide6.QtGui import QAction, QCursor, QIcon, QPixmap, QShortcut, QKeySeque
 from PySide6.QtWidgets import QMenuBar, QToolTip, QApplication, QMessageBox, QFileDialog, QMenu
 
 from managers.batch_manager import BatchManager
+from services.nuke_service import NukeService
 from services.sync_service import sync_db
 from models.note_model import NoteModel
 from ui.themes.menu_theme import menu_style
@@ -557,6 +558,9 @@ class MainMenuBar(QMenuBar):
                 QMessageBox.critical(self, "Error", f"Import failed:\n{e}")
 
     def _delete_database(self):
+        """
+        Private method to nuke the database by instantiating the NukeService.
+        """
         if not self.note_model:
             QMessageBox.warning(self, "Error", "We're sorry - something went wrong.")
             return
@@ -584,27 +588,34 @@ class MainMenuBar(QMenuBar):
 
         if response == QMessageBox.StandardButton.Yes:
             try:
-                self.note_model.nuke_everything()
-                QMessageBox.information(self, "Scratch Board: Database Deleted", "All data has been deleted.")
+                final_nuke_info_msg = QMessageBox(self)
+                final_nuke_info_msg.setWindowTitle("Scratch Board: Database Deletion")
+                final_nuke_info_msg.setText("WARNING: You are about to nuke all data!\n\nThe app will close and you must restart it.")
+                final_nuke_info_msg.setIconPixmap(skull_icon)
+                final_nuke_info_msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+                final_nuke_info_msg.exec()
 
-                # Forces refresh
-                if self.dashboard:
+                NukeService.request_reset_and_restart(delay_ms=500)
+
+                # Refresh certain UI elements
+                if hasattr(self, 'dashboard') and self.dashboard:
                     self.dashboard.go_to_dashboard()
-                    self.dashboard.refresh_dashboard()  # refresh dashboard
-
-                # Directly refresh the ReferenceWidget without waiting for dashboard button click
-                if self.dashboard and hasattr(self.dashboard, 'reference_widget'):
-                    self.dashboard.reference_widget.refresh_references()  # Refresh reference widget immediately
-
-                # Trigger calendar update
-                if hasattr(self.dashboard, 'calendar_widget'):
-                    self.dashboard.calendar_widget.refresh_calendar()
+                    self.dashboard.refresh_dashboard()
+                    if hasattr(self.dashboard, 'reference_widget'):
+                        self.dashboard.reference_widget.refresh_references()
+                    if hasattr(self.dashboard, 'calendar_widget'):
+                        self.dashboard.calendar_widget.refresh_calendar()
 
             except Exception as e:
                 error_message = f"Failed to delete notes:\n{e}\n\nStack Trace:\n{traceback.format_exc()}"
                 QMessageBox.critical(self, "Error", error_message)
 
     def _sync_db(self):
+        """
+        Private method to sync database.
+        Important to note that if the One-Drive folder is not set to sync by admin, this feature will not work.
+        """
+
         # Dialog window to select zipped database export
         db_path, _ = QFileDialog.getOpenFileName(
             self, "Select Database (Export to ZIP first)", "", "Zipped Files (*.zip)"

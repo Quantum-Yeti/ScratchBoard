@@ -8,6 +8,8 @@ from PySide6.QtWidgets import (QApplication,
                                QWidget,
                                QStackedLayout,
                                QMessageBox)
+
+from services.nuke_service import NukeService
 from startup.startup_runner import run_startup
 from helpers.ui_helpers.update_window_title import update_window_title
 from ui.menus.main_menu import MainMenuBar
@@ -165,6 +167,9 @@ def main():
     Exits:
         - Terminates immediately if another instance of the program is already running.
     """
+
+    NukeService.handle_startup_reset()
+
     # Main Qt application instance handling event loop and GUI behavior
     app = QApplication(sys.argv)
 
