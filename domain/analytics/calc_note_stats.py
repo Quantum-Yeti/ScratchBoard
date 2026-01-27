@@ -1,6 +1,8 @@
 import math
 from datetime import datetime, timedelta
 
+from PySide6.QtGui import QTextDocument
+
 
 def calculate_stats(model):
     """
@@ -83,21 +85,34 @@ def calculate_stats(model):
     category_entropy_norm = category_entropy / max_entropy
 
     ### --- Word statistics ---###
-    word_counts = [
-        len(n["content"].split())
-        for n in notes_up_to_date
-        if n["content"]
-    ]
+    def clean_text(html: str) -> str:
+        """Convert HTML/RTF-like content to plain text for accurate word counts."""
+        if not html:
+            return ""
+        doc = QTextDocument()
+        doc.setHtml(html)  # Automatically strips HTML tags
+        return doc.toPlainText().strip()
+
+    ### --- Word statistics ---###
+    word_counts = []
+    daily_words = 0
+
+    for n in notes_up_to_date:
+        content = clean_text(n["content"])
+        if not content:
+            continue
+
+        words = len(content.split())
+        word_counts.append(words)
+
+        # Count words for today separately
+        created_date = datetime.fromisoformat(n["created"]).date()
+        if created_date == target_date:
+            daily_words += words
 
     avg_words = round(sum(word_counts) / len(word_counts), 1) if word_counts else 0
     longest_note = max(word_counts, default=0)
     shortest_note = min(word_counts, default=0)
-
-    daily_words = sum(
-        len(n["content"].split())
-        for n in notes_today
-        if n["content"]
-    )
 
     ### --- Daily edits ---###
     daily_edits = sum(

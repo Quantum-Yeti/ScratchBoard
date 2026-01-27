@@ -1,3 +1,4 @@
+import re
 from typing import Union
 
 from PySide6.QtGui import QTextDocument
@@ -21,10 +22,12 @@ def count_words(source: Union[str, QTextDocument]) -> tuple[int, int]:
     else:
         text = str(source)
 
-    if not text.strip():
+    text = text.strip()
+    if not text:
         return 0, 0
 
-    words = len(text.split())
+    # Regex-based word counting to avoid hidden characters
+    words = len(re.findall(r'\b\w+\b', text))
     chars = len(text)
 
     return words, chars
