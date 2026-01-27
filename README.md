@@ -29,7 +29,7 @@
 - Exported database files are automatically converted into a human-readable '.json' file, which allows for portability and use outside the program.
 
 ### Extras
-- **Search Suggestion Autocompletion:** Super fast search suggestions utilizing a Trie algorithm to index notes.
+- **Search Suggestion Autocompletion:** Super fast search suggestions utilizing a Trie data structure with DFS and indexer -> O(n).
 - **Rich Text Formatting:** All notes can be formatted using rich-text features via toolbar buttons.
 - **Image Embedding:** All notes can store images using the button in the note editing toolbar.
 - **Keyboard Shortcuts:** All views and tools have keyboard shortcuts for quick, easy navigation.
