@@ -2,6 +2,15 @@
 
 All **_notable_** changes to this project will be documented in this file.
 
+## [2.3.0] - 2026-01-27
+
+### Features
+- Implemented 'Trie' algorithm for autocomplete note search suggestions.
+- Added the 'NukeService' function to wipe and restart cleanly avoiding file-lock issues.
+
+### Fixed
+- Corrected note statistics on the dashboard
+
 ## [2.1.1] – 2026-01-01
 
 ### Fixed
