@@ -1,4 +1,4 @@
-# Scratch Board
+# ![Astronaut](resources/icons/astronaut_wave.png) Scratch Board
 
 **Scratch Board** is a lightweight desktop productivity app that combines note-taking, sticky notes, a MAC vendor lookup, and MUCH more. Designed for capturing quick notes and playful exploration, it keeps your ideas organized while adding a touch of fun.
 
