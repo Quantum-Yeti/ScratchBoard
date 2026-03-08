@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 from PySide6.QtGui import QIcon, QPixmap, Qt
@@ -40,10 +41,13 @@ def update_db_stats(model):
     num_tags = len(set(tags_list))
 
     # Database / image storage size
-    db_file = Path("sb_data/db/notes.db")
+    base_dir = Path(os.getenv("LOCALAPPDATA")) / "ScratchBoardData"
+
+    # Database / image storage size
+    db_file = base_dir / "db" / "notes.db"
     db_size = db_file.stat().st_size if db_file.exists() else 0
 
-    images_path = Path("sb_data/images")
+    images_path = base_dir / "images"
     num_images = len(list(images_path.glob("*.*"))) if images_path.exists() else 0
     images_size = sum(f.stat().st_size for f in images_path.glob("*.*")) if images_path.exists() else 0
 

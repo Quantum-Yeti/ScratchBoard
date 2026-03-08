@@ -1,3 +1,4 @@
+import os
 import webbrowser
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -138,8 +139,13 @@ def dashboard_left_panel(model):
 
     def save_arm_statement():
         try:
-            Path("sb_data/notepad").mkdir(exist_ok=True)
-            with open("sb_data/notepad/arm_statement.txt", "w", encoding="utf-8") as s:
+            base_dir = Path(os.getenv("LOCALAPPDATA")) / "ScratchBoardData"
+            notepad_dir = base_dir / "notepad"
+
+            notepad_dir.mkdir(parents=True, exist_ok=True)
+
+            file_path = notepad_dir / "arm_statement.txt"
+            with open(file_path, "w", encoding="utf-8") as s:
                 s.write(arm_text.toPlainText())
 
             # Success message
@@ -163,8 +169,12 @@ def dashboard_left_panel(model):
 
     # Load existing ARM statement
     try:
-        with open("sb_data/notepad/arm_statement.txt", "r", encoding="utf-8") as f:
+        base_dir = Path(os.getenv("LOCALAPPDATA")) / "ScratchBoardData"
+        arm_file = base_dir / "notepad" / "arm_statement.txt"
+
+        with open(arm_file, "r", encoding="utf-8") as f:
             arm_text.setPlainText(f.read())
+
     except FileNotFoundError:
         pass
 

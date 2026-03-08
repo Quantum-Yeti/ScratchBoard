@@ -1,3 +1,5 @@
+import os
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout
@@ -40,7 +42,10 @@ class ArmDialog(QDialog):
 
     def load_arm(self):
         try:
-            with open("sb_data/notepad/arm_statement.txt", "r", encoding="utf-8") as f:
+            base_dir = Path(os.getenv("LOCALAPPDATA")) / "ScratchBoardData"
+            file_path = base_dir / "notepad" / "arm_statement.txt"
+
+            with open(file_path, "r", encoding="utf-8") as f:
                 self.arm_text.setPlainText(f.read())
 
         except FileNotFoundError:

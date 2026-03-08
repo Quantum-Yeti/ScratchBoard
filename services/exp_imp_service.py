@@ -1,11 +1,17 @@
 # Import / Export Database
 import json
+import os
 import shutil
 import uuid
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from utils.image_io import save_file_drop
+
+local_appdata = os.getenv("LOCALAPPDATA") or Path.home() / "AppData" / "Local"
+BASE_DATA_DIR = Path(local_appdata) / "ScratchBoardData"
+
+BASE_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 class ImportExportService:
     def __init__(self, note_model):
@@ -24,7 +30,7 @@ class ImportExportService:
             Export all data (notes, contacts, references, categories) and images
             into a single ZIP file.
             """
-            temp_dir = Path("sb_temp_export")
+            temp_dir = BASE_DATA_DIR / "temp_export"
             temp_dir.mkdir(parents=True, exist_ok=True)
 
             # Copy images to a temp folder
@@ -55,7 +61,7 @@ class ImportExportService:
 
                 # If broken/relative path → try sb_data/images
                 if not src.is_file():
-                    candidate = Path("sb_data/images") / src.name
+                    candidate = BASE_DATA_DIR / "images" / src.name
                     if candidate.is_file():
                         src = candidate
                     else:
@@ -76,7 +82,7 @@ class ImportExportService:
                 export_data["notes"].append(note_dict)
 
             # Copy image folder
-            sb_images = Path("sb_data/images")
+            sb_images = BASE_DATA_DIR / "images"
             if sb_images.is_dir():
                 for file in sb_images.glob("*.*"):
                     # Avoid name collisions: only copy if filename not already used
@@ -85,7 +91,7 @@ class ImportExportService:
                         shutil.copy(file, dst)
 
             # Copy notepad folder
-            sb_notepad = Path("sb_data/notepad")
+            sb_notepad = BASE_DATA_DIR / "notepad"
             notepad_dst = temp_dir / "notepad"
             notepad_dst.mkdir(exist_ok=True)
 
@@ -128,14 +134,14 @@ class ImportExportService:
         Import notes, contacts, references, and images from a ZIP export.
         Images are copied to the local image folder.
         """
-        import_dir = Path("sb_temp_import")
+        import_dir = BASE_DATA_DIR / "temp_import"
         import_dir.mkdir(parents=True, exist_ok=True)
 
         with ZipFile(zip_path, "r") as zipf:
             zipf.extractall(import_dir)
 
         src_images = import_dir / "images"
-        dst_images = Path("sb_data/images")
+        dst_images = BASE_DATA_DIR / "images"
         dst_images.mkdir(parents=True, exist_ok=True)
 
         if src_images.exists():
@@ -146,7 +152,7 @@ class ImportExportService:
                     print("Failed copying image:", file, e)
 
         src_notepad = import_dir / "notepad"
-        dst_notepad = Path("sb_data/notepad")
+        dst_notepad = BASE_DATA_DIR / "notepad"
         dst_notepad.mkdir(parents=True, exist_ok=True)
 
         if src_notepad.exists():

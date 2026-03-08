@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -6,8 +7,9 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
 class NukeService:
-    RESET_FLAG = Path(".scratchboard_reset")
-    DATA_DIR = Path("sb_data")
+    BASE_DATA_DIR = Path(os.getenv("LOCALAPPDATA")) / "ScratchBoardData"
+    RESET_FLAG = BASE_DATA_DIR / ".scratchboard_reset"
+    DATA_DIR = BASE_DATA_DIR
 
     @classmethod
     def request_reset_and_restart(cls, delay_ms=500):

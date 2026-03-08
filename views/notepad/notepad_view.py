@@ -1,3 +1,4 @@
+import os
 import re
 from pathlib import Path
 
@@ -202,11 +203,15 @@ class NotepadDialog(QDialog):
                 self.text_edit.setPlainText(f.read())
 
     def save_file(self):
-        notepad_dir = Path("sb_data/notepad")
+        base_dir = Path(os.getenv("LOCALAPPDATA")) / "ScratchBoardData"
+        notepad_dir = base_dir / "notepad"
+
         notepad_dir.mkdir(parents=True, exist_ok=True)
 
         path, _ = QFileDialog.getSaveFileName(
-            self, "Save File", str(notepad_dir),
+            self,
+            "Save File",
+            str(notepad_dir),
             "Text Files (*.txt);;All Files (*)"
         )
 

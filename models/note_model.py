@@ -25,11 +25,14 @@ class NoteModel:
         Args:
             db_path (str):
                         Path to SQLite database file.
-                        Defaults to "sb_data/db/notes.db".
+                        Defaults to LOCALAPPDATA.
         """
         if db_path is None:
-            os.makedirs("sb_data/db", exist_ok=True)
-            db_path = os.path.join("sb_data/db", "notes.db")
+            base_dir = os.getenv("LOCALAPPDATA", os.path.expanduser("~"))
+            data_dir = os.path.join(base_dir, "ScratchBoardData", "db")
+
+            os.makedirs(data_dir, exist_ok=True)
+            db_path = os.path.join(data_dir, "notes.db")
 
         self.conn = sqlite3.connect(db_path)
 

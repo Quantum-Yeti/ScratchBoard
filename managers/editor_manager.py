@@ -12,8 +12,14 @@ from PySide6.QtWidgets import QFileDialog, QInputDialog, QColorDialog
 class EditorManager:
     """Logic class to manage editor panels which includes formatting, preview rendering, and I/O helpers."""
 
-    # Image path for storage
-    IMAGE_DIR = Path("sb_data/images")
+    # Path
+    BASE_DATA_DIR = Path(os.getenv("LOCALAPPDATA")) / "ScratchBoardData"
+
+    # Image storage folder
+    IMAGE_DIR = BASE_DATA_DIR / "images"
+
+    # Ensure directory exists
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
     # Override CSS/QSS for preview HTML
     PREVIEW_STYLE = """
