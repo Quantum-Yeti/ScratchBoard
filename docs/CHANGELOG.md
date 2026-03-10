@@ -2,6 +2,11 @@
 
 All **_notable_** changes to this project will be documented in this file.
 
+## [2.3.1] - 2026-03-10
+
+### Improvements
+- The database structure has been renamed and moved from 'sb_data' to 'ScratchBoardData' located at '%LOCALAPPDATA%/ScratchBoardData'. This makes the program compliant with Microsoft Store releases.
+
 ## [2.3.0] - 2026-01-27
 
 ### Features
