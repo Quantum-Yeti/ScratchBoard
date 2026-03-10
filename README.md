@@ -25,7 +25,7 @@
 ### Local Database Storage
 - Scratch Board uses a lightweight local SQLite database to securely store user-generated information such as scratch notes, contacts, categorized notes, and more.
 - Database files are created automatically and can be exported or imported.
-- The database file 'notes.db' is stored in the 'sb_data' folder within a program directory created on startup if it does not yet exist. It is suggested to keep this folder next to 'ScratchBoard.exe' on your desktop.
+- The database file is stored in the 'ScratchBoardData' folder directory created automatically on startup if it does not yet exist. The folder can be found at '%LOCALAPPDATA%/ScratchBoardData'.
 - Exported database files are automatically converted into a human-readable '.json' file, which allows for portability and use outside the program.
 
 ### Extras
@@ -38,7 +38,7 @@
 
 ## User Manual
 
-For detailed instructions and a comprehensive guide to using **Scratch Board**, please refer to the [User Manual](docs/ScratchBoardEnd-UserManual.pdf).
+For detailed instructions and a comprehensive guide to using **Scratch Board** and its core features, please refer to the [User Manual](docs/USERGUIDE.md).
 
 ---
 
