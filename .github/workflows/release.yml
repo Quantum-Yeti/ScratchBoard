@@ -106,7 +106,6 @@ jobs:
             --onefile \
             --windowed \
             --name "ScratchBoard" \
-            --icon "resources/icons/astronaut_main.icns" \
             --add-data "resources/icons:resources/icons" \
             --add-data "resources/ieee_oui.csv:resources" \
             --add-data "resources/wordlist.txt:resources" \
