@@ -31,7 +31,7 @@ shortcut_list = [
             },
             {
                 "shortcut": "F3",
-                "action": "CoPilot"
+                "action": "Nexus"
             },
             {
                 "shortcut": "F4",

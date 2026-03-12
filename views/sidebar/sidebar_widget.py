@@ -38,7 +38,7 @@ class Sidebar(QWidget):
     # Dictionary of categories with their icons
     CATEGORIES = {
         "Contacts": "resources/icons/contacts.png",
-        "CoPilot": "resources/icons/copilot.png",
+        "Nexus": "resources/icons/guru.png",
         "Internet": "resources/icons/internet.png",
         "Email": "resources/icons/email.png",
         "Phone": "resources/icons/landline.png",
@@ -52,7 +52,7 @@ class Sidebar(QWidget):
     # Dictionary of tooltips for each category
     CATEGORY_TOOLTIPS = {
         "Contacts": "View and manage your contacts",
-        "CoPilot": "View and manage notes from your knowledge domain",
+        "Nexus": "View and manage notes from your knowledge domain",
         "Internet": "View and manage your Internet notes",
         "Email": "View and manage your email notes",
         "Phone": "View and manage your phone notes",
@@ -94,7 +94,7 @@ class Sidebar(QWidget):
             layout.addWidget(btn)
 
             # Add visual separators between certain categories
-            if name == "CoPilot" or name == "Streaming":
+            if name == "Nexus" or name == "Streaming":
                 separator = QFrame()
                 separator.setFrameShape(QFrame.Shape.HLine)  # Horizontal line
                 separator.setFrameShadow(QFrame.Shadow.Plain)  # Gives subtle 3D effect

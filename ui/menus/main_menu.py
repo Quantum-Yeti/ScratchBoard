@@ -191,10 +191,10 @@ class MainMenuBar(QMenuBar):
         self.contact_action.setShortcut("F2")
         view_menu.addAction(self.contact_action)
 
-        self.copilot_action = QAction("CoPilot", self)
-        self.copilot_action.setIcon(QIcon(resource_path("resources/icons/owl.png")))
-        self.copilot_action.setShortcut("F3")
-        view_menu.addAction(self.copilot_action)
+        self.nexus_action = QAction("Nexus", self)
+        self.nexus_action.setIcon(QIcon(resource_path("resources/icons/owl.png")))
+        self.nexus_action.setShortcut("F3")
+        view_menu.addAction(self.nexus_action)
 
         self.internet_action = QAction("Internet", self)
         self.internet_action.setIcon(QIcon(resource_path("resources/icons/internet.png")))
@@ -402,7 +402,7 @@ class MainMenuBar(QMenuBar):
 
         # Wire the view categories
         self.contact_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Contacts"))
-        self.copilot_action.triggered.connect(lambda: self.sidebar.category_selected.emit("CoPilot"))
+        self.nexus_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Nexus"))
         self.internet_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Internet"))
         self.email_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Email"))
         self.phone_action.triggered.connect(lambda: self.sidebar.category_selected.emit("Phone"))
