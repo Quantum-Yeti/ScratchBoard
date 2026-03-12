@@ -3,6 +3,10 @@ name: Build & Release ScratchBoard
 on:
   release:
     types: [created]
+  workflow_dispatch:  # allows manual testing
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # fixes Node.js 20 deprecation warnings
 
 permissions:
   contents: write
@@ -18,11 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Get version from release tag
       - name: Get version from tag
         run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      # Cache Python dependencies
       - name: Cache pip
         uses: actions/cache@v4
         with:
@@ -35,6 +37,7 @@ jobs:
       - name: Build Windows EXE
         shell: powershell
         run: |
+          if (-Not (Test-Path "resources/icons/astronaut_main.ico")) { throw "ICO icon not found!" }
           pyinstaller `
             --noconfirm `
             --clean `
@@ -61,6 +64,7 @@ jobs:
       - name: Build Windows installer
         shell: powershell
         run: |
+          if (-Not (Test-Path "dist/ScratchBoard.exe")) { throw "EXE not found, build failed!" }
           echo [Setup] > installer.iss
           echo AppName=ScratchBoard >> installer.iss
           echo AppVersion=%VERSION% >> installer.iss
@@ -100,12 +104,16 @@ jobs:
 
       - name: Build macOS app
         run: |
+          if [ ! -f "resources/icons/astronaut_main.icns" ]; then
+            echo "ICNS icon missing!" && exit 1
+          fi
           pyinstaller \
             --noconfirm \
             --clean \
             --onefile \
             --windowed \
             --name "ScratchBoard" \
+            --icon "resources/icons/astronaut_main.icns" \
             --add-data "resources/icons:resources/icons" \
             --add-data "resources/ieee_oui.csv:resources" \
             --add-data "resources/wordlist.txt:resources" \
@@ -118,11 +126,14 @@ jobs:
             --hidden-import=PySide6.QtCharts \
             main.py
 
-      - name: Install DMG tool
+      - name: Install create-dmg
         run: brew install create-dmg
 
-      - name: Create DMG installer
+      - name: Build DMG
         run: |
+          if [ ! -d "dist/ScratchBoard.app" ]; then
+            echo "App bundle missing!" && exit 1
+          fi
           create-dmg \
             --volname "ScratchBoard $VERSION" \
             --window-size 500 300 \
@@ -155,6 +166,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Install AppImage tools
+        run: |
+          sudo apt update
+          sudo apt install -y wget fuse libfuse2
+
       - name: Build Linux binary
         run: |
           pyinstaller \
@@ -175,17 +191,15 @@ jobs:
             --hidden-import=PySide6.QtCharts \
             main.py
 
-      - name: Install AppImage tools
-        run: |
-          sudo apt update
-          sudo apt install -y appimagekit
-
       - name: Build AppImage
         run: |
+          if [ ! -f "dist/ScratchBoard" ]; then
+            echo "Linux binary missing!" && exit 1
+          fi
           mkdir -p AppDir/usr/bin
           cp dist/ScratchBoard AppDir/usr/bin/
 
-          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x appimagetool-x86_64.AppImage
 
           ./appimagetool-x86_64.AppImage AppDir ScratchBoard-$VERSION.AppImage
