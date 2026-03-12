@@ -1,0 +1,196 @@
+name: Build & Release ScratchBoard
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+
+# -----------------------------
+# WINDOWS BUILD
+# -----------------------------
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Get version from release tag
+      - name: Get version from tag
+        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      # Cache Python dependencies
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build Windows EXE
+        shell: powershell
+        run: |
+          pyinstaller `
+            --noconfirm `
+            --clean `
+            --onefile `
+            --windowed `
+            --name "ScratchBoard" `
+            --icon "resources/icons/astronaut_main.ico" `
+            --add-data "resources/icons;resources/icons" `
+            --add-data "resources/ieee_oui.csv;resources" `
+            --add-data "resources/wordlist.txt;resources" `
+            --add-data "ui/themes;ui/themes" `
+            --add-data "docs/version.txt;docs" `
+            --version-file "docs/meta.txt" `
+            --hidden-import=markdown2 `
+            --hidden-import=PySide6.QtCore `
+            --hidden-import=PySide6.QtGui `
+            --hidden-import=PySide6.QtWidgets `
+            --hidden-import=PySide6.QtCharts `
+            main.py
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Build Windows installer
+        shell: powershell
+        run: |
+          echo [Setup] > installer.iss
+          echo AppName=ScratchBoard >> installer.iss
+          echo AppVersion=%VERSION% >> installer.iss
+          echo DefaultDirName={pf}\ScratchBoard >> installer.iss
+          echo OutputBaseFilename=ScratchBoard-Setup >> installer.iss
+          echo [Files] >> installer.iss
+          echo Source: "dist\ScratchBoard.exe"; DestDir: "{app}" >> installer.iss
+          echo [Icons] >> installer.iss
+          echo Name: "{group}\ScratchBoard"; Filename: "{app}\ScratchBoard.exe" >> installer.iss
+
+          iscc installer.iss
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: Output/ScratchBoard-Setup.exe
+
+# -----------------------------
+# MAC BUILD
+# -----------------------------
+  mac:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from tag
+        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build macOS app
+        run: |
+          pyinstaller \
+            --noconfirm \
+            --clean \
+            --onefile \
+            --windowed \
+            --name "ScratchBoard" \
+            --icon "resources/icons/astronaut_main.icns" \
+            --add-data "resources/icons:resources/icons" \
+            --add-data "resources/ieee_oui.csv:resources" \
+            --add-data "resources/wordlist.txt:resources" \
+            --add-data "ui/themes:ui/themes" \
+            --add-data "docs/version.txt:docs" \
+            --hidden-import=markdown2 \
+            --hidden-import=PySide6.QtCore \
+            --hidden-import=PySide6.QtGui \
+            --hidden-import=PySide6.QtWidgets \
+            --hidden-import=PySide6.QtCharts \
+            main.py
+
+      - name: Install DMG tool
+        run: brew install create-dmg
+
+      - name: Create DMG installer
+        run: |
+          create-dmg \
+            --volname "ScratchBoard $VERSION" \
+            --window-size 500 300 \
+            --app-drop-link 380 150 \
+            ScratchBoard-$VERSION.dmg \
+            dist/ScratchBoard.app
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ScratchBoard-$VERSION.dmg
+
+# -----------------------------
+# LINUX BUILD
+# -----------------------------
+  linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from tag
+        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build Linux binary
+        run: |
+          pyinstaller \
+            --noconfirm \
+            --clean \
+            --onefile \
+            --windowed \
+            --name "ScratchBoard" \
+            --add-data "resources/icons:resources/icons" \
+            --add-data "resources/ieee_oui.csv:resources" \
+            --add-data "resources/wordlist.txt:resources" \
+            --add-data "ui/themes:ui/themes" \
+            --add-data "docs/version.txt:docs" \
+            --hidden-import=markdown2 \
+            --hidden-import=PySide6.QtCore \
+            --hidden-import=PySide6.QtGui \
+            --hidden-import=PySide6.QtWidgets \
+            --hidden-import=PySide6.QtCharts \
+            main.py
+
+      - name: Install AppImage tools
+        run: |
+          sudo apt update
+          sudo apt install -y appimagekit
+
+      - name: Build AppImage
+        run: |
+          mkdir -p AppDir/usr/bin
+          cp dist/ScratchBoard AppDir/usr/bin/
+
+          wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+
+          ./appimagetool-x86_64.AppImage AppDir ScratchBoard-$VERSION.AppImage
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ScratchBoard-$VERSION.AppImage
