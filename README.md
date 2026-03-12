@@ -42,7 +42,7 @@ For detailed instructions and a comprehensive guide to using **Scratch Board** a
 
 ---
 
-## Screenshots
+## Screenshots of Selected Features
 
 ### Dashboard
 ![Scratch Board Dashboard](screenshots/screenshotdash.png)
@@ -53,7 +53,7 @@ For detailed instructions and a comprehensive guide to using **Scratch Board** a
 ### Modem Log Parser
 ![LogParser](screenshots/logparser.png)
 
-### Scratch Notes
+### Sticky Notes
 ![ScratchNotes](screenshots/scratchnotes.png)
 
 ### Mac Vendor Query
