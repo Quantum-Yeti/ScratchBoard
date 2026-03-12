@@ -6,7 +6,7 @@ on:
   workflow_dispatch:  # allows manual testing
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # fixes Node.js 20 deprecation warnings
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # silences Node.js 20 deprecation warnings
 
 permissions:
   contents: write
@@ -16,194 +16,209 @@ jobs:
 # -----------------------------
 # WINDOWS BUILD
 # -----------------------------
-  windows:
-    runs-on: windows-latest
+windows:
+  runs-on: windows-latest
 
-    steps:
-      - uses: actions/checkout@v4
+  steps:
+    - uses: actions/checkout@v4
 
-      - name: Get version from tag
-        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+    - name: Get version from tag
+      run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    - name: Cache pip
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 
-      - name: Build Windows EXE
-        shell: powershell
-        run: |
-          if (-Not (Test-Path "resources/icons/astronaut_main.ico")) { throw "ICO icon not found!" }
-          pyinstaller `
-            --noconfirm `
-            --clean `
-            --onefile `
-            --windowed `
-            --name "ScratchBoard" `
-            --icon "resources/icons/astronaut_main.ico" `
-            --add-data "resources/icons;resources/icons" `
-            --add-data "resources/ieee_oui.csv;resources" `
-            --add-data "resources/wordlist.txt;resources" `
-            --add-data "ui/themes;ui/themes" `
-            --add-data "docs/version.txt;docs" `
-            --version-file "docs/meta.txt" `
-            --hidden-import=markdown2 `
-            --hidden-import=PySide6.QtCore `
-            --hidden-import=PySide6.QtGui `
-            --hidden-import=PySide6.QtWidgets `
-            --hidden-import=PySide6.QtCharts `
-            main.py
+    - name: Install dependencies
+      run: pip install -r requirements.txt
 
-      - name: Install Inno Setup
-        run: choco install innosetup -y
+    - name: Build Windows EXE
+      shell: powershell
+      run: |
+        if (-Not (Test-Path "resources/icons/astronaut_main.ico")) { throw "ICO icon not found!" }
+        pyinstaller `
+          --noconfirm `
+          --clean `
+          --onefile `
+          --windowed `
+          --name "ScratchBoard" `
+          --icon "resources/icons/astronaut_main.ico" `
+          --add-data "resources/icons;resources/icons" `
+          --add-data "resources/ieee_oui.csv;resources" `
+          --add-data "resources/wordlist.txt;resources" `
+          --add-data "ui/themes;ui/themes" `
+          --add-data "docs/version.txt;docs" `
+          --version-file "docs/meta.txt" `
+          --hidden-import=markdown2 `
+          --hidden-import=PySide6.QtCore `
+          --hidden-import=PySide6.QtGui `
+          --hidden-import=PySide6.QtWidgets `
+          --hidden-import=PySide6.QtCharts `
+          main.py
 
-      - name: Build Windows installer
-        shell: powershell
-        run: |
-          if (-Not (Test-Path "dist/ScratchBoard.exe")) { throw "EXE not found, build failed!" }
-          echo [Setup] > installer.iss
-          echo AppName=ScratchBoard >> installer.iss
-          echo AppVersion=%VERSION% >> installer.iss
-          echo DefaultDirName={pf}\ScratchBoard >> installer.iss
-          echo OutputBaseFilename=ScratchBoard-Setup >> installer.iss
-          echo [Files] >> installer.iss
-          echo Source: "dist\ScratchBoard.exe"; DestDir: "{app}" >> installer.iss
-          echo [Icons] >> installer.iss
-          echo Name: "{group}\ScratchBoard"; Filename: "{app}\ScratchBoard.exe" >> installer.iss
+    - name: Install Inno Setup
+      run: choco install innosetup -y
 
-          iscc installer.iss
+    - name: Build Windows installer
+      shell: powershell
+      run: |
+        if (-Not (Test-Path "dist/ScratchBoard.exe")) { throw "EXE not found, build failed!" }
+        echo [Setup] > installer.iss
+        echo AppName=ScratchBoard >> installer.iss
+        echo AppVersion=%VERSION% >> installer.iss
+        echo DefaultDirName={pf}\ScratchBoard >> installer.iss
+        echo OutputBaseFilename=ScratchBoard-Setup >> installer.iss
+        echo [Files] >> installer.iss
+        echo Source: "dist\ScratchBoard.exe"; DestDir: "{app}" >> installer.iss
+        echo [Icons] >> installer.iss
+        echo Name: "{group}\ScratchBoard"; Filename: "{app}\ScratchBoard.exe" >> installer.iss
 
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: Output/ScratchBoard-Setup.exe
+        iscc installer.iss
+
+    - uses: softprops/action-gh-release@v2
+      with:
+        files: Output/ScratchBoard-Setup.exe
 
 # -----------------------------
 # MAC BUILD
 # -----------------------------
-  mac:
-    runs-on: macos-latest
+mac:
+  runs-on: macos-latest
 
-    steps:
-      - uses: actions/checkout@v4
+  steps:
+    - uses: actions/checkout@v4
 
-      - name: Get version from tag
-        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+    - name: Get version from tag
+      run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    - name: Cache pip
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 
-      - name: Build macOS app
-        run: |
-          if [ ! -f "resources/icons/astronaut_main.icns" ]; then
-            echo "ICNS icon missing!" && exit 1
-          fi
-          pyinstaller \
-            --noconfirm \
-            --clean \
-            --onefile \
-            --windowed \
-            --name "ScratchBoard" \
-            --icon "resources/icons/astronaut_main.icns" \
-            --add-data "resources/icons:resources/icons" \
-            --add-data "resources/ieee_oui.csv:resources" \
-            --add-data "resources/wordlist.txt:resources" \
-            --add-data "ui/themes:ui/themes" \
-            --add-data "docs/version.txt:docs" \
-            --hidden-import=markdown2 \
-            --hidden-import=PySide6.QtCore \
-            --hidden-import=PySide6.QtGui \
-            --hidden-import=PySide6.QtWidgets \
-            --hidden-import=PySide6.QtCharts \
-            main.py
+    - name: Install dependencies
+      run: pip install -r requirements.txt
 
-      - name: Install create-dmg
-        run: brew install create-dmg
+    - name: Build macOS app
+      run: |
+        if [ ! -f "resources/icons/astronaut_main.icns" ]; then
+          echo "ICNS icon missing!" && exit 1
+        fi
+        pyinstaller \
+          --noconfirm \
+          --clean \
+          --onefile \
+          --windowed \
+          --name "ScratchBoard" \
+          --icon "resources/icons/astronaut_main.icns" \
+          --add-data "resources/icons:resources/icons" \
+          --add-data "resources/ieee_oui.csv:resources" \
+          --add-data "resources/wordlist.txt:resources" \
+          --add-data "ui/themes:ui/themes" \
+          --add-data "docs/version.txt:docs" \
+          --hidden-import=markdown2 \
+          --hidden-import=PySide6.QtCore \
+          --hidden-import=PySide6.QtGui \
+          --hidden-import=PySide6.QtWidgets \
+          --hidden-import=PySide6.QtCharts \
+          main.py
 
-      - name: Build DMG
-        run: |
-          if [ ! -d "dist/ScratchBoard.app" ]; then
-            echo "App bundle missing!" && exit 1
-          fi
-          create-dmg \
-            --volname "ScratchBoard $VERSION" \
-            --window-size 500 300 \
-            --app-drop-link 380 150 \
-            ScratchBoard-$VERSION.dmg \
-            dist/ScratchBoard.app
+    - name: Install create-dmg
+      run: brew install create-dmg
 
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: ScratchBoard-$VERSION.dmg
+    - name: Build DMG
+      run: |
+        if [ ! -d "dist/ScratchBoard.app" ]; then
+          echo "App bundle missing!" && exit 1
+        fi
+        create-dmg \
+          --volname "ScratchBoard $VERSION" \
+          --window-size 500 300 \
+          --app-drop-link 380 150 \
+          ScratchBoard-$VERSION.dmg \
+          dist/ScratchBoard.app
+
+    - uses: softprops/action-gh-release@v2
+      with:
+        files: ScratchBoard-$VERSION.dmg
 
 # -----------------------------
 # LINUX BUILD
 # -----------------------------
-  linux:
-    runs-on: ubuntu-latest
+linux:
+  runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+  steps:
+    - uses: actions/checkout@v4
 
-      - name: Get version from tag
-        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+    - name: Get version from tag
+      run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    - name: Cache pip
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 
-      - name: Install AppImage tools
-        run: |
-          sudo apt update
-          sudo apt install -y wget fuse libfuse2
+    - name: Install dependencies
+      run: pip install -r requirements.txt
 
-      - name: Build Linux binary
-        run: |
-          pyinstaller \
-            --noconfirm \
-            --clean \
-            --onefile \
-            --windowed \
-            --name "ScratchBoard" \
-            --add-data "resources/icons:resources/icons" \
-            --add-data "resources/ieee_oui.csv:resources" \
-            --add-data "resources/wordlist.txt:resources" \
-            --add-data "ui/themes:ui/themes" \
-            --add-data "docs/version.txt:docs" \
-            --hidden-import=markdown2 \
-            --hidden-import=PySide6.QtCore \
-            --hidden-import=PySide6.QtGui \
-            --hidden-import=PySide6.QtWidgets \
-            --hidden-import=PySide6.QtCharts \
-            main.py
+    - name: Install AppImage tools
+      run: |
+        sudo apt update
+        sudo apt install -y wget fuse libfuse2
 
-      - name: Build AppImage
-        run: |
-          if [ ! -f "dist/ScratchBoard" ]; then
-            echo "Linux binary missing!" && exit 1
-          fi
-          mkdir -p AppDir/usr/bin
-          cp dist/ScratchBoard AppDir/usr/bin/
+    - name: Build Linux binary
+      run: |
+        pyinstaller \
+          --noconfirm \
+          --clean \
+          --onefile \
+          --windowed \
+          --name "ScratchBoard" \
+          --add-data "resources/icons:resources/icons" \
+          --add-data "resources/ieee_oui.csv:resources" \
+          --add-data "resources/wordlist.txt:resources" \
+          --add-data "ui/themes:ui/themes" \
+          --add-data "docs/version.txt:docs" \
+          --hidden-import=markdown2 \
+          --hidden-import=PySide6.QtCore \
+          --hidden-import=PySide6.QtGui \
+          --hidden-import=PySide6.QtWidgets \
+          --hidden-import=PySide6.QtCharts \
+          main.py
 
-          wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
-          chmod +x appimagetool-x86_64.AppImage
+    - name: Build AppImage
+      run: |
+        if [ ! -f "dist/ScratchBoard" ]; then
+          echo "Linux binary missing!" && exit 1
+        fi
+        mkdir -p AppDir/usr/bin
+        cp dist/ScratchBoard AppDir/usr/bin/
 
-          ./appimagetool-x86_64.AppImage AppDir ScratchBoard-$VERSION.AppImage
+        wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+        chmod +x appimagetool-x86_64.AppImage
 
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: ScratchBoard-$VERSION.AppImage
+        ./appimagetool-x86_64.AppImage AppDir ScratchBoard-$VERSION.AppImage
+
+    - uses: softprops/action-gh-release@v2
+      with:
+        files: ScratchBoard-$VERSION.AppImage
