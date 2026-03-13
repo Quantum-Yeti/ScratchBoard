@@ -4,6 +4,11 @@
 
 ---
 
+### **Now available in the Microsoft Store for free!**
+💚 https://apps.microsoft.com/detail/9p546tthfkk5?hl=en-US&gl=US 💚
+
+---
+
 ## Features
 
 ### Main Tools
