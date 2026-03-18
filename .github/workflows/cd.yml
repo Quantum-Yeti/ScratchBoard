@@ -40,25 +40,22 @@ jobs:
 
       # Step 5: Build EXE with PyInstaller
       - name: Build EXE
+        shell: pwsh
         run: |
-          pyinstaller \
-            --noconfirm \
-            --clean \
-            --onefile \
-            --windowed \
-            --name "ScratchBoard-$VERSION" \
-            --icon "resources/icons/astronaut_main.ico" \
-            --add-data "resources/icons;resources/icons" \
-            --add-data "resources/ieee_oui.csv;resources" \
-            --add-data "resources/wordlist.txt;resources" \
-            --add-data "ui/themes;ui/themes" \
-            --add-data "docs/version.txt;docs" \
-            --version-file "docs/meta.txt" \
-            --hidden-import=markdown2 \
-            --hidden-import=PySide6.QtCore \
-            --hidden-import=PySide6.QtGui \
-            --hidden-import=PySide6.QtWidgets \
-            --hidden-import=PySide6.QtCharts \
+          pyinstaller --noconfirm --clean --onefile --windowed `
+            --name "ScratchBoard-$env:VERSION" `
+            --icon "resources/icons/astronaut_main.ico" `
+            --add-data "resources/icons;resources/icons" `
+            --add-data "resources/ieee_oui.csv;resources" `
+            --add-data "resources/wordlist.txt;resources" `
+            --add-data "ui/themes;ui/themes" `
+            --add-data "docs/version.txt;docs" `
+            --version-file "docs/meta.txt" `
+            --hidden-import=markdown2 `
+            --hidden-import=PySide6.QtCore `
+            --hidden-import=PySide6.QtGui `
+            --hidden-import=PySide6.QtWidgets `
+            --hidden-import=PySide6.QtCharts `
             main.py
 
       # Step 6: Upload artifact
