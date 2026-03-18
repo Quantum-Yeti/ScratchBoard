@@ -62,9 +62,12 @@ jobs:
             --hidden-import=PySide6.QtCharts `
             main.py
 
-      # Step 6: Upload artifact
+      # Step 6: Upload the EXE as a release artifact
       - name: Create GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: "v$VERSION"
-          artifacts: "dist/ScratchBoard-$VERSION.exe"
+          tag: "v${{ env.VERSION }}"
+          release_name: "ScratchBoard v${{ env.VERSION }}"
+          artifacts: "dist/ScratchBoard-${{ env.VERSION }}.exe"
+          draft: true       # Set true for draft
+          token: ${{ secrets.GH_TOKEN }} # Use a PAT with repo permissions
