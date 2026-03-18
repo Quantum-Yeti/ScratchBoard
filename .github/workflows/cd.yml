@@ -12,31 +12,33 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # Step 1 Checkout repo
+      # Step 1: Checkout repo
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2 Set up Python
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      # Step 3 Install dependencies
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pyinstaller PySide6 markdown2
 
-      # Step 4 Read version
+      # Step 4: Read version
       - name: Read version
         id: get_version
+        shell: pwsh
         run: |
-          VERSION=$(cat docs/version.txt)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          $VERSION = Get-Content docs/version.txt
+          Write-Host "Version read from file: $VERSION"
+          echo "VERSION=$VERSION" >> $env:GITHUB_ENV
 
-      # Step 5 Build EXE with PyInstaller
+      # Step 5: Build EXE with PyInstaller
       - name: Build EXE
         run: |
           pyinstaller \
@@ -59,7 +61,7 @@ jobs:
             --hidden-import=PySide6.QtCharts \
             main.py
 
-      # 6️⃣ Upload artifact
+      # Step 6: Upload artifact
       - name: Create GitHub release
         uses: ncipollo/release-action@v1
         with:
