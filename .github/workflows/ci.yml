@@ -9,7 +9,9 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest   # PySide6 works on Windows, can also use ubuntu-latest
+    runs-on: windows-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       # Step 1: Checkout code

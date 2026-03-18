@@ -1,0 +1,67 @@
+name: CD - Build ScratchBoard EXE
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "docs/version.txt"    # only trigger if version.txt changed
+  workflow_dispatch:         # manual trigger maybe later
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Step 1 Checkout repo
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2 Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Step 3 Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller PySide6 markdown2
+
+      # Step 4 Read version
+      - name: Read version
+        id: get_version
+        run: |
+          VERSION=$(cat docs/version.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      # Step 5 Build EXE with PyInstaller
+      - name: Build EXE
+        run: |
+          pyinstaller \
+            --noconfirm \
+            --clean \
+            --onefile \
+            --windowed \
+            --name "ScratchBoard-$VERSION" \
+            --icon "resources/icons/astronaut_main.ico" \
+            --add-data "resources/icons;resources/icons" \
+            --add-data "resources/ieee_oui.csv;resources" \
+            --add-data "resources/wordlist.txt;resources" \
+            --add-data "ui/themes;ui/themes" \
+            --add-data "docs/version.txt;docs" \
+            --version-file "docs/meta.txt" \
+            --hidden-import=markdown2 \
+            --hidden-import=PySide6.QtCore \
+            --hidden-import=PySide6.QtGui \
+            --hidden-import=PySide6.QtWidgets \
+            --hidden-import=PySide6.QtCharts \
+            main.py
+
+      # 6️⃣ Upload artifact
+      - name: Create GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "v$VERSION"
+          artifacts: "dist/ScratchBoard-$VERSION.exe"
