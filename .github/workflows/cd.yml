@@ -2,7 +2,7 @@ name: CD - Build ScratchBoard EXE
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - "docs/version.txt"    # only trigger if version.txt changed
   workflow_dispatch:         # manual trigger maybe later
