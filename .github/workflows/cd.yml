@@ -67,7 +67,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: "v${{ env.VERSION }}"
-          release_name: "ScratchBoard v${{ env.VERSION }}"
+          name: "ScratchBoard v${{ env.VERSION }}"   # release title
           artifacts: "dist/ScratchBoard-${{ env.VERSION }}.exe"
-          draft: true       # Set true for draft
-          token: ${{ secrets.GH_TOKEN }} # Use a PAT with repo permissions
+          draft: false
+          token: ${{ secrets.GITHUB_TOKEN }}          # built-in token
