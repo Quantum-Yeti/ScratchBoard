@@ -1,5 +1,9 @@
 name: CD - Build ScratchBoard EXE
 
+permissions:
+  contents: write
+  packages: write
+
 on:
   push:
     branches: [ master ]
